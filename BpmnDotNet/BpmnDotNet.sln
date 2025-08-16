@@ -10,7 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_SolutionItems", "_Solution
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{062CAF72-15CF-47C4-8C38-432967E4C218}"
 	ProjectSection(SolutionItems) = preProject
-		..\BpmnNanation.md = ..\BpmnNanation.md
+		..\Documents\BpmnNanation.md = ..\Documents\BpmnNanation.md
+		..\Documents\Developer.md = ..\Documents\Developer.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{FBDE75F2-CD4F-4ACB-9681-792E5DDADAAC}"
