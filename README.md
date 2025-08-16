@@ -1,4 +1,4 @@
-# Простой движек для Bpmn
+# Простой движок для Bpmn
 
 **BpmnDotNet** <br>
 При разработки данного продукта вдохновлялись продуктами Camunda [Camunda](https://github.com/camunda) <br>
