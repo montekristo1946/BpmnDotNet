@@ -2,7 +2,7 @@ using BpmnDotNet.Interfaces.Elements;
 
 namespace BpmnDotNet.Interfaces.Handlers;
 
-public interface IXmlBpmnLoader
+public interface ICheckBpmnProcessDto
 {
-    BpmnProcessDto LoadXml(string pathDiagram);
+    void Check(BpmnProcessDto bpmnProcess);
 }

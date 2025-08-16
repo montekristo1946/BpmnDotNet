@@ -46,8 +46,7 @@ public class PathFinder : IPathFinder
         {
             throw new InvalidDataException(nameof(currentNodes));
         }
-
-
+        
 
         var elementsNode = new List<IElement>();
 
@@ -89,7 +88,7 @@ public class PathFinder : IPathFinder
 
     private IElement[] ParallelGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
-        var outgoingNode = GetOutgoingPath(currentNode);
+        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
 
         var allFlow = outgoingNode.Outgoing.Select(flow =>
         {
@@ -110,15 +109,10 @@ public class PathFinder : IPathFinder
 
     public string GetConditionRouteWithExclusiveGateWay(IContextBpmnProcess context, IElement currentNode)
     {
-        var outgoingNode = GetOutgoingPath(currentNode);
-
-        // var conditionName = string.Empty;
+        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNode.Outgoing.Length == 1)
             return outgoingNode.Outgoing.First();
-
-        // GetConditionRouteWithExclusiveGateWay(context, currentNode.IdElement) 
-        // : outgoingNode.Outgoing.First();
 
         if (context is not IExclusiveGateWay exclusiveGateWay)
             throw new InvalidDataException($"[GetConditionRouteWithExclusiveGateWay] " +
@@ -137,11 +131,6 @@ public class PathFinder : IPathFinder
     private IElement[] ExclusiveGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc, IContextBpmnProcess context)
     {
         var conditionName = GetConditionRouteWithExclusiveGateWay(context, currentNode);
-        //      = GetOutgoingPath(currentNode);
-        //  
-        // var conditionName = outgoingNode.Outgoing.Length > 1 ? 
-        //      GetConditionRouteWithExclusiveGateWay(context, currentNode.IdElement) 
-        //      : outgoingNode.Outgoing.First();
 
         var elementFlow = elementsSrc.FirstOrDefault(p => p.IdElement == conditionName && p.ElementType == ElementType.SequenceFlow) ??
                           throw new InvalidOperationException($"Not element type Flow, name: {conditionName}");
@@ -150,21 +139,11 @@ public class PathFinder : IPathFinder
 
         return [elementNext];
     }
-
-    private IOutgoingPath GetOutgoingPath(IElement currentNode)
-    {
-        var outgoingPath = (IOutgoingPath)currentNode;
-
-        if (outgoingPath.Outgoing.Length == 0)
-            throw new InvalidDataException($"{currentNode.ElementType} does not contain Outgoing: {currentNode.IdElement}");
-
-        return outgoingPath;
-    }
-
+    
 
     private IElement[] OnPathGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
-        var outgoingNodes = GetOutgoingPath(currentNode);
+        var outgoingNodes = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNodes.Outgoing.Length != 1)
             throw new InvalidOperationException($"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
@@ -182,7 +161,7 @@ public class PathFinder : IPathFinder
 
     private IElement GetNextFromFlowElement(IElement[] elementsSrc, IElement elementFlow)
     {
-        var outgoingFlow = GetOutgoingPath(elementFlow);
+        var outgoingFlow = ElementOperator.GetOutgoingPath(elementFlow);
 
         if (outgoingFlow.Outgoing.Length != 1)
             throw new InvalidOperationException($"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");

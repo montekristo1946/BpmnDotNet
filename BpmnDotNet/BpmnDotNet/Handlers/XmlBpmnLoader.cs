@@ -2,12 +2,11 @@ using System.Xml;
 using BpmnDotNet.Elements.BpmnNatation;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
-using Microsoft.Extensions.Logging;
 
 
 namespace BpmnDotNet.Handlers;
 
-public class XmlBpmnLoader : IXmlBpmnLoader
+internal class XmlBpmnLoader : IXmlBpmnLoader
 {
     public BpmnProcessDto LoadXml(string pathDiagram)
     {
@@ -41,7 +40,7 @@ public class XmlBpmnLoader : IXmlBpmnLoader
 
         foreach (XmlNode xmlNode in processBlock.ChildNodes)
         {
-            IElement element = xmlNode.Name switch
+            var element = xmlNode.Name switch
             {
                 Constants.BpmnStartEventName => CreateStartEvent(xmlNode),
                 Constants.BpmnSequenceFlowName => CreateSequenceFlow(xmlNode),
@@ -52,7 +51,7 @@ public class XmlBpmnLoader : IXmlBpmnLoader
                 Constants.BpmnReceiveTaskName => CreateReceiveTask(xmlNode),
                 Constants.BpmnServiceTaskName => CreateServiceTask(xmlNode),
                 Constants.BpmnSubProcess => CreateSubProcess(xmlNode),
-                _ => throw new ArgumentOutOfRangeException(xmlNode.Name)
+                _ => throw new ArgumentOutOfRangeException($"{idProcess} { xmlNode.Name}")
             };
             elements.Add(element);
         }
@@ -66,8 +65,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private IElement CreateSubProcess(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new SubProcessComponent(id, incoming, outgoing);
     }
@@ -75,8 +74,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private ServiceTaskComponent CreateServiceTask(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new ServiceTaskComponent(id, incoming, outgoing);
     }
@@ -84,8 +83,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private ReceiveTaskComponent CreateReceiveTask(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new ReceiveTaskComponent(id, incoming, outgoing);
     }
@@ -93,8 +92,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private SendTaskComponent CreateSendTaskName(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new SendTaskComponent(id, incoming, outgoing);
     }
@@ -102,8 +101,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private ParallelGatewayComponent CreateParallelGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new ParallelGatewayComponent(id, incoming, outgoing);
     }
@@ -111,8 +110,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private ExclusiveGatewayComponent CreateExclusiveGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
-        var incoming = GetIncoming(elements);
+        var outgoing = GetOutGoing(elements,id);
+        var incoming = GetIncoming(elements,id);
 
         return new ExclusiveGatewayComponent(id, incoming, outgoing);
     }
@@ -122,10 +121,10 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     {
         var id = GetId(elements);
         var incoming = elements.Attributes?[Constants.BpmnSourceRef]?.Value
-                       ?? throw new InvalidOperationException($"Not Find targetRef from:{elements.Name}");
+                       ?? throw new InvalidDataException($"{id} Not Find targetRef from:{elements.Name}");
 
         var outGoing = elements.Attributes?[Constants.BpmnTargetRef]?.Value
-                       ?? throw new InvalidOperationException($"Not Find sourceRef from:{elements.Name}");
+                       ?? throw new InvalidDataException($"{id} Not Find sourceRef from:{elements.Name}");
 
         var sequenceFlow = new SequenceFlowComponent(id, [incoming], [outGoing]);
         return sequenceFlow;
@@ -134,7 +133,7 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private StartEventComponent CreateStartEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements);
+        var outgoing = GetOutGoing(elements,id);
         var startEvent = new StartEventComponent(id, outgoing);
 
         return startEvent;
@@ -143,13 +142,13 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     private EndEventComponent CreateEndEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var incoming = GetIncoming(elements);
+        var incoming = GetIncoming(elements,id);
         var endEvent = new EndEventComponent(id, incoming);
 
         return endEvent;
     }
 
-    private string[] GetIncoming(XmlNode elements)
+    private string[] GetIncoming(XmlNode elements, string idNode)
     {
         var outgoing = elements.ChildNodes.Cast<XmlNode>()
             .Where(p => p.Name == Constants.BpmnIncomingName)
@@ -157,12 +156,12 @@ public class XmlBpmnLoader : IXmlBpmnLoader
             .ToArray();
 
         if (outgoing.Any() is false)
-            throw new InvalidOperationException($"Not Find Incoming from:{elements.Name}");
+            throw new InvalidDataException($"{idNode} Not Find Incoming from:{elements.Name}");
 
         return outgoing;
     }
 
-    private string[] GetOutGoing(XmlNode elements)
+    private string[] GetOutGoing(XmlNode elements, string idNode)
     {
         var outgoing = elements.ChildNodes.Cast<XmlNode>()
             .Where(p => p.Name == Constants.BpmnOutGoingName)
@@ -170,7 +169,7 @@ public class XmlBpmnLoader : IXmlBpmnLoader
             .ToArray();
 
         if (outgoing.Any() is false)
-            throw new InvalidOperationException($"Not Find outgoing from:{elements.Name}");
+            throw new InvalidDataException($"{idNode} Not Find outgoing from:{elements.Name}");
 
         return outgoing;
     }
@@ -179,6 +178,8 @@ public class XmlBpmnLoader : IXmlBpmnLoader
     {
         var id = elements.Attributes?[Constants.BpmnIdName]?.Value
                  ?? throw new InvalidOperationException($"Not Find ID from:{elements.Name}");
+        if (string.IsNullOrWhiteSpace(id))
+            throw new InvalidDataException($"Not Find ID from:{elements.Name}");
 
         return id;
     }
