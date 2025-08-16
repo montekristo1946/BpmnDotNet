@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0inwert" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:process id="IdBpmnProcessing_2" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_in_GatewayThirdHandler</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:parallelGateway id="GatewayThirdHandler" name="GatewayThirdHandler">
+      <bpmn:incoming>Flow_in_GatewayThirdHandler</bpmn:incoming>
+      <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ku36b2</bpmn:outgoing>
+      <bpmn:outgoing>Flow_in_ServiceTaskSecondHandler</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_in_GatewayThirdHandler" sourceRef="StartEvent_1" targetRef="GatewayThirdHandler" />
+    <bpmn:sendTask id="SendTaskFirstHandler" name="SendTaskFirstHandler">
+      <bpmn:incoming>Flow_in_SendTaskFirstHandler</bpmn:incoming>
+      <bpmn:outgoing>Flow_out_SendTaskFirstHandler</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
+      <bpmn:incoming>Flow_1ku36b2</bpmn:incoming>
+      <bpmn:outgoing>Flow_in_ServiceTaskThirdHandler</bpmn:outgoing>
+      <bpmn:outgoing>Flow_in_SubProcessFirstHandler</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_in_SendTaskFirstHandler" sourceRef="GatewayThirdHandler" targetRef="SendTaskFirstHandler" />
+    <bpmn:sequenceFlow id="Flow_1ku36b2" sourceRef="GatewayThirdHandler" targetRef="GatewayFirstHandler" />
+    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="ServiceTaskSecondHandler">
+      <bpmn:incoming>Flow_in_ServiceTaskSecondHandler</bpmn:incoming>
+      <bpmn:outgoing>Flow_out_ServiceTaskSecondHandler</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_in_ServiceTaskSecondHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskSecondHandler" />
+    <bpmn:serviceTask id="ServiceTaskThirdHandler" name="ServiceTaskThirdHandler">
+      <bpmn:incoming>Flow_in_ServiceTaskThirdHandler</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o1edtn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="SubProcessFirstHandler" name="SubProcessFirst">
+      <bpmn:incoming>Flow_in_SubProcessFirstHandler</bpmn:incoming>
+      <bpmn:outgoing>Flow_084divz</bpmn:outgoing>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_in_ServiceTaskThirdHandler" sourceRef="GatewayFirstHandler" targetRef="ServiceTaskThirdHandler" />
+    <bpmn:sequenceFlow id="Flow_in_SubProcessFirstHandler" sourceRef="GatewayFirstHandler" targetRef="SubProcessFirstHandler" />
+    <bpmn:sequenceFlow id="Flow_out_ServiceTaskSecondHandler" sourceRef="ServiceTaskSecondHandler" targetRef="Gateway_Second" />
+    <bpmn:sequenceFlow id="Flow_out_SendTaskFirstHandler" sourceRef="SendTaskFirstHandler" targetRef="Gateway_Second" />
+    <bpmn:endEvent id="Event_End">
+      <bpmn:incoming>Flow_out_Gateway_Second</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_out_Gateway_Second" sourceRef="Gateway_Second" targetRef="Event_End" />
+    <bpmn:parallelGateway id="Gateway_Second">
+      <bpmn:incoming>Flow_out_ServiceTaskSecondHandler</bpmn:incoming>
+      <bpmn:incoming>Flow_out_SendTaskFirstHandler</bpmn:incoming>
+      <bpmn:incoming>Flow_0m5fdwo</bpmn:incoming>
+      <bpmn:outgoing>Flow_out_Gateway_Second</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="GatewaySecondExlusive">
+      <bpmn:incoming>Flow_1o1edtn</bpmn:incoming>
+      <bpmn:incoming>Flow_084divz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0m5fdwo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1o1edtn" sourceRef="ServiceTaskThirdHandler" targetRef="GatewaySecondExlusive" />
+    <bpmn:sequenceFlow id="Flow_084divz" sourceRef="SubProcessFirstHandler" targetRef="GatewaySecondExlusive" />
+    <bpmn:sequenceFlow id="Flow_0m5fdwo" sourceRef="GatewaySecondExlusive" targetRef="Gateway_Second" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessing_2">
+      <bpmndi:BPMNShape id="Gateway_0k7arcx_di" bpmnElement="GatewayThirdHandler">
+        <dc:Bounds x="275" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="202" y="206.5" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="132" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gke426_di" bpmnElement="ServiceTaskThirdHandler">
+        <dc:Bounds x="640" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
+        <dc:Bounds x="515" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="509" y="206" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1004tiz_di" bpmnElement="ServiceTaskSecondHandler">
+        <dc:Bounds x="400" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01c0426_di" bpmnElement="SendTaskFirstHandler">
+        <dc:Bounds x="400" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1urnnj5_di" bpmnElement="Event_End">
+        <dc:Bounds x="1162" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1doh30z_di" bpmnElement="GatewaySecondExlusive" isMarkerVisible="true">
+        <dc:Bounds x="785" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1b04v3w_di" bpmnElement="Gateway_Second">
+        <dc:Bounds x="925" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k2itzl_di" bpmnElement="SubProcessFirstHandler" isExpanded="false">
+        <dc:Bounds x="640" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1wnyavv_di" bpmnElement="Flow_in_GatewayThirdHandler">
+        <di:waypoint x="168" y="270" />
+        <di:waypoint x="275" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10seiic_di" bpmnElement="Flow_in_SendTaskFirstHandler">
+        <di:waypoint x="300" y="245" />
+        <di:waypoint x="300" y="120" />
+        <di:waypoint x="400" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ku36b2_di" bpmnElement="Flow_1ku36b2">
+        <di:waypoint x="325" y="270" />
+        <di:waypoint x="515" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ddvn1k_di" bpmnElement="Flow_in_ServiceTaskSecondHandler">
+        <di:waypoint x="300" y="295" />
+        <di:waypoint x="300" y="430" />
+        <di:waypoint x="400" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xolr6d_di" bpmnElement="Flow_in_ServiceTaskThirdHandler">
+        <di:waypoint x="540" y="245" />
+        <di:waypoint x="540" y="200" />
+        <di:waypoint x="640" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cxmwyu_di" bpmnElement="Flow_in_SubProcessFirstHandler">
+        <di:waypoint x="540" y="295" />
+        <di:waypoint x="540" y="340" />
+        <di:waypoint x="640" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_010hw3v_di" bpmnElement="Flow_out_ServiceTaskSecondHandler">
+        <di:waypoint x="500" y="430" />
+        <di:waypoint x="950" y="430" />
+        <di:waypoint x="950" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07vm255_di" bpmnElement="Flow_out_SendTaskFirstHandler">
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="950" y="120" />
+        <di:waypoint x="950" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ls78ka_di" bpmnElement="Flow_out_Gateway_Second">
+        <di:waypoint x="975" y="270" />
+        <di:waypoint x="1162" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o1edtn_di" bpmnElement="Flow_1o1edtn">
+        <di:waypoint x="740" y="200" />
+        <di:waypoint x="810" y="200" />
+        <di:waypoint x="810" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_084divz_di" bpmnElement="Flow_084divz">
+        <di:waypoint x="740" y="340" />
+        <di:waypoint x="810" y="340" />
+        <di:waypoint x="810" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0m5fdwo_di" bpmnElement="Flow_0m5fdwo">
+        <di:waypoint x="835" y="270" />
+        <di:waypoint x="925" y="270" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_0n6mkfq">
+    <bpmndi:BPMNPlane id="BPMNPlane_0kzzxe2" bpmnElement="SubProcessFirstHandler" />
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
