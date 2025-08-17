@@ -44,12 +44,14 @@
     </bpmn:parallelGateway>
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskSecondHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskSecondHandler" />
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskSecondHandler" sourceRef="ServiceTaskSecondHandler" targetRef="GatewayFourthHandler" />
+  
     <bpmn:parallelGateway id="GatewayFourthHandler" name="GatewayFourthHandler">
       <bpmn:incoming>Flow_out_ServiceTaskSecondHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_ServiceTaskThirdHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_SubProcessFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_GatewayFourthHandler</bpmn:outgoing>
     </bpmn:parallelGateway>
+    
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskThirdHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskThirdHandler" />
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskThirdHandler" sourceRef="ServiceTaskThirdHandler" targetRef="GatewayFourthHandler" />
     <bpmn:sequenceFlow id="Flow_out_GatewayFourthHandler" sourceRef="GatewayFourthHandler" targetRef="End_event" />
@@ -74,14 +76,18 @@
     <bpmn:sequenceFlow id="Flow_in_SubProcessFirstHandler" sourceRef="ServiceTaskFourthHandler" targetRef="SubProcessFirstHandler" />
     <bpmn:sequenceFlow id="Flow_out_SubProcessFirstHandler" sourceRef="SubProcessFirstHandler" targetRef="GatewayFourthHandler" />
   </bpmn:process>
+  
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessingMain">
+      
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="173" y="73" width="55" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
         <dc:Bounds x="475" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -124,26 +130,31 @@
         <dc:Bounds x="990" y="300" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Event_1tak4tf_di" bpmnElement="End_event">
         <dc:Bounds x="1462" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1466" y="56" width="27" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">
         <dc:Bounds x="1375" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1355" y="56" width="90" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Activity_1k2itzl_di" bpmnElement="SubProcessFirstHandler" isExpanded="false">
         <dc:Bounds x="1150" y="300" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNEdge id="Flow_1y5xzzh_di" bpmnElement="Flow_to_BlockFirstHandler">
         <di:waypoint x="218" y="120" />
         <di:waypoint x="290" y="120" />
       </bpmndi:BPMNEdge>
+      
       <bpmndi:BPMNEdge id="Flow_0bcpggf_di" bpmnElement="Flow_in_ReceiveTaskFirstHandle">
         <di:waypoint x="500" y="145" />
         <di:waypoint x="500" y="310" />

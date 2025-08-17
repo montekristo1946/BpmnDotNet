@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 		..\Documents\BpmnNanation.md = ..\Documents\BpmnNanation.md
 		..\Documents\Developer.md = ..\Documents\Developer.md
 		..\README.md = ..\README.md
+		..\Documents\UiMonitoring.md = ..\Documents\UiMonitoring.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{FBDE75F2-CD4F-4ACB-9681-792E5DDADAAC}"

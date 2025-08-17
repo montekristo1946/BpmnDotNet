@@ -15,6 +15,7 @@
     </bpmn:serviceTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessingSub">
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="102" width="36" height="36" />
@@ -26,6 +27,7 @@
         <dc:Bounds x="260" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNEdge id="Flow_1y2qpel_di" bpmnElement="Flow_1y2qpel">
         <di:waypoint x="218" y="120" />
         <di:waypoint x="260" y="120" />
@@ -36,4 +38,5 @@
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
+  
 </bpmn:definitions>
