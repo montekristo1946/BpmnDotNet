@@ -1,8 +1,7 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection.Metadata;
+using BpmnDotNet.Common;
+using BpmnDotNet.Common.Interfases;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Elements;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;

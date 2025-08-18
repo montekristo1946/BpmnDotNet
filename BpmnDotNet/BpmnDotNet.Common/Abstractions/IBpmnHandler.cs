@@ -1,4 +1,7 @@
-namespace BpmnDotNet.Interfaces.Handlers;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace BpmnDotNet.Common.Interfases;
 
 /// <summary>
 /// Интерфейс обработчиков блоков Bpmn.

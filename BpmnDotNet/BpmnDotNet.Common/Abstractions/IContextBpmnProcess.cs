@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Common.Interfases;
 
 public interface IContextBpmnProcess
 {

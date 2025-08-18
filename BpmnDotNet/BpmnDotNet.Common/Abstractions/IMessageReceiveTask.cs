@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Concurrent;
 
-namespace BpmnDotNet.Interfaces.Elements;
+namespace BpmnDotNet.Common.Interfases;
 
 /// <summary>
 /// Хранилище зарегистрированных сообщений.

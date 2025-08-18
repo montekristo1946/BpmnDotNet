@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using BpmnDotNet.Common;
+using BpmnDotNet.Common.Interfases;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 

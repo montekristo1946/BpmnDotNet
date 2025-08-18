@@ -15,5 +15,9 @@
   
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BpmnDotNet.Common\BpmnDotNet.Common.csproj" />
+    </ItemGroup>
+
 
 </Project>

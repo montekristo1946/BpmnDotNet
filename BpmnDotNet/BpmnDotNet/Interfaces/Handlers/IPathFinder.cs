@@ -1,3 +1,5 @@
+using BpmnDotNet.Common;
+using BpmnDotNet.Common.Interfases;
 using BpmnDotNet.Interfaces.Elements;
 
 namespace BpmnDotNet.Interfaces.Handlers;

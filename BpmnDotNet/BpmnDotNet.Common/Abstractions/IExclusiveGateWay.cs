@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace BpmnDotNet.Interfaces.Elements;
+namespace BpmnDotNet.Common.Interfases;
 
 /// <summary>
 /// Маршруты для эксклюзивных шлюзов.
