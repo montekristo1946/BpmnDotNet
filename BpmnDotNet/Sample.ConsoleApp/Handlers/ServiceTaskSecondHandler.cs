@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Net.Mail;
 using BpmnDotNet.Common;
-using BpmnDotNet.Common.Interfases;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;

@@ -1,6 +1,8 @@
+using BpmnDotNet.Common.Dto;
+
 namespace BpmnDotNet.Dto;
 
-internal class NodeJobStatus
+internal class NodeTaskStatus
 {
     public string IdNode { get; init; } = String.Empty;
 

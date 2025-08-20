@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BpmnDotNet.Common.Interfases;
+namespace BpmnDotNet.Common.Abstractions;
 
 /// <summary>
 /// Интерфейс обработчиков блоков Bpmn.

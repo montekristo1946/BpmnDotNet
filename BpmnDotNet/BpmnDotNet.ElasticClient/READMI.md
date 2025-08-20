@@ -13,3 +13,6 @@ docker run --rm  \
   -v /mnt/Disk_D/TMP/16.08.2025/ElasticDb/:/usr/share/elasticsearch/data \
   docker.elastic.co/elasticsearch/elasticsearch:9.1.2
 ~~~
+
+## Сотояние эластики можно смотреть 
+1. elasticvue_1.8.0_amd64.AppImage

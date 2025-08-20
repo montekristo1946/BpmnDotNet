@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using BpmnDotNet.Common;
-using BpmnDotNet.Common.Interfases;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 

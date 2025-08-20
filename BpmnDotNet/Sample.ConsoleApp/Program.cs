@@ -1,5 +1,5 @@
 ﻿using BpmnDotNet.Common;
-using BpmnDotNet.Common.Interfases;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Config;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.Interfaces.Handlers;
@@ -33,7 +33,6 @@ services.AddScoped<SampleService>();
 
 
 services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
-
 
 //  Run service
 using var provider = services.BuildServiceProvider();

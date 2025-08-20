@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using BpmnDotNet.Common;
-using BpmnDotNet.Common.Interfases;
+using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Elements;
 using BpmnDotNet.Interfaces.Elements;
@@ -32,7 +33,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <summary>
     /// Очередь для вызовов.
     /// </summary>
-    private readonly ConcurrentDictionary<string, NodeJobStatus> _nodeStateRegistry = new();
+    private readonly ConcurrentDictionary<string, NodeTaskStatus> _nodeStateRegistry = new();
 
 
     private readonly CancellationTokenSource _cts;
@@ -117,7 +118,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             {
                 UpdateParallelGatewayState();
                 CheckMessagesStore();
-                foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+                foreach (KeyValuePair<string, NodeTaskStatus> nodeState in _nodeStateRegistry)
                 {
                     var isPending = nodeState.Value.ProcessingStaus == ProcessingStaus.Pending;
                     if (!isPending)
@@ -150,7 +151,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private void CheckMessagesStore()
     {
-        foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+        foreach (KeyValuePair<string, NodeTaskStatus> nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.ProcessingStaus != ProcessingStaus.WaitingReceivedMessage)
                 continue;
@@ -221,7 +222,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// </summary>
     private void UpdateParallelGatewayState()
     {
-        foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+        foreach (KeyValuePair<string, NodeTaskStatus> nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.ProcessingStaus != ProcessingStaus.WaitingCompletedWays)
                 continue;
@@ -293,7 +294,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private void NodeRegistryChangeState(string nodeId, ProcessingStaus staus, Task? taskRunNode = null)
     {
-        var stateNew = new NodeJobStatus()
+        var stateNew = new NodeTaskStatus()
         {
             ProcessingStaus = staus,
             IdNode = nodeId,
@@ -304,7 +305,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             key: nodeId,
             addValueFactory: _ => stateNew,
             updateValueFactory: (keyOld, oldMessage) =>
-                new NodeJobStatus()
+                new NodeTaskStatus()
                 {
                     ProcessingStaus = staus,
                     IdNode = keyOld,

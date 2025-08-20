@@ -26,11 +26,11 @@ public class HistoryNodeState
     /// <summary>
     /// Время создания документа.
     /// </summary>
-    public DateTime DateCreated => DateTime.Now;
-
+    public DateTime DateCreated { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// Очередь для вызовов.
+    /// Текущее состояние нод.
     /// </summary>
-    // private readonly Dictionary<string, NodeJobStatus> _nodeStateRegistry = new();
+    public NodeJobStatus [] NoesStaus {get; set;} = [];
+
 }

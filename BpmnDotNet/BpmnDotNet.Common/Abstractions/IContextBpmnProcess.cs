@@ -1,8 +1,7 @@
-namespace BpmnDotNet.Common.Interfases;
+namespace BpmnDotNet.Common.Abstractions;
 
 public interface IContextBpmnProcess
 {
-
     /// <summary>
     /// ID Bpmn процесса из схемы bpmn.
     /// </summary>

@@ -1,5 +1,5 @@
 using BpmnDotNet.Common;
-using BpmnDotNet.Common.Interfases;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Handlers;
 

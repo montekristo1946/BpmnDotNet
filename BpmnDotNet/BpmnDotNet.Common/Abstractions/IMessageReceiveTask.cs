@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace BpmnDotNet.Common.Interfases;
+namespace BpmnDotNet.Common.Abstractions;
 
 /// <summary>
 /// Хранилище зарегистрированных сообщений.
