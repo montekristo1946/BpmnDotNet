@@ -16,15 +16,16 @@ internal static class BpmnClientBuilder
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
+        
         return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder);
     }
 
     private static BpmnProcessDto[] CreateBusinessProcessDtos(string[] allBpmnFiles)
     {
-        var xmlBpmnLoader = new XmlBpmnLoader();
+        var xmlBpmnLoader = new XmlSerializationProcessSection();
 
         var retValue = allBpmnFiles.Select(p =>
-            xmlBpmnLoader.LoadXml(p)).ToArray();
+            xmlBpmnLoader.LoadXmlProcessSection(p)).ToArray();
 
         return retValue;
     }

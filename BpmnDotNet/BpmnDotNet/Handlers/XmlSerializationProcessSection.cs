@@ -6,14 +6,13 @@ using BpmnDotNet.Interfaces.Handlers;
 
 namespace BpmnDotNet.Handlers;
 
-internal class XmlBpmnLoader : IXmlBpmnLoader
+internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
 {
-    public BpmnProcessDto LoadXml(string pathDiagram)
+    public BpmnProcessDto LoadXmlProcessSection(string pathDiagram)
     {
         if (string.IsNullOrWhiteSpace(pathDiagram))
             throw new ArgumentNullException(nameof(pathDiagram));
-
-
+        
         var ret = new XmlDocument();
         ret.Load(pathDiagram);
 

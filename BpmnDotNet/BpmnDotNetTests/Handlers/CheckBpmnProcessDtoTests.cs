@@ -5,20 +5,20 @@ namespace BpmnDotNetTests.Handlers;
 
 public class CheckBpmnProcessDtoTests
 {
-    private readonly IXmlBpmnLoader _xmlBpmnLoader;
+    private readonly IXmlSerializationProcessSection _xmlSerializationProcessSection;
     private readonly ICheckBpmnProcessDto _checkBpmnProcessDto;
 
 
     public CheckBpmnProcessDtoTests()
     {
-        _xmlBpmnLoader = new XmlBpmnLoader();
+        _xmlSerializationProcessSection = new XmlSerializationProcessSection();
         _checkBpmnProcessDto = new CheckBpmnProcessDto();
     }
 
     [Fact]
     public void Check_CheckAvailabilityOutgoingsStartEvent_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/StartEvent_1.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/StartEvent_1.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -28,7 +28,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckAvailabilityOutgoingsSendTask_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/SendTask_2.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/SendTask_2.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -38,7 +38,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckAvailabilityIncomingPathReceiveTask_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/ReceiveTask_3.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/ReceiveTask_3.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -48,7 +48,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckAvailabilityIncomingPathSubProcess_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/SubProcess_4.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/SubProcess_4.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -58,7 +58,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckNormalBpmn_successfullyCompleted()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/diagram_1.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_1.bpmn");
 
         _checkBpmnProcessDto.Check(diagram);
     }
@@ -66,7 +66,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckBeginingEvent_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/CheckBeginningAndEnd_5.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/CheckBeginningAndEnd_5.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -76,7 +76,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckExclusiveGateway_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/ExclusiveGateway_6.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/ExclusiveGateway_6.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -86,7 +86,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckParallelGateway_throwException()
     {
-        var diagram = _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/ParallelGateway_7.bpmn");
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/ParallelGateway_7.bpmn");
 
         var exception = Assert.Throws<InvalidDataException>(() => _checkBpmnProcessDto.Check(diagram));
 
@@ -96,7 +96,7 @@ public class CheckBpmnProcessDtoTests
     [Fact]
     public void Check_CheckFailIdProcess_throwException()
     {
-        var exception = Assert.Throws<InvalidDataException>(() => _xmlBpmnLoader.LoadXml("./BpmnDiagram/CheckError/FailId_8.bpmn"));
+        var exception = Assert.Throws<InvalidDataException>(() => _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/FailId_8.bpmn"));
 
         Assert.Equal("Not Find ID from:bpmn:process", exception.Message);
     }

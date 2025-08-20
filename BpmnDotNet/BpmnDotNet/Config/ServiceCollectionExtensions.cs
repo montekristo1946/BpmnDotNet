@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Регистрация по прастранству имен.
+    /// Регистрация по пространству имен.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="predicate">Filter registered handlers based on type</param>

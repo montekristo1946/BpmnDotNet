@@ -3,6 +3,7 @@ using System.Globalization;
 using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Models;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Elements;
 using BpmnDotNet.Interfaces.Elements;

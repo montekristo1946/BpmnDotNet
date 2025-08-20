@@ -1,5 +1,6 @@
 using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.Models;
 using BpmnDotNet.Elements;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;

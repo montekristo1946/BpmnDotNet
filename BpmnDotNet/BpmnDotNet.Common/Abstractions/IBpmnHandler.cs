@@ -9,7 +9,7 @@ namespace BpmnDotNet.Common.Abstractions;
 public interface IBpmnHandler
 {
     /// <summary>
-    /// ID блочка в Bpmn натации.
+    /// ID блочка в Bpmn нотации.
     /// </summary>
     string TaskDefinitionId { get; init; }
 

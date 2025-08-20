@@ -1,3 +1,4 @@
+using BpmnDotNet.Common.Models;
 using BpmnDotNet.Elements;
 
 namespace BpmnDotNet.Interfaces.Elements;

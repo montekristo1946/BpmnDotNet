@@ -1,3 +1,4 @@
+using BpmnDotNet.Common.Models;
 using BpmnDotNet.Interfaces.Elements;
 
 namespace BpmnDotNet.Elements.BpmnNatation;

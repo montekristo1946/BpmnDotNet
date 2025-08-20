@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BpmnDotNet.Elements;
+namespace BpmnDotNet.Common.Models;
 
 public enum ElementType
 {
