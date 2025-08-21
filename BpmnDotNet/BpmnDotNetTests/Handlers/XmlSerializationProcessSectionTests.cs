@@ -22,5 +22,6 @@ public class XmlSerializationProcessSectionTests
 
         Assert.NotNull(diagram);
         Assert.Equal(28, diagram.ElementsFromBody.Length);
+        Assert.Equal("IdBpmnProcessingMain", diagram.IdBpmnProcess);
     }
 }

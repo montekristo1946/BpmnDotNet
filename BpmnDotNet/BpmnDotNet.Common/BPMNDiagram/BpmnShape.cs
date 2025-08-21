@@ -5,25 +5,36 @@ namespace BpmnDotNet.Common.BPMNDiagram;
 /// <summary>
 ///В нотации секция: bpmndi:BPMNShape
 /// </summary>
-public class BpmnShape
+public record BpmnShape
 {
     /// <summary>
-    ///  На схеме это поле:id.
+    ///  Уникальное имя для схемы BPMNShape. На схеме это поле:id.
     /// </summary>
-    public string Id { get; set; }
+    public string Id { get; init; } = string.Empty;
 
     /// <summary>
-    ///  На схеме это поле:bpmnElement (элемент из секции process).
+    ///  Называние элемент из секции process. На схеме это поле:bpmnElement.
     /// </summary>
-    public string BpmnElement { get; set; }
+    public string BpmnElement { get; init; } = string.Empty;
 
     /// <summary>
     /// Тип фигуры.
     /// </summary>
-    public ElementType Type { get; set; }
+    public ElementType Type { get; init; } = ElementType.None;
 
     /// <summary>
-    /// Переменная описывающая координаты.
+    /// Переменная описывающая координаты левого угла фигуры, (массив например для Flow)
     /// </summary>
-    public Bound[] Bounds { get; set; }
+    public Bound[] Bounds { get; init; } = [];
+    
+    /// <summary>
+    /// Текст в элементах. Описывает name.
+    /// </summary>
+    public string Name { get; init; } =string.Empty;
+    
+    /// <summary>
+    /// Координаты текста. На схеме это bpmndi:BPMNLabel, 
+    /// </summary>
+    public Bound BpmnLabel{ get; init; } =  new Bound();
+    
 }
