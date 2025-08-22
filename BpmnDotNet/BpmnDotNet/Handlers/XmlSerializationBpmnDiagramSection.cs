@@ -53,7 +53,6 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         return new BpmnPlane()
         {
             IdBpmnProcess = bpmnElementPlane,
-            Id = idBpmnPlane,
             Shapes = shapes
         };
     }

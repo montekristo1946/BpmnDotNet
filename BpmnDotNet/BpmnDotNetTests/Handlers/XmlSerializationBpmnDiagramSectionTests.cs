@@ -22,4 +22,8 @@ public class XmlSerializationBpmnDiagramSectionTests
         Assert.Equal("IdBpmnProcessingMain" , diagram.IdBpmnProcess);
    
     }
+    
+    
+    
+    
 }

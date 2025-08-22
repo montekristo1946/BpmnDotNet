@@ -25,11 +25,15 @@
       <None Update="Configs\appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="BpmnDiagram\diagram_1.bpmn">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BpmnDotNet.Common\BpmnDotNet.Common.csproj" />
       <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
+      <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj" />
     </ItemGroup>
 
 </Project>

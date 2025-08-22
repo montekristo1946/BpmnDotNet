@@ -1,4 +1,5 @@
 ﻿using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,9 @@ public class ElasticClient : IElasticClient
                 .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
                 .IdProperty(d => d.Id)
             )
-            .DefaultMappingFor<UIBpmnDiagram>(m => m
-                .IndexName(StringUtils.CreateIndexName(typeof(UIBpmnDiagram)))
-                .IdProperty(d => d.IdBpmnProcess)
+            .DefaultMappingFor<BpmnPlane>(m => m
+                .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
+                .IdProperty(d => d.Id)
             );
     }
 

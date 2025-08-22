@@ -2,8 +2,10 @@ using System.Diagnostics;
 using AutoFixture;
 using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.ElasticClient.Tests.Configs;
+using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -16,13 +18,15 @@ public class BackgroundWorkerService : BackgroundService
     private readonly AppSettings _config;
     private readonly IElasticClient _elasticClient;
     private readonly Fixture _fixture;
+    private readonly IXmlSerializationBpmnDiagramSection _xmlSerializationProcessSection;
 
     public BackgroundWorkerService(ILogger<BackgroundWorkerService> logger, AppSettings config,
-        IElasticClient elasticClient)
+        IElasticClient elasticClient, IXmlSerializationBpmnDiagramSection xmlSerializationProcessSection)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+        _xmlSerializationProcessSection = xmlSerializationProcessSection;
         _fixture = new Fixture();
     }
 
@@ -49,8 +53,10 @@ public class BackgroundWorkerService : BackgroundService
                     break;
                 case 's':
                     // GetDataIndex();
-                    await GetLastData();
+                    // await GetLastData();
                     // Pagination();
+                    // LoadXmlBpmn();
+                    GetXmlBpmn();
                     break;
                 case 'q':
                     Console.WriteLine("Quitting");
@@ -96,12 +102,6 @@ public class BackgroundWorkerService : BackgroundService
         }
         _logger.LogDebug(document.ToString());
         
-        var document2 = _elasticClient.GetDataFromIdAsync<UIBpmnDiagram>("01DNtpUzMm").Result;
-        if ( document2 is null)
-        {
-            throw new Exception("Failed to set history node state");
-        }
-        _logger.LogDebug(document2.ToString());
     }
 
     string GenerateRandomString(int length)
@@ -132,16 +132,13 @@ public class BackgroundWorkerService : BackgroundService
                 throw new Exception("Failed to set history node state");
             }
 
-            var UIBpmnDiagram = new UIBpmnDiagram()
-            {
-                IdBpmnProcess = GenerateRandomString(10),
-            };
+          
 
-            var resUi = _elasticClient.SetDataAsync(UIBpmnDiagram).Result;
-            if (!resUi)
-            {
-                throw new Exception("Failed to set SetUIBpmnDiagramAsync");
-            }
+            // var resUi = _elasticClient.SetDataAsync(UIBpmnDiagram).Result;
+            // if (!resUi)
+            // {
+            //     throw new Exception("Failed to set SetUIBpmnDiagramAsync");
+            // }
 
             if (i > 0 && i % 100 == 0)
             {
@@ -151,5 +148,27 @@ public class BackgroundWorkerService : BackgroundService
 
         sw.Stop();
         _logger.LogDebug($"Elapsed time: {sw.ElapsedMilliseconds}");
+    }
+    
+    private void LoadXmlBpmn()
+    {
+        var diagram = _xmlSerializationProcessSection.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_1.bpmn");
+
+        var reshistoryNodeState = _elasticClient.SetDataAsync(diagram).Result;
+        if (!reshistoryNodeState)
+        {
+            throw new Exception("Failed to set history node state");
+        }
+   
+    }
+    private void GetXmlBpmn()
+    {
+
+        var reshistoryNodeState = _elasticClient.GetDataFromIdAsync<BpmnPlane>("IdBpmnProcessingMain_638914914391324271").Result;
+        if (reshistoryNodeState is null)
+        {
+            throw new Exception("Failed to set history node state");
+        }
+   
     }
 }
