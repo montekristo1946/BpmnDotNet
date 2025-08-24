@@ -1,28 +1,28 @@
-using BpmnDotNet.Arm.Web.Components;
+using BpmnDotNet.Arm.Web.AppWeb;
+using BpmnDotNet.Arm.Web.Config;
+using BpmnDotNet.Arm.Web.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls(SystemConfigure.AppSetting["UseUrls"] ?? string.Empty);
+builder.Host.UseLogger();
+builder.Host.InitCulture();
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services
+        //Add service
+    .AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
 
-app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();
-
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+Log.Information("Service started on url {UseUrls}", SystemConfigure.AppSetting["UseUrls"]);
 
 app.Run();
