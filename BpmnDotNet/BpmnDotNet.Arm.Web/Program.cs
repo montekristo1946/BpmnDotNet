@@ -18,11 +18,12 @@ var app = builder.Build();
 
 
 
+app.UseStaticFiles();
 app.UseAntiforgery();
-app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 Log.Information("Service started on url {UseUrls}", SystemConfigure.AppSetting["UseUrls"]);
 
 app.Run();
+

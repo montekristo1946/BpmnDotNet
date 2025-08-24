@@ -1,3 +1,4 @@
+
 .border-enveloping-custom {
     border: 1px solid;
     border-color: #ced4da;
@@ -5,13 +6,13 @@
 }
 
 
-.col-md-imagePanel {
-    width: 91.0%;
+.col-md-filter-panel {
+    width: 20.0%;
     height: 100%;
 }
 
-.col-md-rightPanel {
-    width: 9.0%;
+.col-md-process-panel {
+    width: 80.0%;
     height: 100%;
 }
 
