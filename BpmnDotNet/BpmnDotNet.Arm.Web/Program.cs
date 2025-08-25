@@ -1,7 +1,12 @@
+using System.Runtime.CompilerServices;
+using BpmnDotNet.Arm.Core.Abstractions;
+using BpmnDotNet.Arm.Core.Handlers;
 using BpmnDotNet.Arm.Web.AppWeb;
 using BpmnDotNet.Arm.Web.Config;
 using BpmnDotNet.Arm.Web.Extensions;
 using Serilog;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls(SystemConfigure.AppSetting["UseUrls"] ?? string.Empty);
@@ -9,7 +14,8 @@ builder.Host.UseLogger();
 builder.Host.InitCulture();
 
 builder.Services
-        //Add service
+    .AddScoped<IPlanePanelHandler, PlanePanelHandler>()
+    .AddScoped<ISvgConstructor, SvgConstructor>()
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 

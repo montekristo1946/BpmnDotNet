@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Abstractions\" />
-      <Folder Include="Handlers\" />
+      <ProjectReference Include="..\BpmnDotNet.Common\BpmnDotNet.Common.csproj" />
+      <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj" />
     </ItemGroup>
 
 </Project>

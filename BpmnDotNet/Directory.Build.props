@@ -14,13 +14,16 @@
         <SerilogSinksConsoleVersion>6.0.0</SerilogSinksConsoleVersion>
         <SerilogSinksFileVersion>7.0.0</SerilogSinksFileVersion>
         
-        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.7</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
-        <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.7</MicrosoftExtensionsLoggingAbstractionsVersion>
-        <MicrosoftExtensionsDependencyInjectionVersion>9.0.7</MicrosoftExtensionsDependencyInjectionVersion>
-        <MicrosoftExtensionsHostingVerson>9.0.7</MicrosoftExtensionsHostingVerson>
+        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.8</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
+        <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.8</MicrosoftExtensionsLoggingAbstractionsVersion>
+        <MicrosoftExtensionsDependencyInjectionVersion>9.0.8</MicrosoftExtensionsDependencyInjectionVersion>
+        <MicrosoftExtensionsHostingVerson>9.0.8</MicrosoftExtensionsHostingVerson>
+        <MicrosoftAspNetCoreComponentsWebVersion>9.0.8</MicrosoftAspNetCoreComponentsWebVersion>
         
         <ElasticClientsElasticsearchVersion>9.1.4</ElasticClientsElasticsearchVersion>
 
+      
+        
         <!--    Test service-->
         <AutoFixtureVersion>[4.18.1,5)</AutoFixtureVersion>
         <CoverletCollectorVesion>[6.0.2,7)</CoverletCollectorVesion>

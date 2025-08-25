@@ -15,6 +15,12 @@
         <PackageReference Include="Serilog.Enrichers.Process" Version="$(SerilogEnrichersProcessVersion)" />
         <PackageReference Include="Serilog.Exceptions" Version="$(SerilogExceptionsVersion)" />
         <PackageReference Include="Serilog.Sinks.RollingFileSizeLimit" Version="$(SerilogSinksRollingFileSizeLimitVersion)" />
+
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftAspNetCoreComponentsWebVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BpmnDotNet.Arm.Core\BpmnDotNet.Arm.Core.csproj" />
     </ItemGroup>
 
 
