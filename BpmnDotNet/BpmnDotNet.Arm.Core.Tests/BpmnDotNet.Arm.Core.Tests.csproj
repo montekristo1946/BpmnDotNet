@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoFixture" Version="$(AutoFixtureVersion)"/>
+        <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorVesion)"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)"/>
+        <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)"/>
+        <PackageReference Include="xunit" Version="$(XunitVersion)"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualstudioVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BpmnDotNet.Arm.Core\BpmnDotNet.Arm.Core.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="BpmnDiagram\diagram_1.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>
