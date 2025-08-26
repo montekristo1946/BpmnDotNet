@@ -7,12 +7,12 @@ using BpmnDotNet.Common.BPMNDiagram;
 namespace BpmnDotNet.Arm.Core.Abstractions;
 
 /// <summary>
-/// Handler для работы PlanePane.
+///     Handler для работы PlanePane.
 /// </summary>
 internal interface IPlanePanelHandler
 {
     /// <summary>
-    /// Вернет BpmnPlane для отрисовки.
+    ///     Вернет BpmnPlane для отрисовки.
     /// </summary>
-    public Task <BpmnPlane> GetPlane();
+    public Task<BpmnPlane> GetPlane();
 }

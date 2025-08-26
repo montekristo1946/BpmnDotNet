@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <TargetFrameworkVersion>net9.0</TargetFrameworkVersion>
-        
+
         <SerilogVersion>4.3.0</SerilogVersion>
         <SerilogAspNetCoreVersion>[8.0.0,9.0.0)</SerilogAspNetCoreVersion>
         <SerilogEnrichersEnvironmentVersion>[3.0.0,4.0.0)</SerilogEnrichersEnvironmentVersion>
@@ -13,17 +13,16 @@
         <SerilogExtensionsLoggingVersion>9.0.2</SerilogExtensionsLoggingVersion>
         <SerilogSinksConsoleVersion>6.0.0</SerilogSinksConsoleVersion>
         <SerilogSinksFileVersion>7.0.0</SerilogSinksFileVersion>
-        
+
         <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.8</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
         <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.8</MicrosoftExtensionsLoggingAbstractionsVersion>
         <MicrosoftExtensionsDependencyInjectionVersion>9.0.8</MicrosoftExtensionsDependencyInjectionVersion>
         <MicrosoftExtensionsHostingVerson>9.0.8</MicrosoftExtensionsHostingVerson>
         <MicrosoftAspNetCoreComponentsWebVersion>9.0.8</MicrosoftAspNetCoreComponentsWebVersion>
-        
+
         <ElasticClientsElasticsearchVersion>9.1.4</ElasticClientsElasticsearchVersion>
 
-      
-        
+
         <!--    Test service-->
         <AutoFixtureVersion>[4.18.1,5)</AutoFixtureVersion>
         <CoverletCollectorVesion>[6.0.2,7)</CoverletCollectorVesion>

@@ -1,15 +1,11 @@
 using System.Globalization;
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace Sample.ConsoleApp.Handlers;
 
 public class GatewayFirstHandler : IBpmnHandler
 {
-    public string TaskDefinitionId { get; init; } = nameof(GatewayFirstHandler);
     private readonly ILogger<GatewayFirstHandler> _logger;
 
     public GatewayFirstHandler(ILoggerFactory loggerFactory)
@@ -17,6 +13,8 @@ public class GatewayFirstHandler : IBpmnHandler
         ArgumentNullException.ThrowIfNull(loggerFactory);
         _logger = loggerFactory.CreateLogger<GatewayFirstHandler>();
     }
+
+    public string TaskDefinitionId { get; init; } = nameof(GatewayFirstHandler);
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
@@ -32,6 +30,4 @@ public class GatewayFirstHandler : IBpmnHandler
 
         await Task.Delay(1, ctsToken);
     }
-
-
 }

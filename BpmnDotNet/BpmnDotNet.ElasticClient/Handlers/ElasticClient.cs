@@ -9,10 +9,10 @@ namespace BpmnDotNet.ElasticClient.Handlers;
 public class ElasticClient : IElasticClient
 {
     private readonly ILogger<IElasticClient> _logger;
-    private ElasticsearchClient? _client;
     private readonly int _maxRetryCount;
     private readonly TimeSpan _retryDelay;
     private readonly ElasticsearchClientSettings _settings;
+    private ElasticsearchClient? _client;
 
     public ElasticClient(
         ElasticClientConfig config,
@@ -67,10 +67,7 @@ public class ElasticClient : IElasticClient
             var index = StringUtils.CreateIndexName(typeof(T));
             var response = await client.GetAsync<T>(index, id);
 
-            if (!response.IsValidResponse || !response.Found)
-            {
-                return default;
-            }
+            if (!response.IsValidResponse || !response.Found) return default;
 
             var document = response.Source;
             return document is null
@@ -107,10 +104,7 @@ public class ElasticClient : IElasticClient
                 .Size(count)
             );
 
-            if (!response.IsValidResponse)
-            {
-                return [];
-            }
+            if (!response.IsValidResponse) return [];
 
             var retArr = response.Hits.Select(p => p.Source)
                 .Where(p => p is not null)
@@ -195,10 +189,7 @@ public class ElasticClient : IElasticClient
 
     private async Task<ElasticsearchClient> GetClient()
     {
-        if (_client == null || !Ping())
-        {
-            await Reconnect();
-        }
+        if (_client == null || !Ping()) await Reconnect();
 
         return _client ?? throw new InvalidOperationException("Elasticsearch client is null");
     }

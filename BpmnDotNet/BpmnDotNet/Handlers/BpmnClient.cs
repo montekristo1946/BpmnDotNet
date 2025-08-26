@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
@@ -16,14 +15,14 @@ public class BpmnClient : IBpmnClient
     private readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus>
         _bpmnProcesses = new();
 
-    private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
-
     private readonly Task _cleanerTask;
     private readonly CancellationTokenSource _cts = new();
-    private volatile bool _disposed;
-    private readonly IPathFinder _pathFinder;
-    private readonly ILoggerFactory _loggerFactory;
+
+    private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
     private readonly ILogger<BpmnClient> _logger;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly IPathFinder _pathFinder;
+    private volatile bool _disposed;
 
     public BpmnClient(BpmnProcessDto[] businessProcessDtos, ILoggerFactory loggerFactory, IPathFinder pathFinder)
     {
@@ -73,15 +72,27 @@ public class BpmnClient : IBpmnClient
     {
         var resGet = _bpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
-        {
             throw new InvalidOperationException(
                 $"[SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
-        }
 
         var resAdd = bpmn.Process.AddMessageToQueue(messageType, message);
         if (!resAdd)
             throw new InvalidOperationException(
                 $"[SendMessage] Not Add message : {idBpmnProcess} {tokenProcess} {messageType}");
+    }
+
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+        _disposed = true;
+        ClearBpmnProcessesDictionary(true);
+
+        _cts?.Cancel();
+        _cleanerTask.Wait();
+        _cleanerTask.Dispose();
+        _cts?.Dispose();
     }
 
     private async Task CleaningBpmnProcesses(CancellationToken cts)
@@ -144,24 +155,8 @@ public class BpmnClient : IBpmnClient
         string idBpmnProcess)
     {
         if (!bpmnProcessDtos.TryGetValue(idBpmnProcess, out var bpmn))
-        {
             throw new InvalidOperationException($"Not find BpmnProcessDto: {idBpmnProcess}");
-        }
 
         return bpmn;
-    }
-
-
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-        _disposed = true;
-        ClearBpmnProcessesDictionary(true);
-
-        _cts?.Cancel();
-        _cleanerTask.Wait();
-        _cleanerTask.Dispose();
-        _cts?.Dispose();
     }
 }

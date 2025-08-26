@@ -1,22 +1,21 @@
-using System;
 using System.Threading.Tasks;
 using BpmnDotNet.Common.Dto;
 
 namespace BpmnDotNet.Common.Abstractions;
 
 /// <summary>
-/// Клиент для записи в Elastic
+///     Клиент для записи в Elastic
 /// </summary>
 public interface IElasticClient
 {
     /// <summary>
-    /// Сохраняет модели истории проходов по блокам.
+    ///     Сохраняет модели истории проходов по блокам.
     /// </summary>
     /// <param name="document"></param>
     public Task<bool> SetDataAsync<T>(T document);
 
     /// <summary>
-    /// Получить данные по ID.
+    ///     Получить данные по ID.
     /// </summary>
     /// <param name="id"></param>
     /// <typeparam name="T"></typeparam>
@@ -24,15 +23,15 @@ public interface IElasticClient
     public Task<T?> GetDataFromIdAsync<T>(string id);
 
     /// <summary>
-    /// Запросить последних count данных.
+    ///     Запросить последних count данных.
     /// </summary>
     /// <param name="count"></param>
     /// <param name="valueFind"></param>
     /// <returns></returns>
-    public Task<HistoryNodeState[]>GetLastDataAsync(int count, string valueFind);
+    public Task<HistoryNodeState[]> GetLastDataAsync(int count, string valueFind);
 
     /// <summary>
-    /// Пагинация для HistoryNodeState.
+    ///     Пагинация для HistoryNodeState.
     /// </summary>
     /// <param name="valueFind"></param>
     /// <param name="pageNumber"></param>
@@ -44,7 +43,7 @@ public interface IElasticClient
         int pageSize = 10);
 
     /// <summary>
-    /// Получить общее количество.
+    ///     Получить общее количество.
     /// </summary>
     /// <param name="valueFind"></param>
     /// <returns></returns>

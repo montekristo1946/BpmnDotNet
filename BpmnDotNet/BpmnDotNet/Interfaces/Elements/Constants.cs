@@ -24,7 +24,7 @@ internal static class Constants
     public const string BpmnTargetRef = "targetRef";
     public const string BpmnIdName = "id";
     public const string BpmnSourceRef = "sourceRef";
-    
+
     //Drawing Schema
     public const string BpmnDiagramName = "bpmndi:BPMNDiagram";
     public const string BpmnBpmnPlaneName = "bpmndi:BPMNPlane";
@@ -33,19 +33,16 @@ internal static class Constants
 
     public const string BpmnShapeName = "bpmndi:BPMNShape";
     public const string BpmnEdgeName = "bpmndi:BPMNEdge";
-    
+
     public const string BpmnBoundsName = "dc:Bounds";
-    
+
     public const string BpmnXName = "x";
     public const string BpmnYName = "y";
     public const string BpmnWidthName = "width";
     public const string BpmnHeightName = "height";
-    
+
     public const string BpmnLabelName = "bpmndi:BPMNLabel";
     public const string BpmnWaypointName = "di:waypoint";
 
     public const string BpmnAttributesName = "name";
-    
-
-
 }

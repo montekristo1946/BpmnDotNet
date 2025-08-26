@@ -1,10 +1,13 @@
 using BpmnDotNet.Dto;
-using BpmnDotNet.Handlers;
 
 namespace BpmnDotNet.Interfaces.Handlers;
 
 internal interface IBusinessProcess
 {
+    /// <summary>
+    ///     Получить статус процесса.
+    /// </summary>
+    public BusinessProcessJobStatus JobStatus { get; }
     // /// <summary>
     // /// Запустить процесс
     // /// </summary>
@@ -13,15 +16,9 @@ internal interface IBusinessProcess
     // Task<BusinessProcessJobStatus> StartBusinessProcess(CancellationToken ctsToken);
 
     /// <summary>
-    /// Добавить сообщение в очередь.
+    ///     Добавить сообщение в очередь.
     /// </summary>
     /// <param name="messageType"></param>
     /// <param name="message"></param>
     bool AddMessageToQueue(Type messageType, object message);
-
-    /// <summary>
-    /// Получить статус процесса.
-    /// </summary>
-    public BusinessProcessJobStatus JobStatus { get; }
-
 }

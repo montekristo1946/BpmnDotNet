@@ -1,6 +1,7 @@
 # BpmnDotNet.ElasticClient
 
 ## Запустить эластику.
+
 ~~~
 docker run --rm  \
   --name elasticsearch \
@@ -14,5 +15,6 @@ docker run --rm  \
   docker.elastic.co/elasticsearch/elasticsearch:9.1.2
 ~~~
 
-## Сотояние эластики можно смотреть 
+## Сотояние эластики можно смотреть
+
 1. elasticvue_1.8.0_amd64.AppImage

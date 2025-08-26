@@ -50,7 +50,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         shapes = FillTypeAndName(shapes, processBlock);
 
 
-        return new BpmnPlane()
+        return new BpmnPlane
         {
             IdBpmnProcess = bpmnElementPlane,
             Shapes = shapes
@@ -126,7 +126,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var waypoint = GetWaypoint(xmlNode);
         var labelBounds = GetBpmnLabelBound(xmlNode);
 
-        return new BpmnShape()
+        return new BpmnShape
         {
             Id = id,
             BpmnElement = bpmnElement,
@@ -144,12 +144,12 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
             {
                 var x = p.Attributes?[Constants.BpmnXName]?.Value;
                 var y = p.Attributes?[Constants.BpmnYName]?.Value;
-                return new Bound()
+                return new Bound
                 {
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
-                    Height = Int32.MinValue,
-                    Width = Int32.MinValue
+                    Height = int.MinValue,
+                    Width = int.MinValue
                 };
             }).ToArray();
 
@@ -167,7 +167,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var bounds = GetBounds(xmlNode);
         var labelBounds = GetBpmnLabelBound(xmlNode);
 
-        return new BpmnShape()
+        return new BpmnShape
         {
             Id = id,
             Bounds = bounds,
@@ -188,12 +188,12 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                 var y = p.Attributes?[Constants.BpmnYName]?.Value;
                 var width = p.Attributes?[Constants.BpmnWidthName]?.Value;
                 var height = p.Attributes?[Constants.BpmnHeightName]?.Value;
-                return new Bound()
+                return new Bound
                 {
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
                     Width = Mappers.Map(width),
-                    Height = Mappers.Map(height),
+                    Height = Mappers.Map(height)
                 };
             }).ToArray();
 
@@ -211,12 +211,12 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                 var y = p.Attributes?[Constants.BpmnYName]?.Value;
                 var width = p.Attributes?[Constants.BpmnWidthName]?.Value;
                 var height = p.Attributes?[Constants.BpmnHeightName]?.Value;
-                return new Bound()
+                return new Bound
                 {
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
                     Width = Mappers.Map(width),
-                    Height = Mappers.Map(height),
+                    Height = Mappers.Map(height)
                 };
             }).ToArray();
 

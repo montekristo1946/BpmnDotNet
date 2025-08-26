@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-
-namespace Sample.ConsoleApp;
+﻿namespace Sample.ConsoleApp;
 
 public class Producer
 {
@@ -44,6 +39,4 @@ public class Producer
         Console.WriteLine("Consumer listening - press ENTER to quit");
         Console.ReadLine();
     }
-
-
 }

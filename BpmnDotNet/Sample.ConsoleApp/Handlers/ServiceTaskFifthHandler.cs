@@ -1,8 +1,5 @@
 using System.Globalization;
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 
@@ -10,8 +7,6 @@ namespace Sample.ConsoleApp.Handlers;
 
 public class ServiceTaskFifthHandler : IBpmnHandler
 {
-    public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFifthHandler);
-
     private readonly ILogger<ServiceTaskFifthHandler> _logger;
 
     public ServiceTaskFifthHandler(ILoggerFactory loggerFactory)
@@ -19,6 +14,8 @@ public class ServiceTaskFifthHandler : IBpmnHandler
         ArgumentNullException.ThrowIfNull(loggerFactory);
         _logger = loggerFactory.CreateLogger<ServiceTaskFifthHandler>();
     }
+
+    public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFifthHandler);
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
@@ -37,6 +34,4 @@ public class ServiceTaskFifthHandler : IBpmnHandler
 
         await Task.Delay(1, ctsToken);
     }
-
-
 }

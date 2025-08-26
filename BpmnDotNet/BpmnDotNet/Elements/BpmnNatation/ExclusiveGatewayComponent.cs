@@ -3,7 +3,8 @@ using BpmnDotNet.Interfaces.Elements;
 
 namespace BpmnDotNet.Elements.BpmnNatation;
 
-public class ExclusiveGatewayComponent(string id, string[] incoming, string[] outgoing) : IElement, IIncomingPath, IOutgoingPath
+public class ExclusiveGatewayComponent(string id, string[] incoming, string[] outgoing)
+    : IElement, IIncomingPath, IOutgoingPath
 {
     public string IdElement { get; } = id;
 

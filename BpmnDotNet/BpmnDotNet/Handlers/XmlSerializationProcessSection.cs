@@ -3,7 +3,6 @@ using BpmnDotNet.Elements.BpmnNatation;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 
-
 namespace BpmnDotNet.Handlers;
 
 internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
@@ -12,7 +11,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     {
         if (string.IsNullOrWhiteSpace(pathDiagram))
             throw new ArgumentNullException(nameof(pathDiagram));
-        
+
         var ret = new XmlDocument();
         ret.Load(pathDiagram);
 
@@ -50,7 +49,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
                 Constants.BpmnReceiveTaskName => CreateReceiveTask(xmlNode),
                 Constants.BpmnServiceTaskName => CreateServiceTask(xmlNode),
                 Constants.BpmnSubProcess => CreateSubProcess(xmlNode),
-                _ => throw new ArgumentOutOfRangeException($"{idProcess} { xmlNode.Name}")
+                _ => throw new ArgumentOutOfRangeException($"{idProcess} {xmlNode.Name}")
             };
             elements.Add(element);
         }
@@ -64,8 +63,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private IElement CreateSubProcess(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new SubProcessComponent(id, incoming, outgoing);
     }
@@ -73,8 +72,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ServiceTaskComponent CreateServiceTask(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new ServiceTaskComponent(id, incoming, outgoing);
     }
@@ -82,8 +81,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ReceiveTaskComponent CreateReceiveTask(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new ReceiveTaskComponent(id, incoming, outgoing);
     }
@@ -91,8 +90,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private SendTaskComponent CreateSendTaskName(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new SendTaskComponent(id, incoming, outgoing);
     }
@@ -100,8 +99,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ParallelGatewayComponent CreateParallelGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new ParallelGatewayComponent(id, incoming, outgoing);
     }
@@ -109,8 +108,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ExclusiveGatewayComponent CreateExclusiveGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
-        var incoming = GetIncoming(elements,id);
+        var outgoing = GetOutGoing(elements, id);
+        var incoming = GetIncoming(elements, id);
 
         return new ExclusiveGatewayComponent(id, incoming, outgoing);
     }
@@ -132,7 +131,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private StartEventComponent CreateStartEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements,id);
+        var outgoing = GetOutGoing(elements, id);
         var startEvent = new StartEventComponent(id, outgoing);
 
         return startEvent;
@@ -141,7 +140,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private EndEventComponent CreateEndEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var incoming = GetIncoming(elements,id);
+        var incoming = GetIncoming(elements, id);
         var endEvent = new EndEventComponent(id, incoming);
 
         return endEvent;

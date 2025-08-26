@@ -21,41 +21,38 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj" />
+        <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="BpmnDiagram\diagram_1.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\StartEvent_1.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\SendTask_2.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\ReceiveTask_3.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\SubProcess_4.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\CheckBeginningAndEnd_5.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\ExclusiveGateway_6.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\ParallelGateway_7.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="BpmnDiagram\CheckError\FailId_8.bpmn">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="BpmnDiagram\diagram_1.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\StartEvent_1.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\SendTask_2.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\ReceiveTask_3.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\SubProcess_4.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\CheckBeginningAndEnd_5.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\ExclusiveGateway_6.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\ParallelGateway_7.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\FailId_8.bpmn">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
-
-  
-
 
 
 </Project>

@@ -1,16 +1,11 @@
-﻿using BpmnDotNet.Common;
-using BpmnDotNet.Common.Abstractions;
+﻿using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Config;
-using BpmnDotNet.Handlers;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp;
-using Sample.ConsoleApp.Context;
 using Sample.ConsoleApp.Handlers;
 using Serilog;
-using Serilog.Events;
-
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -41,10 +36,8 @@ var handlerTypes = provider.GetServices<IBpmnHandler>().ToArray();
 var bpmnClient = provider.GetRequiredService<IBpmnClient>();
 
 foreach (var handler in handlerTypes)
-{
     //добавить конфигуррирование по времени допустимого выполеннеия
     bpmnClient.RegisterHandlers<IBpmnHandler>(handler);
-}
 
 
 var producer = provider.GetRequiredService<Producer>();

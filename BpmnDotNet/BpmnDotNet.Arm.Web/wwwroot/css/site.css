@@ -20,13 +20,14 @@
     text-align: center;
     display: table
 }
+
 .div-menu-start {
-    text-align: start ;
+    text-align: start;
     display: table
 }
 
 .div-menu-end {
-    text-align: end ;
+    text-align: end;
     display: table
 }
 
@@ -34,6 +35,7 @@
     vertical-align: middle;
     display: table-cell;
 }
+
 .text-vertical-bottom {
     vertical-align: bottom;
     display: table-cell;
@@ -51,13 +53,13 @@
 
 .bottom-shadow:hover {
     box-shadow: 0 7px 15px -5px rgba(0, 0, 0, 1);
-    border:1px solid ;
+    border: 1px solid;
     border-radius: 5px;
     border-color: #ced4da;
 }
 
 .settings-panel {
-    border:1px solid ;
+    border: 1px solid;
     border-radius: 5px;
     border-color: #ced4da;
 
@@ -65,7 +67,7 @@
 }
 
 .button-panel {
-    border:1px solid ;
+    border: 1px solid;
     border-radius: 5px;
     border-color: #8a8d8f;
 
@@ -76,40 +78,41 @@
     background-color: #e1e8ff;
     border-color: #ced4da;
 }
+
 .nav-tabs .nav-link.active {
     background-color: #fdfeff;
     border-color: #ced4da;
 }
 
-.padding-tabs{
+.padding-tabs {
     padding-bottom: 0px;
     padding-top: 2px;
     padding-left: 0px;
     padding-right: 0px;
 }
 
-.padding-1px{
+.padding-1px {
     padding-bottom: 1px;
     padding-top: 1px;
     padding-left: 1px;
     padding-right: 1px;
 }
 
-.padding-2px{
+.padding-2px {
     padding-bottom: 2px;
     padding-top: 2px;
     padding-left: 2px;
     padding-right: 2px;
 }
 
-.padding-3px{
+.padding-3px {
     padding-bottom: 3px;
     padding-top: 3px;
     padding-left: 3px;
     padding-right: 3px;
 }
 
-.style-selector{
+.style-selector {
     outline-color: #258cfb;
     border-color: #ced4da;
     border-radius: 5px 5px 5px 5px;
@@ -118,10 +121,10 @@
 }
 
 
-.page-main-style{
-    height: 95.0vh; 
-    width: 100vw; 
-    overflow-x: hidden; 
+.page-main-style {
+    height: 95.0vh;
+    width: 100vw;
+    overflow-x: hidden;
     overflow-y: auto;
     background-color: #f0f4fa;
 }

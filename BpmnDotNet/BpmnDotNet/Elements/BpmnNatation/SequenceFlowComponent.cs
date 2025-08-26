@@ -3,7 +3,8 @@ using BpmnDotNet.Interfaces.Elements;
 
 namespace BpmnDotNet.Elements.BpmnNatation;
 
-public class SequenceFlowComponent(string id, string[] incoming, string[] outgoing) : IElement, IIncomingPath, IOutgoingPath
+public class SequenceFlowComponent(string id, string[] incoming, string[] outgoing)
+    : IElement, IIncomingPath, IOutgoingPath
 {
     public string IdElement { get; } = id;
 

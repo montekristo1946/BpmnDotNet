@@ -1,5 +1,4 @@
 using System.Reflection;
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.Interfaces.Handlers;
@@ -12,7 +11,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
-
         services.AddScoped<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
@@ -33,7 +31,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Регистрация по пространству имен.
+    ///     Регистрация по пространству имен.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="predicate">Filter registered handlers based on type</param>
@@ -63,9 +61,15 @@ public static class ServiceCollectionExtensions
     }
 
 
-    private static Assembly GetAssembly<THandler>() => typeof(THandler).Assembly;
+    private static Assembly GetAssembly<THandler>()
+    {
+        return typeof(THandler).Assembly;
+    }
 
-    private static bool IsClass(Type type) => !type.IsInterface && !type.IsAbstract;
+    private static bool IsClass(Type type)
+    {
+        return !type.IsInterface && !type.IsAbstract;
+    }
 
     private static void RegisterAssembly(
         IServiceCollection services,
@@ -87,15 +91,10 @@ public static class ServiceCollectionExtensions
             .Where(a => a.ImplementedHandlerInterfaces.Any());
 
         if (!string.IsNullOrEmpty(namespaceFilter))
-        {
             typesToAutoRegister = typesToAutoRegister.Where(a =>
                 a.Type.Namespace != null && a.Type.Namespace.StartsWith(namespaceFilter));
-        }
 
-        foreach (var type in typesToAutoRegister)
-        {
-            RegisterType(services, type.Type);
-        }
+        foreach (var type in typesToAutoRegister) RegisterType(services, type.Type);
     }
 
     private static void RegisterType(IServiceCollection services, Type typeToRegister)
@@ -103,8 +102,6 @@ public static class ServiceCollectionExtensions
         var implementedHandlerInterfaces = GetImplementedHandlerInterfaces(typeToRegister).ToArray();
 
         foreach (var handlerInterface in implementedHandlerInterfaces)
-        {
             services.AddScoped(handlerInterface, typeToRegister);
-        }
     }
 }

@@ -1,10 +1,7 @@
 namespace BpmnDotNet.Arm.Web.Config;
 
-
-static class SystemConfigure
+internal static class SystemConfigure
 {
-    public static IConfiguration AppSetting { get; }
-
     static SystemConfigure()
     {
         AppSetting = new ConfigurationBuilder()
@@ -12,4 +9,6 @@ static class SystemConfigure
             .AddJsonFile("Config/SystemConfigure.json")
             .Build();
     }
+
+    public static IConfiguration AppSetting { get; }
 }

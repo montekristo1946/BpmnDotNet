@@ -1,7 +1,5 @@
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Models;
-using BpmnDotNet.Elements;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
@@ -21,10 +19,7 @@ public class PathFinder : IPathFinder
     {
         ArgumentNullException.ThrowIfNull(elementsSrc);
 
-        if (elementsSrc.Length == 0)
-        {
-            throw new InvalidDataException(nameof(BpmnProcessDto));
-        }
+        if (elementsSrc.Length == 0) throw new InvalidDataException(nameof(BpmnProcessDto));
 
         var res = elementsSrc.Where(p => p.ElementType == ElementType.StartEvent).ToArray();
 
@@ -40,16 +35,10 @@ public class PathFinder : IPathFinder
         ArgumentNullException.ThrowIfNull(currentNodes);
         ArgumentNullException.ThrowIfNull(context);
 
-        if (elementsSrc.Length == 0)
-        {
-            throw new InvalidDataException(nameof(elementsSrc));
-        }
+        if (elementsSrc.Length == 0) throw new InvalidDataException(nameof(elementsSrc));
 
-        if (currentNodes.Length == 0)
-        {
-            throw new InvalidDataException(nameof(currentNodes));
-        }
-        
+        if (currentNodes.Length == 0) throw new InvalidDataException(nameof(currentNodes));
+
 
         var elementsNode = new List<IElement>();
 
@@ -70,12 +59,32 @@ public class PathFinder : IPathFinder
             };
 
             elementsNode.AddRange(elements);
-
         }
 
         var retArr = ClearDuplicateNodes(elementsNode);
 
         return retArr;
+    }
+
+    public string GetConditionRouteWithExclusiveGateWay(IContextBpmnProcess context, IElement currentNode)
+    {
+        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
+
+        if (outgoingNode.Outgoing.Length == 1)
+            return outgoingNode.Outgoing.First();
+
+        if (context is not IExclusiveGateWay exclusiveGateWay)
+            throw new InvalidDataException($"[GetConditionRouteWithExclusiveGateWay] " +
+                                           $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
+
+        var dict = exclusiveGateWay.ConditionRoute;
+
+        if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
+            || string.IsNullOrWhiteSpace(conditionName))
+            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
+                                           $"Couldn't find the condition from gateway:{currentNode.IdElement}");
+
+        return conditionName;
     }
 
     private IEnumerable<IElement> EndEventGetNextNode(IElement currentNode, IElement[] elementsSrc)
@@ -110,56 +119,39 @@ public class PathFinder : IPathFinder
         return retArr;
     }
 
-    public string GetConditionRouteWithExclusiveGateWay(IContextBpmnProcess context, IElement currentNode)
-    {
-        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
-
-        if (outgoingNode.Outgoing.Length == 1)
-            return outgoingNode.Outgoing.First();
-
-        if (context is not IExclusiveGateWay exclusiveGateWay)
-            throw new InvalidDataException($"[GetConditionRouteWithExclusiveGateWay] " +
-                                           $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
-
-        var dict = exclusiveGateWay.ConditionRoute;
-
-        if (!dict.TryGetValue(currentNode.IdElement, out string? conditionName)
-            || string.IsNullOrWhiteSpace(conditionName))
-            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
-                                           $"Couldn't find the condition from gateway:{currentNode.IdElement}");
-
-        return conditionName;
-    }
-
-    private IElement[] ExclusiveGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc, IContextBpmnProcess context)
+    private IElement[] ExclusiveGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc,
+        IContextBpmnProcess context)
     {
         var conditionName = GetConditionRouteWithExclusiveGateWay(context, currentNode);
 
-        var elementFlow = elementsSrc.FirstOrDefault(p => p.IdElement == conditionName && p.ElementType == ElementType.SequenceFlow) ??
-                          throw new InvalidOperationException($"Not element type Flow, name: {conditionName}");
+        var elementFlow =
+            elementsSrc.FirstOrDefault(p =>
+                p.IdElement == conditionName && p.ElementType == ElementType.SequenceFlow) ??
+            throw new InvalidOperationException($"Not element type Flow, name: {conditionName}");
 
         var elementNext = GetNextFromFlowElement(elementsSrc, elementFlow);
 
         return [elementNext];
     }
-    
+
 
     private IElement[] OnPathGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
         var outgoingNodes = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNodes.Outgoing.Length != 1)
-            throw new InvalidOperationException($"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
+            throw new InvalidOperationException(
+                $"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
 
         var outgoingIdStartEvent = outgoingNodes.Outgoing.First();
 
-        var elementFlow = elementsSrc.FirstOrDefault(p => p.IdElement == outgoingIdStartEvent && p.ElementType == ElementType.SequenceFlow) ??
-                      throw new InvalidOperationException($"Not element type Flow, name: {outgoingIdStartEvent}");
+        var elementFlow = elementsSrc.FirstOrDefault(p =>
+                              p.IdElement == outgoingIdStartEvent && p.ElementType == ElementType.SequenceFlow) ??
+                          throw new InvalidOperationException($"Not element type Flow, name: {outgoingIdStartEvent}");
 
         var elementNext = GetNextFromFlowElement(elementsSrc, elementFlow);
 
         return [elementNext];
-
     }
 
     private IElement GetNextFromFlowElement(IElement[] elementsSrc, IElement elementFlow)
@@ -167,12 +159,14 @@ public class PathFinder : IPathFinder
         var outgoingFlow = ElementOperator.GetOutgoingPath(elementFlow);
 
         if (outgoingFlow.Outgoing.Length != 1)
-            throw new InvalidOperationException($"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");
+            throw new InvalidOperationException(
+                $"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");
 
         var outgoingIdFlow = outgoingFlow.Outgoing.First();
 
         var elementNext = elementsSrc.FirstOrDefault(p => p.IdElement == outgoingIdFlow) ??
-                          throw new InvalidOperationException($"Not found Outgoing element from Flow, name: {elementFlow.IdElement}");
+                          throw new InvalidOperationException(
+                              $"Not found Outgoing element from Flow, name: {elementFlow.IdElement}");
         return elementNext;
     }
 }

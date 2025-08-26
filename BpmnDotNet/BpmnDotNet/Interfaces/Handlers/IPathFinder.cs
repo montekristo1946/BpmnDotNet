@@ -1,4 +1,3 @@
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Interfaces.Elements;
 

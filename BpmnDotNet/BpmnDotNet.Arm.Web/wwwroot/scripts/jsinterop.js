@@ -1,14 +1,12 @@
-
-
-function FocusElement (id){
+function FocusElement(id) {
     const element = document.getElementById(id);
     if (element == null)
         return
-    element.focus({ preventScroll: true });
+    element.focus({preventScroll: true});
 }
 
-async function LoadImg (idCanvas,imgBase64, width,height){
-    if (imgBase64 == null || width <=0 || height<=0 ) {
+async function LoadImg(idCanvas, imgBase64, width, height) {
+    if (imgBase64 == null || width <= 0 || height <= 0) {
         console.log("Fail input data");
         return;
     }
@@ -19,18 +17,18 @@ async function LoadImg (idCanvas,imgBase64, width,height){
     });
 
     // console.log("chartCanvas  ",imgBase64);
-    
+
     const canvas = document.getElementById(idCanvas);
     if (canvas == null) {
-        console.log("canvas null",idCanvas);
+        console.log("canvas null", idCanvas);
         return -1;
     }
 
-    
+
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0,width,height);
-    
-    ctx.drawImage(img, 0, 0,width,height);
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.drawImage(img, 0, 0, width, height);
 
 }
 
@@ -54,7 +52,7 @@ function GetBrowseSize(idElement) {
     // console.log("positionInfo.width  ",positionInfo.width);
     // console.log("positionInfo.x  ",positionInfo.x);
     // console.log("positionInfo.y  ",positionInfo.y);
-    
+
     return {
         Width: width,
         Height: height,
@@ -63,11 +61,11 @@ function GetBrowseSize(idElement) {
     };
 }
 
-function SetBrowseSize(idElement,width,height) {
+function SetBrowseSize(idElement, width, height) {
 
     const element = document.getElementById(idElement);
-    element.width = width ;
-    element.height = height ;
+    element.width = width;
+    element.height = height;
 
     // console.log("width  ",width);
     // console.log("element.width  ",element.width);
@@ -75,11 +73,11 @@ function SetBrowseSize(idElement,width,height) {
 }
 
 
-function FocusElement (id){
+function FocusElement(id) {
     const element = document.getElementById(id);
     if (element == null)
         return
-    element.focus({ preventScroll: true });
+    element.focus({preventScroll: true});
 }
 
 

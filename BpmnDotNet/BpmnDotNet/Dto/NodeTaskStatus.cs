@@ -4,7 +4,7 @@ namespace BpmnDotNet.Dto;
 
 internal class NodeTaskStatus
 {
-    public string IdNode { get; init; } = String.Empty;
+    public string IdNode { get; init; } = string.Empty;
 
     public ProcessingStaus ProcessingStaus { get; set; } = ProcessingStaus.None;
 

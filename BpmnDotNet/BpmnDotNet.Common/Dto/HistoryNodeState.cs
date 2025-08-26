@@ -1,36 +1,34 @@
 using System;
-using System.Collections.Generic;
 
 namespace BpmnDotNet.Common.Dto;
 
 /// <summary>
-/// Dto -отвечающая за историю отработки блоков.
+///     Dto -отвечающая за историю отработки блоков.
 /// </summary>
 public class HistoryNodeState
 {
     /// <summary>
-    /// Id, IdBpmnProcess+TokenProcess
+    ///     Id, IdBpmnProcess+TokenProcess
     /// </summary>
     public string Id => $"{IdBpmnProcess}_{TokenProcess}";
 
     /// <summary>
-    /// ID Bpmn процесса из схемы bpmn.
+    ///     ID Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; set; } = string.Empty;
 
     /// <summary>
-    /// Текущий Token процесса.
+    ///     Текущий Token процесса.
     /// </summary>
     public string TokenProcess { get; set; } = string.Empty;
 
     /// <summary>
-    /// Время создания документа.
+    ///     Время создания документа.
     /// </summary>
     public DateTime DateCreated { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// Текущее состояние нод.
+    ///     Текущее состояние нод.
     /// </summary>
-    public NodeJobStatus [] NoesStaus {get; set;} = [];
-
+    public NodeJobStatus[] NoesStaus { get; set; } = [];
 }

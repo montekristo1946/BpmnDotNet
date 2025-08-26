@@ -16,7 +16,7 @@ internal static class BpmnClientBuilder
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
-        
+
         return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder);
     }
 

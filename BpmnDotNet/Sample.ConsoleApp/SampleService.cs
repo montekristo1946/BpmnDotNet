@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
 using BpmnDotNet.Interfaces.Handlers;
+using Sample.ConsoleApp.Common;
 using Sample.ConsoleApp.Context;
 using Sample.ConsoleApp.Handlers;
 using Sample.ConsoleApp.Messages;
@@ -17,12 +17,12 @@ public class SampleService
 
     private ContextData CreateContextData()
     {
-        var contextData = new ContextData()
+        var contextData = new ContextData
         {
-            IdBpmnProcess = Common.Constants.IdBpmnProcessing_2,
-            TokenProcess = Guid.NewGuid().ToString() + "_test_1",
+            IdBpmnProcess = Constants.IdBpmnProcessing_2,
+            TokenProcess = Guid.NewGuid() + "_test_1",
             TestValue = 25,
-            TestValue2 = "Call from StartNewProcess",
+            TestValue2 = "Call from StartNewProcess"
         };
 
         contextData.RegistrationMessagesType.TryAdd(nameof(ReceiveTaskFirstHandle), typeof(MessageExampleFirst));
@@ -30,9 +30,9 @@ public class SampleService
         return contextData;
     }
 
-    object CreateMessageExampleFirst()
+    private object CreateMessageExampleFirst()
     {
-        return new MessageExampleFirst()
+        return new MessageExampleFirst
         {
             Age = (int)DateTime.Now.Ticks,
             Name = "John Doe",
@@ -46,7 +46,7 @@ public class SampleService
 
         for (var j = 0; j < 1; j++)
         {
-            for (int i = 0; i < 1; i++)
+            for (var i = 0; i < 1; i++)
             {
                 var timeout = TimeSpan.FromMinutes(10);
                 var contextData = CreateContextData();
@@ -70,7 +70,7 @@ public class SampleService
             _bpmnClient.SendMessage(
                 idBpmnProcess,
                 tokenProcess,
-                messageType: typeof(MessageExampleFirst),
+                typeof(MessageExampleFirst),
                 messageExampleFirst);
         }
         catch (Exception e)

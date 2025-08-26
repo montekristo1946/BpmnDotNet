@@ -1,15 +1,11 @@
 using System.Globalization;
-using BpmnDotNet.Common;
 using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace Sample.ConsoleApp.Handlers;
 
 public class GatewayThirdHandler : IBpmnHandler
 {
-    public string TaskDefinitionId { get; init; } = nameof(GatewayThirdHandler);
-
     private readonly ILogger<GatewayThirdHandler> _logger;
 
     public GatewayThirdHandler(ILoggerFactory loggerFactory)
@@ -18,6 +14,8 @@ public class GatewayThirdHandler : IBpmnHandler
         _logger = loggerFactory.CreateLogger<GatewayThirdHandler>();
     }
 
+    public string TaskDefinitionId { get; init; } = nameof(GatewayThirdHandler);
+
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[GatewayThirdHandler:AsyncJobHandler]  " +
@@ -25,6 +23,4 @@ public class GatewayThirdHandler : IBpmnHandler
 
         await Task.Delay(1, ctsToken);
     }
-
-
 }

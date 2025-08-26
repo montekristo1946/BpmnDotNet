@@ -1,6 +1,7 @@
 # Визуальная часть.
 
 ## Настройка
+
 1. Поднять ElasticSearch <br>
    ~~~docker run --rm  \
    --name elasticsearch \
@@ -12,6 +13,6 @@
    -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
    -v /mnt/Disk_D/TMP/16.08.2025/ElasticDb/:/usr/share/elasticsearch/data \
    docker.elastic.co/elasticsearch/elasticsearch:9.1.2
-   
+
 2. Проинициализировать инстанс в контейнере
-... ще работаем над этим
+   ... ще работаем над этим
