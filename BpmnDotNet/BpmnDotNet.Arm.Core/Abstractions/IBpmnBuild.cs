@@ -9,5 +9,5 @@ public interface IBpmnBuild<T> where T : new()
         return new T();
     }
 
-    public void AddChild(string childElement);
+    public T AddChild(string childElement);
 }

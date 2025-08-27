@@ -25,20 +25,25 @@ public class SvgConstructor : ISvgConstructor
         var viewportBuilder = IBpmnBuild<ViewportBuilder>.Create();
         ;
 
-
+        const int stokeWidthStart = 2;
+        const int stokeWidthEnd = 4;
         var color = "#22242a";
         foreach (var shape in shapes)
         {
             var stringShape = shape.Type switch
             {
-                ElementType.StartEvent => CreateStartEvent(shape, color),
-                // ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
+                ElementType.StartEvent => CreateStartEvent(shape, color,stokeWidthStart),
+                ElementType.EndEvent => CreateStartEvent(shape, color,stokeWidthEnd),
+                ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
                 // ElementType.ServiceTask => CreateService(shape, color),
 
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
             };
+            
             viewportBuilder.AddChild(stringShape);
+            var label = AddLabel(shape);
+            viewportBuilder.AddChild(label);
         }
 
         var viewportString = viewportBuilder.Build();
@@ -47,8 +52,46 @@ public class SvgConstructor : ISvgConstructor
         return retStringSvg;
     }
 
+    private string AddLabel(BpmnShape shape)
+    {
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .Build();
+        
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .Build();
 
-    private string CreateStartEvent(BpmnShape shape, string color)
+        var label = IBpmnBuild<LabelBuilder>
+            .Create()
+            .AddPosition(shape.BpmnLabel.X,shape.BpmnLabel.Y)
+            .AddChild(textBuilder)
+            .Build();
+        
+        return label;
+    }
+
+    private string CreateSequenceFlow(BpmnShape shape, string color)
+    {
+        if (shape.Bounds.Length < 2)
+            throw new ArgumentException("Shape must have at least 2 bounds");
+
+        var id = shape.Id;
+        var bounds =  shape.Bounds;
+        
+        var circle = IBpmnBuild<SequenceFlowBuilder>
+            .Create()
+            .AddColor(color)
+            .AddBound(bounds)
+            .AddId(id)
+            .Build();
+        return circle;
+    }
+
+
+    private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth)
     {
         var boundCircle = shape.Bounds.FirstOrDefault()
                           ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -57,15 +100,23 @@ public class SvgConstructor : ISvgConstructor
         var xStart = boundCircle.X;
         var yStart = boundCircle.Y;
         var id = shape.Id;
+        
+        var circle = IBpmnBuild<CircleBuilder>
+            .Create()
+            .AddColor(color)
+            .AddRadius(radius)
+            .AddStokeWidth(stokeWidth)
+            .Build();
 
+        
         var startEvent = IBpmnBuild<StartEventBuilder>.Create();
         var retStringSvg = startEvent
             .AddId(id)
             .AddPosition(xStart, yStart)
-            .AddRadius(radius)
-            .AddColor(color)
+            .AddChild(circle)
             .Build();
 
+        
         return retStringSvg;
     }
 

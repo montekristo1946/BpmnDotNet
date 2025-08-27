@@ -20,8 +20,9 @@ public class ViewportBuilder : IBpmnBuild<ViewportBuilder>
         return _svgStorage.ToString();
     }
 
-    public void AddChild(string childElement)
+    public ViewportBuilder AddChild(string childElement)
     {
         _childElements.Add(childElement);
+        return this;
     }
 }
