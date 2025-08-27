@@ -35,7 +35,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.StartEvent => CreateStartEvent(shape, color,stokeWidthStart),
                 ElementType.EndEvent => CreateStartEvent(shape, color,stokeWidthEnd),
                 ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
-                // ElementType.ServiceTask => CreateService(shape, color),
+                ElementType.ServiceTask => CreateServiceTask(shape, color),
 
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
@@ -52,8 +52,40 @@ public class SvgConstructor : ISvgConstructor
         return retStringSvg;
     }
 
+    private string CreateServiceTask(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                          ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddMaxLenLine(5)
+            .AddPaddingY(15)
+            .AddPaddingX(10)
+            .Build();
+        
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .Build();
+        
+       
+        var serviceTask = IBpmnBuild<ServiceTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return serviceTask;
+    }
+
     private string AddLabel(BpmnShape shape)
     {
+        if(shape.BpmnLabel.X<0 || shape.BpmnLabel.Y<0)
+            return string.Empty;
+        
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)

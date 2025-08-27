@@ -23,15 +23,15 @@
     <bpmn:sequenceFlow id="Flow_out_ReceiveTaskFirstHandle" sourceRef="ReceiveTaskFirstHandle" targetRef="Gateway_Second" />
     <bpmn:sequenceFlow id="Flow_out_BlockFirstHandler" sourceRef="ServiceTaskFirstHandler" targetRef="GatewayFirstHandler" />
     <bpmn:sequenceFlow id="Flow_in_SendTaskFirstHandler" name="Нет" sourceRef="GatewayFirstHandler" targetRef="SendTaskFirstHandler" />
-    <bpmn:serviceTask id="ServiceTaskFirstHandler" name="ServiceTaskFirstHandler">
+    <bpmn:serviceTask id="ServiceTaskFirstHandler" name="ServiceTask FirstHandler">
       <bpmn:incoming>Flow_to_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_BlockFirstHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sendTask id="SendTaskFirstHandler" name="SendTaskFirstHandler">
+    <bpmn:sendTask id="SendTaskFirstHandler" name="SendTask FirstHandler">
       <bpmn:incoming>Flow_in_SendTaskFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_SendTaskFirstHandler</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:receiveTask id="ReceiveTaskFirstHandle" name="ReceiveTaskFirstHandle">
+    <bpmn:receiveTask id="ReceiveTaskFirstHandle" name="ReceiveTask FirstHandle">
       <bpmn:incoming>Flow_in_ReceiveTaskFirstHandle</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ReceiveTaskFirstHandle</bpmn:outgoing>
     </bpmn:receiveTask>
@@ -54,19 +54,19 @@
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskThirdHandler" sourceRef="ServiceTaskThirdHandler" targetRef="GatewayFourthHandler" />
     <bpmn:sequenceFlow id="Flow_out_GatewayFourthHandler" name="to end" sourceRef="GatewayFourthHandler" targetRef="End_event" />
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskFourthHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskFourthHandler" />
-    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="ServiceTaskSecondHandler">
+    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="ServiceTask SecondHandler">
       <bpmn:incoming>Flow_in_ServiceTaskSecondHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ServiceTaskSecondHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTaskThirdHandler" name="ServiceTaskThirdHandler">
+    <bpmn:serviceTask id="ServiceTaskThirdHandler" name="ServiceTask ThirdHandler">
       <bpmn:incoming>Flow_in_ServiceTaskThirdHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ServiceTaskThirdHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTaskFourthHandler" name="ServiceTaskFourthHandler">
+    <bpmn:serviceTask id="ServiceTaskFourthHandler" name="ServiceTask FourthHandler">
       <bpmn:incoming>Flow_in_ServiceTaskFourthHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_SubProcessFirstHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:subProcess id="SubProcessFirstHandler" name="SubProcessFirst">
+    <bpmn:subProcess id="SubProcessFirstHandler" name="SubProcess First">
       <bpmn:extensionElements />
       <bpmn:incoming>Flow_in_SubProcessFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_SubProcessFirstHandler</bpmn:outgoing>

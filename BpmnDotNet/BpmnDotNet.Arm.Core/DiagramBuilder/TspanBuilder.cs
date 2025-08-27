@@ -7,18 +7,21 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
-    private const int SymbolInOneLine = 12;
+    private  int _symbolInOneLine = 15;
     private const int FontSize = 11;
-    
+    private int _paddingY = 0;
+    private int _paddingX = 0;
+
+
     public string Build()
     {
-        var allLines = _childElements.SelectMany(SpliteLines).ToArray();
+        var allLines = _childElements.SelectMany(SplitLines).ToArray();
 
         for (var i = 0; i < allLines.Length; i++)
         {
             var body = allLines[i];
-            var y = i * FontSize+FontSize;
-            var x = 0;
+            var y = i * FontSize+FontSize+_paddingY;
+            var x = _paddingX;
             var hider = $"<tspan x=\"{x}\" y=\"{y}\">";
             var footer = " </tspan>";
             _svgStorage.Append(hider);
@@ -28,11 +31,25 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
         return _svgStorage.ToString();
     }
 
-    private string [] SpliteLines(string input)
+    private string [] SplitLines(string input)
     {
-        var segments = Enumerable.Range(0, (int)Math.Ceiling(input.Length /(double)SymbolInOneLine))
-            .Select(i => input.Substring(i * SymbolInOneLine, 
-                Math.Min(SymbolInOneLine, input.Length - i * SymbolInOneLine)));
+        var arrWord = input.Split(' ');
+        var segments = arrWord.Aggregate(new List<StringBuilder> { new () }, 
+                (list, str) =>
+                {
+                    var last = list.Last();
+                    if (last.Length + str.Length <= _symbolInOneLine)
+                    {
+                        last.Append($"{str} ");
+                    }
+                    else
+                    {
+                        list.Add(new StringBuilder($"{str} "));
+                    }
+                    return list;
+                })
+            .Select(sb => sb.ToString())
+            .ToArray();
         
         return segments.ToArray();
     }
@@ -40,6 +57,23 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
     public TspanBuilder AddChild(string childElement)
     {
         _childElements.Add(childElement);
+        return this;
+    }
+
+    public TspanBuilder AddMaxLenLine(int len)
+    {
+        _symbolInOneLine = len;
+        return this;
+    }
+    public TspanBuilder AddPaddingY(int value)
+    {
+        _paddingY = value;
+        return this;
+    }
+    
+    public TspanBuilder AddPaddingX(int value)
+    {
+        _paddingX = value;
         return this;
     }
 }
