@@ -38,6 +38,8 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ServiceTask => CreateServiceTask(shape, color),
                 ElementType.SendTask => CreateSendTask(shape, color),
                 ElementType.ReceiveTask => CreateReceiveTask(shape, color),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
+                ElementType.ParallelGateway => CreateParallelGateway(shape, color),
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
             };
@@ -51,6 +53,34 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.Build();
         return retStringSvg;
+    }
+
+    private string CreateParallelGateway(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var gateway = IBpmnBuild<ParallelGatewayBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return gateway;
+    }
+    
+    private string CreateExclusiveGateway(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var gateway = IBpmnBuild<ExlusiveGatewayBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return gateway;
     }
 
     private string CreateReceiveTask(BpmnShape shape, string color)

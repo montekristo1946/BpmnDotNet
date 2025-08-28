@@ -8,7 +8,7 @@
     <bpmn:endEvent id="End_event" name="End event">
       <bpmn:incoming>Flow_out_GatewayFourthHandler</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
+    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="Gateway FirstHandler">
       <bpmn:incoming>Flow_out_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
       <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
@@ -91,7 +91,7 @@
       <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
         <dc:Bounds x="475" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="469" y="56" width="85" height="27" />
+          <dc:Bounds x="481" y="56" width="61" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0oqklk1_di" bpmnElement="Gateway_Second" isMarkerVisible="true">
