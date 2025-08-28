@@ -51,6 +51,8 @@ public partial class Operate : ComponentBase
 
     private void UpdateUpdatePanel()
     {
+  
         _drawingPlanePanel?.UpdatePanel().Wait();
+     
     }
 }

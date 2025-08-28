@@ -10,7 +10,7 @@ public class SvgRootBuilder : IBpmnBuild<SvgRootBuilder>
 
     public string Build()
     {
-        var hider = "<svg width=\"1600px\" height=\"600px\" xmlns=\"http://www.w3.org/2000/svg\">";
+        var hider = "<svg width=\"100%\" height=\"100%\" xmlns=\"http://www.w3.org/2000/svg\">";
         var footer = "</svg>";
 
         _svgStorage.AppendLine(hider);

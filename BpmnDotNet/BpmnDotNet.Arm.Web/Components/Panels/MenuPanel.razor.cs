@@ -9,5 +9,6 @@ public partial class MenuPanel : ComponentBase
     private void OnClickUpdate()
     {
         IsUpdatePanel?.Invoke();
+       
     }
 }

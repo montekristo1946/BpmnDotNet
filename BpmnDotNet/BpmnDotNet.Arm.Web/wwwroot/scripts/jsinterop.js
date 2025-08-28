@@ -1,10 +1,3 @@
-function FocusElement(id) {
-    const element = document.getElementById(id);
-    if (element == null)
-        return
-    element.focus({preventScroll: true});
-}
-
 async function LoadImg(idCanvas, imgBase64, width, height) {
     if (imgBase64 == null || width <= 0 || height <= 0) {
         console.log("Fail input data");

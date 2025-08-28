@@ -1,4 +1,5 @@
 using BpmnDotNet.Arm.Core.Abstractions;
+using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Arm.Core.Handlers;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Handlers;
@@ -20,7 +21,12 @@ public class SvgConstructorTests
     [Fact]
     public async Task CreatePlanes_Svg()
     {
-        var res = await _svgConstructor.CreatePlane(_bpmnPlane);
+        var size = new SizeWindows()
+        {
+            Height = 603,
+            Width = 1594
+        };
+        var res = await _svgConstructor.CreatePlane(_bpmnPlane, size);
         await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
         throw new NotImplementedException();

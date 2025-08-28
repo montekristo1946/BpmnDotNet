@@ -10,7 +10,7 @@ public class PlanePanelHandler : IPlanePanelHandler
     {
         var serialization = new XmlSerializationBpmnDiagramSection();
         var diagram = serialization.LoadXmlBpmnDiagram(
-            "/mnt/Disk_C/git/BpmnDotNet/BpmnDotNet/BpmnDotNet.ElasticClient.Tests/BpmnDiagram/diagram_1.bpmn");
+            "/mnt/Disk_C/git/BpmnDotNet/BpmnDotNet/BpmnDotNet.Arm.Core.Tests/BpmnDiagram/diagram_1.bpmn");
 
         return Task.FromResult(diagram);
     }

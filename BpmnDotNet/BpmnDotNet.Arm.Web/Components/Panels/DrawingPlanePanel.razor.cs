@@ -1,5 +1,8 @@
+using BlazorBrowserInteractLabeler.Web.Common;
 using BpmnDotNet.Arm.Core.Abstractions;
+using BpmnDotNet.Arm.Core.Dto;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace BpmnDotNet.Arm.Web.Components.Panels;
 
@@ -12,14 +15,21 @@ public partial class DrawingPlanePanel : ComponentBase
 
     [Inject] private ISvgConstructor SvgConstructor { get; set; } = null!;
 
+    [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
 
     private string WidthConvas => $"{100}%";
     private string HeightConvas => $"{100}%";
 
+    private SizeWindows SizeWindows { get; set; } = new SizeWindows();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
+    }
+
     private string CssScale()
     {
         var scaleCurrent = 1.0F;
-        ;
         var offsetX = 0;
         var offsetY = 0;
         return $"transform: scale({scaleCurrent}) translate({offsetX}px, {offsetY}px)";
@@ -27,13 +37,10 @@ public partial class DrawingPlanePanel : ComponentBase
 
     private RenderFragment GetRenderAnnotation()
     {
-        return async void (builder) =>
+        return void (builder) =>
         {
             try
             {
-                var bpmnPlane = await PlaneHandler.GetPlane();
-                _svgToString = await SvgConstructor.CreatePlane(bpmnPlane);
-
                 builder.AddMarkupContent(0, _svgToString);
             }
             catch (Exception e)
@@ -42,16 +49,22 @@ public partial class DrawingPlanePanel : ComponentBase
             }
         };
     }
-
+    
     public async Task UpdatePanel()
     {
-        var bpmnPlane = await PlaneHandler.GetPlane();
-        _svgToString = await SvgConstructor.CreatePlane(bpmnPlane);
-
-        await InvokeAsync(() =>
+        try
         {
-            StateHasChanged();
-            return Task.CompletedTask;
-        });
+            var bpmnPlane = await PlaneHandler.GetPlane();
+            _svgToString = await SvgConstructor.CreatePlane(bpmnPlane, SizeWindows);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+                return Task.CompletedTask;
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("[UpdatePanel] {@Exception}", e.Message);
+        }
     }
 }
