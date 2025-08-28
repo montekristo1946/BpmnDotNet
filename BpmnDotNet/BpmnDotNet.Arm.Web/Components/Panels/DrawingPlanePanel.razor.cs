@@ -24,9 +24,24 @@ public partial class DrawingPlanePanel : ComponentBase
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("window.registerViewportChangeCallback", DotNetObjectReference.Create(this));
+            SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
+        }
+        
     }
 
+    [JSInvokable]
+    public void OnResize(int width, int height)
+    {
+        InvokeAsync(async () =>
+        {
+            SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
+            await UpdatePanel();
+        });
+    }
+    
     private string CssScale()
     {
         var scaleCurrent = 1.0F;
