@@ -37,6 +37,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
                 ElementType.ServiceTask => CreateServiceTask(shape, color),
                 ElementType.SendTask => CreateSendTask(shape, color),
+                ElementType.ReceiveTask => CreateReceiveTask(shape, color),
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
             };
@@ -50,6 +51,36 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.Build();
         return retStringSvg;
+    }
+
+    private string CreateReceiveTask(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddMaxLenLine(5)
+            .AddPaddingY(15)
+            .AddPaddingX(10)
+            .Build();
+        
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .Build();
+        
+       
+        var task = IBpmnBuild<ReceiveTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return task;
     }
 
     private string CreateSendTask(BpmnShape shape, string color)
@@ -72,14 +103,14 @@ public class SvgConstructor : ISvgConstructor
             .Build();
         
        
-        var serviceTask = IBpmnBuild<SendTaskBuilder>
+        var task = IBpmnBuild<SendTaskBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
             .Build();
-        return serviceTask;
+        return task;
     }
 
     private string CreateServiceTask(BpmnShape shape, string color)
@@ -102,14 +133,14 @@ public class SvgConstructor : ISvgConstructor
             .Build();
         
        
-        var serviceTask = IBpmnBuild<ServiceTaskBuilder>
+        var task = IBpmnBuild<ServiceTaskBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
             .Build();
-        return serviceTask;
+        return task;
     }
 
     private string AddLabel(BpmnShape shape, string color)
