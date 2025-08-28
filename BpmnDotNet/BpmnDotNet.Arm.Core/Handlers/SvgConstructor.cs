@@ -25,14 +25,12 @@ public class SvgConstructor : ISvgConstructor
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes,widthWindows);
         var scalingY = CalculateScalingViewportCoordinateY(shapes,heightWindows);
-        // var offset = CalculateOffsetViewport(shapes);
+       
 
         var viewportBuilder = IBpmnBuild<ViewportBuilder>
             .Create()
             .AddScalingX(scalingX)
-            .AddScalingY(scalingY)
-            // .AddOffset(offset.offsetX, offset.offsetY)
-            ;
+            .AddScalingY(scalingY);
 
 
         const int stokeWidthStart = 2;

@@ -27,8 +27,8 @@ public class SvgConstructorTests
             Width = 1594
         };
         var res = await _svgConstructor.CreatePlane(_bpmnPlane, size);
-        await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
+        // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
-        throw new NotImplementedException();
+        Assert.Equal(37567,res.Length);
     }
 }

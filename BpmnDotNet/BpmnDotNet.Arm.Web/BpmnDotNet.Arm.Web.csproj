@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\BpmnDotNet.Arm.Core\BpmnDotNet.Arm.Core.csproj"/>
+        <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
     </ItemGroup>
 
 

@@ -170,14 +170,14 @@ public class ElasticClient : IElasticClient
                 .Indices(index)
                 .Query(q => q
                     .Match(m => m
-                        .Field(f => f.IdBpmnProcess) // Замените на ваше поле
+                        .Field(f => f.IdBpmnProcess) 
                         .Query(valueFind)
                     )
                 )
             );
 
             return response.Count;
-            ;
+            
         }
         catch (Exception ex)
         {

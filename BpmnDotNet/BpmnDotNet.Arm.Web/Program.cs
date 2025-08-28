@@ -3,6 +3,9 @@ using BpmnDotNet.Arm.Core.Handlers;
 using BpmnDotNet.Arm.Web.AppWeb;
 using BpmnDotNet.Arm.Web.Config;
 using BpmnDotNet.Arm.Web.Extensions;
+using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.ElasticClient;
+using BpmnDotNet.ElasticClient.Handlers;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +16,8 @@ builder.Host.InitCulture();
 builder.Services
     .AddScoped<IPlanePanelHandler, PlanePanelHandler>()
     .AddScoped<ISvgConstructor, SvgConstructor>()
+    .AddScoped<ElasticClientConfig>()
+    .AddScoped<IElasticClient, ElasticClient>()
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 
