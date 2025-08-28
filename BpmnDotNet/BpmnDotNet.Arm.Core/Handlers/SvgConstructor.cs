@@ -40,6 +40,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ReceiveTask => CreateReceiveTask(shape, color),
                 ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
                 ElementType.ParallelGateway => CreateParallelGateway(shape, color),
+                ElementType.SubProcess => CreateSubProcess(shape, color),
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
             };
@@ -53,6 +54,36 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.Build();
         return retStringSvg;
+    }
+
+    private string CreateSubProcess(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddMaxLenLine(5)
+            .AddPaddingY(15)
+            .AddPaddingX(10)
+            .Build();
+        
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .Build();
+        
+       
+        var task = IBpmnBuild<SubProcessBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return task;
     }
 
     private string CreateParallelGateway(BpmnShape shape, string color)

@@ -44,7 +44,7 @@
     </bpmn:parallelGateway>
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskSecondHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskSecondHandler" />
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskSecondHandler" sourceRef="ServiceTaskSecondHandler" targetRef="GatewayFourthHandler" />
-    <bpmn:parallelGateway id="GatewayFourthHandler" name="GatewayFourthHandler">
+    <bpmn:parallelGateway id="GatewayFourthHandler" name="GatewayFourth Handler">
       <bpmn:incoming>Flow_out_ServiceTaskSecondHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_ServiceTaskThirdHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_SubProcessFirstHandler</bpmn:incoming>
@@ -121,7 +121,7 @@
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">
         <dc:Bounds x="1375" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1355" y="56" width="90" height="27" />
+          <dc:Bounds x="1362" y="56" width="76" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1004tiz_di" bpmnElement="ServiceTaskSecondHandler">
