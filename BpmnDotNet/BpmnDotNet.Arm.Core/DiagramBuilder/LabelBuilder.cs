@@ -16,7 +16,7 @@ public class LabelBuilder: IBpmnBuild<LabelBuilder>
 
     public string Build()
     {
-        var hider = $"<g class=\"djs-element djs-shape\" data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
+        var hider = $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
         
         var footer = "</g>";
         

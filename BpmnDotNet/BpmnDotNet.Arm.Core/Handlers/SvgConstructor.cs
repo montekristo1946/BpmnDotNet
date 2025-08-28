@@ -36,13 +36,13 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.EndEvent => CreateStartEvent(shape, color,stokeWidthEnd),
                 ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
                 ElementType.ServiceTask => CreateServiceTask(shape, color),
-
+                ElementType.SendTask => CreateSendTask(shape, color),
                 _ => string.Empty
                 // _ => throw new ArgumentOutOfRangeException()
             };
             
             viewportBuilder.AddChild(stringShape);
-            var label = AddLabel(shape);
+            var label = AddLabel(shape,color);
             viewportBuilder.AddChild(label);
         }
 
@@ -50,6 +50,36 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.Build();
         return retStringSvg;
+    }
+
+    private string CreateSendTask(BpmnShape shape, string color)
+    {
+        var boundServiceTask = shape.Bounds.FirstOrDefault()
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+        
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddMaxLenLine(5)
+            .AddPaddingY(15)
+            .AddPaddingX(10)
+            .Build();
+        
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .Build();
+        
+       
+        var serviceTask = IBpmnBuild<SendTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .Build();
+        return serviceTask;
     }
 
     private string CreateServiceTask(BpmnShape shape, string color)
@@ -68,6 +98,7 @@ public class SvgConstructor : ISvgConstructor
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
+            .AddColor(color)
             .Build();
         
        
@@ -81,7 +112,7 @@ public class SvgConstructor : ISvgConstructor
         return serviceTask;
     }
 
-    private string AddLabel(BpmnShape shape)
+    private string AddLabel(BpmnShape shape, string color)
     {
         if(shape.BpmnLabel.X<0 || shape.BpmnLabel.Y<0)
             return string.Empty;
@@ -94,12 +125,14 @@ public class SvgConstructor : ISvgConstructor
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
+            .AddColor(color)
             .Build();
 
         var label = IBpmnBuild<LabelBuilder>
             .Create()
             .AddPosition(shape.BpmnLabel.X,shape.BpmnLabel.Y)
             .AddChild(textBuilder)
+            .AddId($"Label_{shape.Id}")
             .Build();
         
         return label;
