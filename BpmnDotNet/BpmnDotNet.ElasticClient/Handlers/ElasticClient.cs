@@ -198,7 +198,7 @@ public class ElasticClient : IElasticClient
         try
         {
             var client = await GetClient();
-            var index = StringUtils.CreateIndexName(typeof(BpmnPlane));
+            var index = StringUtils.CreateIndexName(typeof(TIndex));
             var field = nameField.ToElasticsearchFieldName();
 
             var response = await client.SearchAsync<TIndex>(s => s

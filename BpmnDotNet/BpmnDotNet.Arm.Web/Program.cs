@@ -14,10 +14,12 @@ builder.Host.UseLogger();
 builder.Host.InitCulture();
 
 builder.Services
-    .AddScoped<IPlanePanelHandler, PlanePanelHandler>()
     .AddScoped<ISvgConstructor, SvgConstructor>()
     .AddScoped<ElasticClientConfig>()
     .AddScoped<IElasticClient, ElasticClient>()
+    .AddTransient<IPlanePanelHandler, PlanePanelHandler>()
+    .AddTransient<IFilterPanelHandler, FilterPanelHandler>()
+    
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 

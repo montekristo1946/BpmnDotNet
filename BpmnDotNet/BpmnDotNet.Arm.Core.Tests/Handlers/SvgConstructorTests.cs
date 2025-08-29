@@ -8,14 +8,14 @@ namespace BpmnDotNet.Arm.Core.Tests.Handlers;
 
 public class SvgConstructorTests
 {
-    private readonly BpmnPlane _bpmnPlane;
+    private readonly BpmnPlane _string;
     private readonly ISvgConstructor _svgConstructor;
 
     public SvgConstructorTests()
     {
         _svgConstructor = new SvgConstructor();
         var serialization = new XmlSerializationBpmnDiagramSection();
-        _bpmnPlane = serialization.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_1.bpmn");
+        _string = serialization.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_1.bpmn");
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class SvgConstructorTests
             Height = 603,
             Width = 1594
         };
-        var res = await _svgConstructor.CreatePlane(_bpmnPlane, size);
+        var res = await _svgConstructor.CreatePlane(_string, size);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
         Assert.Equal(37567,res.Length);

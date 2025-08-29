@@ -9,13 +9,12 @@ namespace BpmnDotNet.Arm.Core.Handlers;
 
 public class SvgConstructor : ISvgConstructor
 {
-    public Task<string> CreatePlane(BpmnPlane bpmnPlane, SizeWindows sizeWindows)
+    public Task<string> CreatePlane(BpmnPlane plane, SizeWindows sizeWindows)
     {
         var widthWindows = (int) sizeWindows.Width;
         var heightWindows =(int) sizeWindows.Height;
-        var shapes = CreateShapes(bpmnPlane.Shapes,widthWindows,heightWindows);
-
-       
+        var shapes = CreateShapes(plane.Shapes,widthWindows,heightWindows);
+        
         return Task.FromResult(shapes);
     }
     

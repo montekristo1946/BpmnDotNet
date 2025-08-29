@@ -5,15 +5,41 @@ namespace BpmnDotNet.Arm.Web.Components.Pages;
 
 public partial class Operate : ComponentBase
 {
-    private DrawingPlanePanel? _drawingPlanePanel;
-    private MenuPanel? _menuPanel;
     private RenderFragment BpmnPlanePanelTemplate { get; set; }
+    private DrawingPlanePanel? _drawingPlanePanel;
     private RenderFragment MenuPanelTemplate { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    private MenuPanel? _menuPanel;
+    private RenderFragment FilterPanelTemplate { get; set; }
+    private FilterPanel? _filterPanel;
+    
+    protected override Task OnInitializedAsync()
     {
         BpmnPlanePanelTemplate = CreateBpmnPlanePanelTemplate();
         MenuPanelTemplate = CreateMenuPanelTemplate();
+        FilterPanelTemplate = CreateFilterPanelTemplate();
+        return Task.CompletedTask;
+    }
+
+    private RenderFragment CreateFilterPanelTemplate()
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, typeof(FilterPanel));
+            builder.AddAttribute(1, nameof(FilterPanel.HandlerSetupIdProcess), HandlerSetupIdProcess);
+            builder.AddComponentReferenceCapture(1, value =>
+            {
+                _filterPanel = value as FilterPanel
+                               ?? throw new InvalidOperationException(
+                                   "Не смог c конвертировать FilterPanel в FilterPanel");
+            });
+
+            builder.CloseComponent();
+        };
+    }
+
+    private void HandlerSetupIdProcess( string  value )
+    {
+        _drawingPlanePanel?.UpdatePanel(value);
     }
 
     private RenderFragment CreateBpmnPlanePanelTemplate()
@@ -51,8 +77,8 @@ public partial class Operate : ComponentBase
 
     private void UpdateUpdatePanel()
     {
-  
-        _drawingPlanePanel?.UpdatePanel().Wait();
-     
+
+        _drawingPlanePanel?.UpdatePanel();
+
     }
 }

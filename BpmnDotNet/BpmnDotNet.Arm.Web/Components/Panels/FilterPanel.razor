@@ -1,0 +1,21 @@
+
+<div class="m-0 padding-1px border-enveloping-custom "
+     style="background-color: #f8f9fa; height: 100%; width: 100%; overflow-x: hidden;  overflow-y: auto;">
+
+     @{
+          foreach (var process in _arrayProcessId)
+          {
+               <div class="row padding-1px  div-menu-center bottom-shadow"
+                    style="height: 2vh; width: 100%;
+                             background-color: #ffffff;
+                         margin-top: 3px; margin-left: 1px; margin-right: 1px;
+                         border-radius: 5px 5px 5px 5px; "
+                    @onclick="@(() => ButtonClickObjectAsync(process))">
+                    <div class="col-12 m-0 text-vertical-center padding-1px" style="">
+                         @process
+                    </div>
+                 
+               </div>
+          }
+     }
+</div>

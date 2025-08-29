@@ -50,7 +50,7 @@ public interface IElasticClient
     public Task<long> GetHistoryNodeStateCountAsync(string valueFind);
 
     /// <summary>
-    /// Получить все поля nameField из TIndex. Остальные поля буду заполнены default.
+    /// Получить все записи по полю TField из TIndex. 
     /// </summary>
     /// <typeparam name="TIndex"></typeparam>
     /// <typeparam name="TField"></typeparam>

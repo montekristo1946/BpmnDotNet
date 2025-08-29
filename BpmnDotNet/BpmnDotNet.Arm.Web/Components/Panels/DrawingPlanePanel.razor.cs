@@ -12,13 +12,13 @@ public partial class DrawingPlanePanel : ComponentBase
     [Inject] private IPlanePanelHandler PlaneHandler { get; set; } = null!;
 
     [Inject] private ILogger<DrawingPlanePanel> Logger { get; set; } = null!;
-
-    [Inject] private ISvgConstructor SvgConstructor { get; set; } = null!;
-
+    
     [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
 
     private string WidthConvas => $"{100}%";
     private string HeightConvas => $"{100}%";
+    
+    private string _activeProcess  = string.Empty;
 
     private SizeWindows SizeWindows { get; set; } = new SizeWindows();
 
@@ -65,12 +65,16 @@ public partial class DrawingPlanePanel : ComponentBase
         };
     }
     
-    public async Task UpdatePanel()
+    public async Task UpdatePanel( string idProcess = "")
     {
         try
         {
-            var bpmnPlane = await PlaneHandler.GetPlane();
-            _svgToString = await SvgConstructor.CreatePlane(bpmnPlane, SizeWindows);
+            if (!string.IsNullOrEmpty(idProcess))
+            {
+                _activeProcess =  idProcess;
+            }
+            
+            _svgToString = await PlaneHandler.GetPlane(_activeProcess,SizeWindows);
             await InvokeAsync(() =>
             {
                 StateHasChanged();
