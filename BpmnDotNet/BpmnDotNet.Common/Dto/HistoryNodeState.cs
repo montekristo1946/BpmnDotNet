@@ -8,9 +8,9 @@ namespace BpmnDotNet.Common.Dto;
 public class HistoryNodeState
 {
     /// <summary>
-    ///     Id, IdBpmnProcess+TokenProcess
+    ///     ID, IdBpmnProcess+TokenProcess
     /// </summary>
-    public string Id => $"{IdBpmnProcess}_{TokenProcess}";
+    public string Id => $"{IdBpmnProcess}_{TokenProcess}_{DateCreated.Ticks}";
 
     /// <summary>
     ///     ID Bpmn процесса из схемы bpmn.

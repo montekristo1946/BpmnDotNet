@@ -14,13 +14,13 @@ internal static class BpmnClientBuilder
     public static IBpmnClient Build(string pathDiagram,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
-        IElasticClient elasticClient)
+        IElasticClient elasticClient,
+        IHistoryNodeStateWriter historyNodeStateWriter)
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
         LoadBpmnInElastic(allBpmnFiles,elasticClient);
-        //TODO: добавить регистарцию класса логирования процессов.
-        return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder);
+        return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder,historyNodeStateWriter);
     }
 
     private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClient elasticClient)

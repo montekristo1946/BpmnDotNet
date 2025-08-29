@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
-        
+        services.AddScoped<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
         services.AddScoped<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
@@ -26,10 +26,9 @@ public static class ServiceCollectionExtensions
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
             var pathFinder = options.GetRequiredService<IPathFinder>();
             var elasticClient = options.GetRequiredService<IElasticClient>();
-         
-            //TODO: добавить регистрацию класса логирования процессов.
+            var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
             
-            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder,elasticClient);
+            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder,elasticClient,historyNodeStateWriter);
         });
 
 

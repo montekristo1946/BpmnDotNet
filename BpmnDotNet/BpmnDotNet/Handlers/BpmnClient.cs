@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;
 
-public class BpmnClient : IBpmnClient
+internal class BpmnClient : IBpmnClient
 {
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
 
@@ -22,12 +22,17 @@ public class BpmnClient : IBpmnClient
     private readonly ILogger<BpmnClient> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IPathFinder _pathFinder;
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private volatile bool _disposed;
 
-    public BpmnClient(BpmnProcessDto[] businessProcessDtos, ILoggerFactory loggerFactory, IPathFinder pathFinder)
+    public BpmnClient(BpmnProcessDto[] businessProcessDtos,
+        ILoggerFactory loggerFactory, 
+        IPathFinder pathFinder,
+        IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
+        _historyNodeStateWriter = historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
         _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
@@ -44,7 +49,7 @@ public class BpmnClient : IBpmnClient
         var logger = _loggerFactory.CreateLogger<BusinessProcess>();
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
 
-        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout);
+        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout,_historyNodeStateWriter);
 
         var resAdd = _bpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
         if (resAdd is false)

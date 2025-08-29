@@ -25,6 +25,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// </summary>
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers;
 
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
+
     private readonly ILogger<IBusinessProcess> _logger;
 
     /// <summary>
@@ -45,13 +47,15 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         ILogger<IBusinessProcess> logger,
         BpmnProcessDto bpmnShema, IPathFinder pathFinder,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        TimeSpan timeout)
+        TimeSpan timeout, 
+        IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _contextBpmnProcess = contextBpmnProcess ?? throw new ArgumentNullException(nameof(contextBpmnProcess));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _bpmnShema = bpmnShema ?? throw new ArgumentNullException(nameof(bpmnShema));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
         _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
+        _historyNodeStateWriter = historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
 
         _cts = new CancellationTokenSource(timeout);
         var task = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
@@ -267,9 +271,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 NodeRegistryChangeState(nodeId, ProcessingStaus.Complete);
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
-
-                //TODO: добавить сюда заливать состояние в elastic.
                 
+                //Запишем состояние процесса в бд.
+               await _historyNodeStateWriter.SetStateProcess(
+                    _contextBpmnProcess.IdBpmnProcess, 
+                    _contextBpmnProcess.TokenProcess,
+                    _nodeStateRegistry.Values.ToArray()
+                    );
+               
                 CheckFinalProcessing(nodeId);
             }
             catch (OperationCanceledException)

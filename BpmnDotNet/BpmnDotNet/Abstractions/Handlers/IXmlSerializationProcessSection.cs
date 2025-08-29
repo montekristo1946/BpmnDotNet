@@ -3,7 +3,7 @@ using BpmnDotNet.Abstractions.Elements;
 namespace BpmnDotNet.Abstractions.Handlers;
 
 /// <summary>
-///     Сериализатор в обьектынй вид.
+///     Сериализатор в объектный вид.
 /// </summary>
 public interface IXmlSerializationProcessSection
 {
