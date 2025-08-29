@@ -100,7 +100,7 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(5)
+            .AddMaxLenLine(14)
             .AddPaddingY(15)
             .AddPaddingX(10)
             .Build();
@@ -158,7 +158,7 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(5)
+            .AddMaxLenLine(14)
             .AddPaddingY(15)
             .AddPaddingX(10)
             .Build();
@@ -188,7 +188,7 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(5)
+            .AddMaxLenLine(14)
             .AddPaddingY(15)
             .AddPaddingX(10)
             .Build();
@@ -218,7 +218,7 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(5)
+            .AddMaxLenLine(14)
             .AddPaddingY(15)
             .AddPaddingX(10)
             .Build();

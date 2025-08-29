@@ -15,7 +15,8 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
 
     public string Build()
     {
-        var allLines = _childElements.SelectMany(SplitLines).ToArray();
+        var allLines = _childElements.SelectMany(SplitLinesFromWhiteSpace).ToArray();
+        allLines = SplitLinesFromLongLine(allLines);
 
         for (var i = 0; i < allLines.Length; i++)
         {
@@ -31,7 +32,28 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
         return _svgStorage.ToString();
     }
 
-    private string [] SplitLines(string input)
+    private string[] SplitLinesFromLongLine(string[] allLines)
+    {
+        var retArr = new List<string>();
+        foreach (var line in allLines)
+        {
+            if (line.Length <= _symbolInOneLine)
+            {
+                retArr.Add(line);
+                continue;
+            }
+
+            for (int i = 0; i < line.Length; i += _symbolInOneLine)
+            {
+                var length = Math.Min(_symbolInOneLine, line.Length - i);
+                retArr.Add(line.Substring(i, length));
+            }
+        }
+
+        return retArr.ToArray();
+    }
+
+    private string [] SplitLinesFromWhiteSpace(string input)
     {
         var arrWord = input.Split(' ');
         var segments = arrWord.Aggregate(new List<StringBuilder> { new () }, 
