@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using AutoFixture;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.ElasticClient.Tests.Configs;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

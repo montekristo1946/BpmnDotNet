@@ -1,7 +1,7 @@
+using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Interfaces.Elements;
 
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Abstractions.Handlers;
 
 public interface IPathFinder
 {

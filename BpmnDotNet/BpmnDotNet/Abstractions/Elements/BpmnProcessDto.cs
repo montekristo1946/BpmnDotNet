@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Interfaces.Elements;
+namespace BpmnDotNet.Abstractions.Elements;
 
 public class BpmnProcessDto(string idBpmnProcess, IElement[] elementsFromBody)
 {

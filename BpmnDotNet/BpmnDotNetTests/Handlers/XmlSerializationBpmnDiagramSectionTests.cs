@@ -1,5 +1,5 @@
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Handlers;
-using BpmnDotNet.Interfaces.Handlers;
 
 namespace BpmnDotNetTests.Handlers;
 

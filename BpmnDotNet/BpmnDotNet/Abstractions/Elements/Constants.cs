@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Interfaces.Elements;
+namespace BpmnDotNet.Abstractions.Elements;
 
 internal static class Constants
 {

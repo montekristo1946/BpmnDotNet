@@ -1,4 +1,4 @@
-using BpmnDotNet.Interfaces.Handlers;
+using BpmnDotNet.Abstractions.Handlers;
 using Sample.ConsoleApp.Common;
 using Sample.ConsoleApp.Context;
 using Sample.ConsoleApp.Handlers;

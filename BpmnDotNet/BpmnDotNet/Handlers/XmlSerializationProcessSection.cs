@@ -1,7 +1,7 @@
 using System.Xml;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Elements.BpmnNatation;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 
 namespace BpmnDotNet.Handlers;
 

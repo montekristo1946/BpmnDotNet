@@ -1,6 +1,6 @@
-using BpmnDotNet.Interfaces.Elements;
+using BpmnDotNet.Abstractions.Elements;
 
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Abstractions.Handlers;
 
 /// <summary>
 ///     Сериализатор в обьектынй вид.

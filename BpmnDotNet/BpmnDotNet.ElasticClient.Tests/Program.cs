@@ -1,10 +1,10 @@
-﻿using BpmnDotNet.Common.Abstractions;
+﻿using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.ElasticClient;
 using BpmnDotNet.ElasticClient.Handlers;
 using BpmnDotNet.ElasticClient.Tests;
 using BpmnDotNet.ElasticClient.Tests.Configs;
 using BpmnDotNet.Handlers;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

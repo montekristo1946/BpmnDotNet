@@ -1,4 +1,4 @@
-using BpmnDotNet.Interfaces.Elements;
+using BpmnDotNet.Abstractions.Elements;
 
 namespace BpmnDotNet.Handlers;
 

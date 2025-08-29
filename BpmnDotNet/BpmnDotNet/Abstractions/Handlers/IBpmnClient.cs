@@ -1,7 +1,7 @@
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Dto;
 
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Abstractions.Handlers;
 
 public interface IBpmnClient : IDisposable
 {

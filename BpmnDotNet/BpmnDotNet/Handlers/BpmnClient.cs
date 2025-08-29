@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;

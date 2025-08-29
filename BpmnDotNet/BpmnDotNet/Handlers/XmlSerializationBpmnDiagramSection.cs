@@ -1,8 +1,8 @@
 using System.Xml;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Models;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using BpmnDotNet.Utils;
 
 namespace BpmnDotNet.Handlers;

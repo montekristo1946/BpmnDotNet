@@ -1,6 +1,6 @@
 using BpmnDotNet.Dto;
 
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Abstractions.Handlers;
 
 internal interface IBusinessProcess
 {

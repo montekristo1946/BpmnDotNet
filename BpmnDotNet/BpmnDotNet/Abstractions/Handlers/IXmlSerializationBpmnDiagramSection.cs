@@ -1,6 +1,6 @@
 using BpmnDotNet.Common.BPMNDiagram;
 
-namespace BpmnDotNet.Interfaces.Handlers;
+namespace BpmnDotNet.Abstractions.Handlers;
 
 public interface IXmlSerializationBpmnDiagramSection
 {
