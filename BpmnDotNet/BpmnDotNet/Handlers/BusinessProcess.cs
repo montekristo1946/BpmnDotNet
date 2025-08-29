@@ -39,7 +39,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private readonly IPathFinder _pathFinder;
     private bool _idDispose;
-
+    
+    
     public BusinessProcess(IContextBpmnProcess contextBpmnProcess,
         ILogger<IBusinessProcess> logger,
         BpmnProcessDto bpmnShema, IPathFinder pathFinder,
@@ -154,14 +155,22 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         foreach (var nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.ProcessingStaus != ProcessingStaus.WaitingReceivedMessage)
+            {
                 continue;
+            }
 
             var typeMessageInNode = GetTypeNameMessage(_contextBpmnProcess, nodeState.Key);
             var resGet = _messagesStore.TryGetValue(typeMessageInNode, out var message);
-            if (!resGet || message is null) continue;
+            if (!resGet || message is null)
+            {
+                continue;
+            }
 
             var resAddMessage = AddMessageInContext(_contextBpmnProcess, typeMessageInNode, message);
-            if (resAddMessage) NodeRegistryChangeState(nodeState.Key, ProcessingStaus.Pending);
+            if (resAddMessage)
+            {
+                NodeRegistryChangeState(nodeState.Key, ProcessingStaus.Pending);
+            }
         }
     }
 
@@ -259,6 +268,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
 
+                //TODO: добавить сюда заливать состояние в elastic.
+                
                 CheckFinalProcessing(nodeId);
             }
             catch (OperationCanceledException)

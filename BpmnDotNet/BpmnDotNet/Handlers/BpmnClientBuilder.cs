@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Interfaces.Elements;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
@@ -12,12 +13,28 @@ internal static class BpmnClientBuilder
 {
     public static IBpmnClient Build(string pathDiagram,
         ILoggerFactory loggerFactory,
-        IPathFinder pathFinder)
+        IPathFinder pathFinder,
+        IElasticClient elasticClient)
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
-
+        LoadBpmnInElastic(allBpmnFiles,elasticClient);
+        //TODO: добавить регистарцию класса логирования процессов.
         return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder);
+    }
+
+    private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClient elasticClient)
+    {
+        var xmlBpmnLoader = new XmlSerializationBpmnDiagramSection();
+        foreach (var allBpmnFile in allBpmnFiles)
+        {
+           var plane= xmlBpmnLoader.LoadXmlBpmnDiagram(allBpmnFile);
+           var res =elasticClient.SetDataAsync(plane).Result;
+           if (!res)
+           {
+               throw new InvalidOperationException($"Failed to set data for file {allBpmnFile}");
+           }
+        }
     }
 
     private static BpmnProcessDto[] CreateBusinessProcessDtos(string[] allBpmnFiles)

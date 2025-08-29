@@ -30,5 +30,5 @@ public class HistoryNodeState
     /// <summary>
     ///     Текущее состояние нод.
     /// </summary>
-    public NodeJobStatus[] NoesStaus { get; set; } = [];
+    public NodeJobStatus[] NodeStaus { get; set; } = [];
 }

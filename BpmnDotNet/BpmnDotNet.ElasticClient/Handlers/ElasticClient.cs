@@ -268,7 +268,7 @@ public class ElasticClient : IElasticClient
         {
             try
             {
-                _logger.LogInformation("Attempting to reconnect to Elasticsearch (attempt {RetryCount})",
+                _logger.LogError("Attempting to reconnect to Elasticsearch (attempt {RetryCount})",
                     retryCount + 1);
 
                 // Создаем нового клиента

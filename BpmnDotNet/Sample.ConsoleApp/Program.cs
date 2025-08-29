@@ -1,5 +1,8 @@
 ﻿using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Config;
+using BpmnDotNet.ElasticClient;
+using BpmnDotNet.ElasticClient.Handlers;
+using BpmnDotNet.Handlers;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,10 +24,14 @@ services.AddSingleton<ILoggerFactory>(option =>
     return LoggerFactory.Create(builder => { builder.AddSerilog(Log.Logger); });
 });
 
+services.AddScoped<ElasticClientConfig>();
+services.AddSingleton<IElasticClient, ElasticClient>();
 services.AddBusinessProcess("./BpmnDiagram");
 
 services.AddSingleton<Producer>();
 services.AddScoped<SampleService>();
+services.AddLogging();
+
 
 
 services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();

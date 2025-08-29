@@ -1,5 +1,6 @@
 using System.Reflection;
 using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.ElasticClient;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
+        
         services.AddScoped<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
@@ -23,7 +25,11 @@ public static class ServiceCollectionExtensions
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
             var pathFinder = options.GetRequiredService<IPathFinder>();
-            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder);
+            var elasticClient = options.GetRequiredService<IElasticClient>();
+         
+            //TODO: добавить регистрацию класса логирования процессов.
+            
+            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder,elasticClient);
         });
 
 
@@ -34,7 +40,6 @@ public static class ServiceCollectionExtensions
     ///     Регистрация по пространству имен.
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="predicate">Filter registered handlers based on type</param>
     /// <typeparam name="THandler"></typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>

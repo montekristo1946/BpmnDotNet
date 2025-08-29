@@ -115,7 +115,7 @@ public class BackgroundWorkerService : BackgroundService
             {
                 IdBpmnProcess = guid.ToString(),
                 TokenProcess = GenerateRandomString(10),
-                NoesStaus = _fixture.Build<NodeJobStatus>().CreateMany(15).ToArray()
+                NodeStaus = _fixture.Build<NodeJobStatus>().CreateMany(15).ToArray()
             };
             var reshistoryNodeState = _elasticClient.SetDataAsync(historyNodeState).Result;
             if (!reshistoryNodeState) throw new Exception("Failed to set history node state");

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace BpmnDotNet.Utils;
 
 public static class Mappers
@@ -6,9 +8,9 @@ public static class Mappers
     {
         ArgumentNullException.ThrowIfNull(x);
 
-        var res = int.TryParse(x, out var y);
+        var res = float.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture,out var y);
         if (!res) throw new ArgumentException($"[Mappers] Could not convert {x} to {y}");
 
-        return y;
+        return (int)y;
     }
 }
