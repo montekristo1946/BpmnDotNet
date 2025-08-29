@@ -1,7 +1,11 @@
-﻿using BpmnDotNet.Common.Abstractions;
+﻿using System.Reflection;
+using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Elastic.Transport.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.ElasticClient.Handlers;
@@ -170,14 +174,13 @@ public class ElasticClient : IElasticClient
                 .Indices(index)
                 .Query(q => q
                     .Match(m => m
-                        .Field(f => f.IdBpmnProcess) 
+                        .Field(f => f.IdBpmnProcess)
                         .Query(valueFind)
                     )
                 )
             );
 
             return response.Count;
-            
         }
         catch (Exception ex)
         {
@@ -185,6 +188,55 @@ public class ElasticClient : IElasticClient
         }
 
         return 0;
+    }
+
+    public async Task<TField[]> GetAllFields<TIndex, TField>(
+        string nameField, 
+        int maxCountElements) 
+        where TIndex : class
+    {
+        try
+        {
+            var client = await GetClient();
+            var index = StringUtils.CreateIndexName(typeof(BpmnPlane));
+            var field = nameField.ToElasticsearchFieldName();
+
+            var response = await client.SearchAsync<TIndex>(s => s
+                .Indices(index)
+                .Size(maxCountElements)
+                .Source(src => src.Filter(f => f.Includes(new Field(field))))
+                .Query(q => q.MatchAll())
+            );
+
+            if (!response.IsValidResponse)
+            {
+                return [];
+            }
+
+            var fieldValues = new List<TField>();
+            var property = typeof(TIndex).GetProperty(nameField, 
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            
+            foreach (var document in response.Documents)
+            {
+                if (property == null) 
+                    continue;
+                
+                var value = property.GetValue(document);
+                if (value is TField typedValue)
+                {
+                    fieldValues.Add(typedValue);
+                }
+            }
+            
+            return fieldValues.ToArray();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"[GetAllFields] Error getting Data: {ex.Message}");
+        }
+
+        return [];
     }
 
     private async Task<ElasticsearchClient> GetClient()

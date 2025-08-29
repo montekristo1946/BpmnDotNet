@@ -10,7 +10,7 @@ public record BpmnPlane
     /// <summary>
     ///     На схеме это поле:id
     /// </summary>
-    public string Id => $"{IdBpmnProcess}_{CreateTime.Ticks}";
+    public string Id => IdBpmnProcess;
 
     /// <summary>
     ///     Время создания документа.

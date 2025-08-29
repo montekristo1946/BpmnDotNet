@@ -48,4 +48,12 @@ public interface IElasticClient
     /// <param name="valueFind"></param>
     /// <returns></returns>
     public Task<long> GetHistoryNodeStateCountAsync(string valueFind);
+
+    /// <summary>
+    /// Получить все поля nameField из TIndex. Остальные поля буду заполнены default.
+    /// </summary>
+    /// <typeparam name="TIndex"></typeparam>
+    /// <typeparam name="TField"></typeparam>
+    /// <returns></returns>
+    public Task<TField[]> GetAllFields<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
 }
