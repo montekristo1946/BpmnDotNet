@@ -19,7 +19,7 @@ builder.Services
     .AddScoped<IElasticClient, ElasticClient>()
     .AddTransient<IPlanePanelHandler, PlanePanelHandler>()
     .AddTransient<IFilterPanelHandler, FilterPanelHandler>()
-    
+    .AddTransient<IListProcessPanelHandler, ListProcessPanelHandler>()
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 

@@ -7,18 +7,32 @@ public partial class FilterPanel : ComponentBase
 {
     [Inject] private IFilterPanelHandler FilterPanelHandler { get; set; } = null!;
     
-    [Parameter] public Action<string> HandlerSetupIdProcess { get; set; } = null!;
+    [Inject] private ILogger<FilterPanel> Logger { get; set; } = null!;
+    
+    [Parameter] public Action<string> ChoseIdProcess { get; set; } = null!;
 
     private string[] _arrayProcessId = [];
 
-    protected override async Task OnInitializedAsync()
-    {
-        _arrayProcessId = await FilterPanelHandler.GetAllProcessId();
-    }
-
     private Task ButtonClickObjectAsync(string process)
     {
-        HandlerSetupIdProcess?.Invoke(process);
+        ChoseIdProcess?.Invoke(process);
         return Task.CompletedTask;
+    }
+
+    public void UpdatePanel()
+    {
+        try
+        {
+             InvokeAsync(() =>
+            {
+                _arrayProcessId =  FilterPanelHandler.GetAllProcessId().Result;
+                StateHasChanged();
+                return Task.CompletedTask;
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("[FilterPanel:UpdatePanel] {@Exception}", e.Message);
+        }
     }
 }

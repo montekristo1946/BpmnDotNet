@@ -12,13 +12,13 @@ public partial class DrawingPlanePanel : ComponentBase
     [Inject] private IPlanePanelHandler PlaneHandler { get; set; } = null!;
 
     [Inject] private ILogger<DrawingPlanePanel> Logger { get; set; } = null!;
-    
+
     [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
 
     private string WidthConvas => $"{100}%";
     private string HeightConvas => $"{100}%";
-    
-    private string _activeProcess  = string.Empty;
+
+    private string _idActiveProcess = string.Empty;
 
     private SizeWindows SizeWindows { get; set; } = new SizeWindows();
 
@@ -26,10 +26,10 @@ public partial class DrawingPlanePanel : ComponentBase
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("window.registerViewportChangeCallback", DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("window.registerViewportChangeCallback",
+                DotNetObjectReference.Create(this));
             SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
         }
-        
     }
 
     [JSInvokable]
@@ -41,7 +41,7 @@ public partial class DrawingPlanePanel : ComponentBase
             await UpdatePanel();
         });
     }
-    
+
     private string CssScale()
     {
         var scaleCurrent = 1.0F;
@@ -64,17 +64,19 @@ public partial class DrawingPlanePanel : ComponentBase
             }
         };
     }
-    
-    public async Task UpdatePanel( string idProcess = "")
+
+    public async Task UpdatePanel(string idProcess = "")
     {
         try
         {
-            if (!string.IsNullOrEmpty(idProcess))
+            if (string.IsNullOrEmpty(idProcess))
             {
-                _activeProcess =  idProcess;
+                return;
             }
-            
-            _svgToString = await PlaneHandler.GetPlane(_activeProcess,SizeWindows);
+
+            _idActiveProcess = idProcess;
+
+            _svgToString = await PlaneHandler.GetPlane(_idActiveProcess, SizeWindows);
             await InvokeAsync(() =>
             {
                 StateHasChanged();

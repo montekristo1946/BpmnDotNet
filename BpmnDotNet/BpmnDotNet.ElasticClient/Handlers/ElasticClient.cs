@@ -201,12 +201,12 @@ public class ElasticClient : IElasticClient
             var index = StringUtils.CreateIndexName(typeof(TIndex));
             var field = nameField.ToElasticsearchFieldName();
 
-            var response = await client.SearchAsync<TIndex>(s => s
+            var response =  client.SearchAsync<TIndex>(s => s
                 .Indices(index)
                 .Size(maxCountElements)
                 .Source(src => src.Filter(f => f.Includes(new Field(field))))
                 .Query(q => q.MatchAll())
-            );
+            ).Result;
 
             if (!response.IsValidResponse)
             {

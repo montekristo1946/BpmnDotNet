@@ -1,0 +1,43 @@
+@using System.Globalization
+@using BpmnDotNet.Arm.Core.Dto
+<div class="p-0 m-0 div-menu-center" style="width: 100%; height: 100%">
+    <div class="p-0 m-0 row text-vertical-center">
+        <div class="col-12 p-0 m-0 border-enveloping-custom   "
+             style=" width: 100%; height: 100%;
+         overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;  ">
+
+            <div class="p-1 m-0 " style="display: flex; flex-direction: column; word-break: break-all; white-space: normal;">
+     
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th scope="col">PROCESS</th>
+                        <th scope="col">TOKEN</th>
+                        <th scope="col">DATA START</th>
+                        <th scope="col">DATA LAST UPDATE</th>
+                        <th scope="col">STATE</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    @{
+                        foreach (var table in _listProcessPanel)
+                        {
+                            var color = GetColorState(table.State);
+                            <tr>
+                                <th scope="row">@table.IdBpmnProcess</th>
+                                <td>@table.TokenProcess</td>
+                                <td>@table.DateCreated.ToString("HH:mm:ss.fff yyyy-MM-dd ",CultureInfo.InvariantCulture)</td>
+                                <td>@table.DateLastModified.ToString("HH:mm:ss.fff yyyy-MM-dd ",CultureInfo.InvariantCulture)</td>
+                                <td style="color: @color">@table.State</td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

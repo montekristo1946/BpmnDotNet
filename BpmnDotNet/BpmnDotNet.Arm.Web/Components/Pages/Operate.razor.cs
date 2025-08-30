@@ -11,21 +11,62 @@ public partial class Operate : ComponentBase
     private MenuPanel? _menuPanel;
     private RenderFragment FilterPanelTemplate { get; set; }
     private FilterPanel? _filterPanel;
+    public RenderFragment ListProcessPanelTemplate { get; set; }
+    private ListProcessPanel? _listProcessPanel;
+    
     
     protected override Task OnInitializedAsync()
     {
         BpmnPlanePanelTemplate = CreateBpmnPlanePanelTemplate();
         MenuPanelTemplate = CreateMenuPanelTemplate();
         FilterPanelTemplate = CreateFilterPanelTemplate();
+        ListProcessPanelTemplate = CreateListProcessPanelTemplate();
         return Task.CompletedTask;
     }
+    
+    private void ChoseIdProcess( string  value )
+    {
+        _drawingPlanePanel?.UpdatePanel(value);
+        _listProcessPanel?.SetIdProcess(value);
+    }
+    private void ChoseTokenProcess( string  value )
+    {
+       
+    }
+    
+    private void UpdateUpdatePanel()
+    {
+        _filterPanel?.UpdatePanel();
+        _drawingPlanePanel?.UpdatePanel();
+        _listProcessPanel?.UpdatePanel();
+        
+    }
+
+    private RenderFragment CreateListProcessPanelTemplate()
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, typeof(ListProcessPanel));
+            builder.AddAttribute(1, nameof(ListProcessPanel.ChoseTokenProcess), ChoseTokenProcess);
+            builder.AddComponentReferenceCapture(1, value =>
+            {
+                _listProcessPanel = value as ListProcessPanel
+                                    ?? throw new InvalidOperationException(
+                                        "Не смог c конвертировать ListProcessPanel в ListProcessPanel");
+            });
+
+            builder.CloseComponent();
+        };
+    }
+
+    
 
     private RenderFragment CreateFilterPanelTemplate()
     {
         return builder =>
         {
             builder.OpenComponent(0, typeof(FilterPanel));
-            builder.AddAttribute(1, nameof(FilterPanel.HandlerSetupIdProcess), HandlerSetupIdProcess);
+            builder.AddAttribute(1, nameof(FilterPanel.ChoseIdProcess), ChoseIdProcess);
             builder.AddComponentReferenceCapture(1, value =>
             {
                 _filterPanel = value as FilterPanel
@@ -37,10 +78,9 @@ public partial class Operate : ComponentBase
         };
     }
 
-    private void HandlerSetupIdProcess( string  value )
-    {
-        _drawingPlanePanel?.UpdatePanel(value);
-    }
+    
+
+
 
     private RenderFragment CreateBpmnPlanePanelTemplate()
     {
@@ -75,10 +115,5 @@ public partial class Operate : ComponentBase
         };
     }
 
-    private void UpdateUpdatePanel()
-    {
-
-        _drawingPlanePanel?.UpdatePanel();
-
-    }
+  
 }
