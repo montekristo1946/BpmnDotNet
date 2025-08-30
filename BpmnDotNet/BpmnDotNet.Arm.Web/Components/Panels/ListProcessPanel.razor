@@ -26,11 +26,18 @@
                         foreach (var table in _listProcessPanel)
                         {
                             var color = GetColorState(table.State);
-                            <tr>
-                                <th scope="row">@table.IdBpmnProcess</th>
+                            var styleTr = string.Empty;
+                            if (table.IdBpmnProcess == _acitveTable.IdBpmnProcess && table.TokenProcess == _acitveTable.TokenProcess)
+                            {
+                                styleTr = "check-tr";
+                            }
+                            
+                            <tr class="bottom-shadow @styleTr" style=""
+                                @onclick="@(() => ButtonClickObjectAsync(table))">
+                                <td>@table.IdBpmnProcess</td>
                                 <td>@table.TokenProcess</td>
-                                <td>@table.DateCreated.ToString("HH:mm:ss.fff yyyy-MM-dd ",CultureInfo.InvariantCulture)</td>
-                                <td>@table.DateLastModified.ToString("HH:mm:ss.fff yyyy-MM-dd ",CultureInfo.InvariantCulture)</td>
+                                <td>@table.DateCreated.ToString("yyyy-MM-dd HH:mm:ss.fff",CultureInfo.InvariantCulture)</td>
+                                <td>@table.DateLastModified.ToString("yyyy-MM-dd HH:mm:ss.fff",CultureInfo.InvariantCulture)</td>
                                 <td style="color: @color">@table.State</td>
                             </tr>
                         }

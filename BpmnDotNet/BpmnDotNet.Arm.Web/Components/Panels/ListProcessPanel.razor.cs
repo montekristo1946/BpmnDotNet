@@ -14,6 +14,7 @@ public partial class ListProcessPanel : ComponentBase
     
     private ListProcessPanelDto [] _listProcessPanel =[];
     private string _idActiveProcess = string.Empty;
+    private ListProcessPanelDto _acitveTable =  new ListProcessPanelDto();
     
     public void UpdatePanel()
     {
@@ -53,5 +54,11 @@ public partial class ListProcessPanel : ComponentBase
             ProcessState.Error => "#f34848",
             _ => "#212529"
         };
+    }
+
+    private Task ButtonClickObjectAsync(ListProcessPanelDto table)
+    {
+        _acitveTable = table;
+        return Task.CompletedTask;
     }
 }

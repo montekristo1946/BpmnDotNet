@@ -13,11 +13,20 @@ public class SvgConstructor : ISvgConstructor
     {
         var widthWindows = (int) sizeWindows.Width;
         var heightWindows =(int) sizeWindows.Height;
+        if (plane.Shapes.Any() is false)
+        {
+            return Task.FromResult(CreateMoqPlane(widthWindows,heightWindows));
+        }
         var shapes = CreateShapes(plane.Shapes,widthWindows,heightWindows);
         
         return Task.FromResult(shapes);
     }
-    
+
+    private string CreateMoqPlane(int widthWindows, int heightWindows)
+    {
+        return string.Empty;
+    }
+
     private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows)
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();

@@ -38,7 +38,7 @@ public partial class DrawingPlanePanel : ComponentBase
         InvokeAsync(async () =>
         {
             SizeWindows = await JSRuntime.InvokeAsync<SizeWindows>("GetBrowseSize", ConstantsArm.DrawingPlanePanel);
-            await UpdatePanel();
+            await UpdatePanel(_idActiveProcess);
         });
     }
 
