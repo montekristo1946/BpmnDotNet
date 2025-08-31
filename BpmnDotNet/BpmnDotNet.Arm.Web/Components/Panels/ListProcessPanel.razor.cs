@@ -7,35 +7,58 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 public partial class ListProcessPanel : ComponentBase
 {
     [Parameter] public Action<string> ChoseTokenProcess { get; set; } = null!;
-    
+
     [Inject] private ILogger<ListProcessPanel> Logger { get; set; } = null!;
-    
+
     [Inject] private IListProcessPanelHandler ListProcessPanelHandler { get; set; } = null!;
-    
-    private ListProcessPanelDto [] _listProcessPanel =[];
+
+    private ListProcessPanelDto[] _listProcessPanel = [];
     private string _idActiveProcess = string.Empty;
-    private ListProcessPanelDto _acitveTable =  new ListProcessPanelDto();
-    private int _currentPage = 0;
-    private int _allPages = 0;
+    private ListProcessPanelDto _acitveTable = new ListProcessPanelDto();
+    private int _currentPage = 1;
+
     private int _countLineOnePage = 3;
-    private string _lastToken = "";
-    
+    private int _countAllPage = 0;
+    private string _curentToken = string.Empty;
+    private Stack<string> _lastTokens = new();
+
+
     public void UpdatePanel()
     {
         try
         {
-            InvokeAsync( () =>
+            InvokeAsync(() =>
             {
+                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_idActiveProcess).Result;
+                if (allprocessLine == 0)
+                {
+                    _listProcessPanel = [];
+                    _countAllPage = 0;
+                    _currentPage = 1;
+                    _lastTokens.Clear(); 
+                    _curentToken= string.Empty;
+                }
 
-                _allPages = ListProcessPanelHandler.GetCountAllPages(_idActiveProcess).Result;
-                _listProcessPanel =  ListProcessPanelHandler.GetPagesStates(_idActiveProcess,_lastToken,_countLineOnePage).Result;
-                StateHasChanged();
+                var currentList = ListProcessPanelHandler
+                    .GetPagesStates(_idActiveProcess, _curentToken, _countLineOnePage).Result;
+                if (currentList.Any() is false)
+                {
+                    return Task.CompletedTask;
+                }
+
+                _listProcessPanel = currentList;
+                _countAllPage = allprocessLine / _countLineOnePage;
+               
                 return Task.CompletedTask;
             });
         }
         catch (Exception e)
         {
             Logger.LogError("[ListProcessPanel:UpdatePanel] {@Exception}", e.Message);
+        }
+        finally
+        {
+            StateHasChanged();
         }
     }
 
@@ -46,8 +69,8 @@ public partial class ListProcessPanel : ComponentBase
             _idActiveProcess = string.Empty;
             return;
         }
-        
-        _idActiveProcess =  value;
+
+        _idActiveProcess = value;
         UpdatePanel();
     }
 
@@ -67,5 +90,37 @@ public partial class ListProcessPanel : ComponentBase
     {
         _acitveTable = table;
         return Task.CompletedTask;
+    }
+
+
+    private void Forward()
+    {
+        if (_currentPage >= _countAllPage)
+        {
+            return;
+        }
+
+        _lastTokens.Push(_curentToken);
+        _curentToken = _listProcessPanel.LastOrDefault()?.TokenProcess ?? string.Empty;
+        _currentPage += 1;
+        UpdatePanel();
+    }
+
+    private void Backward()
+    {
+        if (_currentPage <= 0)
+        {
+            return;
+        }
+
+        if (!_lastTokens.TryPop(out var token))
+        {
+            return;
+        }
+
+        _curentToken = token ?? string.Empty;
+
+        _currentPage -= 1;
+        UpdatePanel();
     }
 }

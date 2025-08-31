@@ -1,13 +1,15 @@
 @using System.Globalization
-@using BpmnDotNet.Arm.Core.Dto
-<div class="p-0 m-0 div-menu-center" style="width: 100%; height: 100%">
-    <div class="p-0 m-0 row text-vertical-center">
-        <div class="col-12 p-0 m-0 border-enveloping-custom   "
-             style=" width: 100%; height: 100%;
-         overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;  ">
 
-            <div class="p-1 m-0 " style="display: flex; flex-direction: column; word-break: break-all; white-space: normal;">
-     
+
+<div class="p-0 m-0 div-menu-center" style="width: 100%; height: 100%">
+
+    <div class="p-0 m-0 row"
+         style=" width: 100%; height: 90%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
+        <div class="col-12 p-0 m-0 border-enveloping-custom   ">
+
+            <div class="p-1 m-0 "
+                 style="display: flex; flex-direction: column; word-break: break-all; white-space: normal;">
+
                 <table>
 
                     <thead>
@@ -31,13 +33,13 @@
                             {
                                 styleTr = "check-tr";
                             }
-                            
+
                             <tr class="bottom-shadow @styleTr" style=""
                                 @onclick="@(() => ButtonClickObjectAsync(table))">
                                 <td>@table.IdBpmnProcess</td>
                                 <td>@table.TokenProcess</td>
-                                <td>@table.DateCreated.ToString("yyyy-MM-dd HH:mm:ss.fff",CultureInfo.InvariantCulture)</td>
-                                <td>@table.DateLastModified.ToString("yyyy-MM-dd HH:mm:ss.fff",CultureInfo.InvariantCulture)</td>
+                                <td>@table.DateCreated.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</td>
+                                <td>@table.DateLastModified.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</td>
                                 <td style="color: @color">@table.State</td>
                             </tr>
                         }
@@ -46,5 +48,46 @@
                 </table>
             </div>
         </div>
+
     </div>
+
+
+        <div class="padding-1px m-0 row"
+         style=" width: 100%; height: 10%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
+        <div class="col-12 p-0 m-0 border-enveloping-custom   ">
+            <div class="row p-0 m-0  " style=" width: 100%; height: 100%;">
+                <div class="col-4"></div>
+               
+               
+                
+                <div class="col-1">
+                    <div class=" p-0 m-0  bottom-shadow button-panel"
+                         title="backward"
+                         style="height: 100%; width: 100%" @onclick="@Backward">
+                        <span role="img" class="  ">
+                            <img src="icons/go_back.svg" width="25" height="25"/>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-1 ">
+                    <div class=" p-0 m-0 bottom-shadow button-panel"
+                         title="forward"
+                         style="height: 100%; width: 100%" @onclick="@Forward">
+                        <span role="img" class=" ">
+                            <img src="icons/go_next.svg" width="25" height="25"/>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="col-1">
+                    @_currentPage on @_countAllPage
+                </div>
+                <div class="col-5"></div>
+            </div>
+            
+        </div>
+
+    </div>
+
+
 </div>

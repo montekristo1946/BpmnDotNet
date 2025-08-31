@@ -370,7 +370,7 @@ public class ElasticClient : IElasticClient
                 .Aggregations(aggs => aggs
                     .Add("tokens", t => t
                         .Composite(c =>
-                            c.Size(2)
+                            c.Size(countLineOnePage)
                                 .Sources(src =>
                                     src.Add(keySort, t =>
                                         t.Terms(descriptor => descriptor
