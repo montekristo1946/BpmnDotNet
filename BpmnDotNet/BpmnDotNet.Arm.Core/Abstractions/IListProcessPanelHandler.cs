@@ -4,5 +4,7 @@ namespace BpmnDotNet.Arm.Core.Abstractions;
 
 public interface IListProcessPanelHandler
 {
-    Task<ListProcessPanelDto[]> GetStates(string idActiveProcess);
+    Task<int> GetCountAllPages(string idActiveProcess);
+    Task<ListProcessPanelDto[]> GetPagesStates(string idActiveProcess, string lastToken, int countLineOnePage );
+   
 }

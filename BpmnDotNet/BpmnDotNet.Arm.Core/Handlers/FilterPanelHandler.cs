@@ -18,7 +18,7 @@ public class FilterPanelHandler:IFilterPanelHandler
 
     public async Task<string[]> GetAllProcessId()
     {
-       var bpmnPlanes = await _elasticClient.GetAllFields<BpmnPlane,string>(nameof(BpmnPlane.IdBpmnProcess),100);
+       var bpmnPlanes = await _elasticClient.GetAllFieldsAsync<BpmnPlane,string>(nameof(BpmnPlane.IdBpmnProcess),100);
 
        return bpmnPlanes ?? [];
     }

@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 using BpmnDotNet.Common.Dto;
 
@@ -18,9 +20,10 @@ public interface IElasticClient
     ///     Получить данные по ID.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="sourceExcludes"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public Task<T?> GetDataFromIdAsync<T>(string id);
+    public Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes = null);
 
     /// <summary>
     ///     Запросить последних count данных.
@@ -42,12 +45,7 @@ public interface IElasticClient
         int pageNumber = 1,
         int pageSize = 10);
 
-    /// <summary>
-    ///     Получить общее количество.
-    /// </summary>
-    /// <param name="valueFind"></param>
-    /// <returns></returns>
-    public Task<long> GetHistoryNodeStateCountAsync(string valueFind);
+
 
     /// <summary>
     /// Получить все записи по полю TField из TIndex. 
@@ -55,5 +53,22 @@ public interface IElasticClient
     /// <typeparam name="TIndex"></typeparam>
     /// <typeparam name="TField"></typeparam>
     /// <returns></returns>
-    public Task<TField[]> GetAllFields<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
+    public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
+
+    /// <summary>
+    /// Сколько всего групп конкретного процесса для пагинации. В расчет берется первая 1000;
+    /// </summary>
+    /// <param name="idActiveProcess"></param>
+    /// <returns></returns>
+    public Task<int> GetAllGroupFromTokenAsync(string idActiveProcess);
+    
+    /// <summary>
+    /// Получить 
+    /// </summary>
+    /// <param name="idActiveProcess"></param>
+    /// <param name="afterKeyValueparam>
+    /// <param name="countLineOnePage"></param>
+    /// <returns></returns>
+    public Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
+        int countLineOnePage);
 }

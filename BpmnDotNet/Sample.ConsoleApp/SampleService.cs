@@ -17,10 +17,13 @@ public class SampleService
 
     private ContextData CreateContextData()
     {
+        var wagon = 1005;
+        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
+        
         var contextData = new ContextData
         {
             IdBpmnProcess = Constants.IdBpmnProcessing_2,
-            TokenProcess = Guid.NewGuid() + "_test_1",
+            TokenProcess = tokenProcess,
             TestValue = 25,
             TestValue2 = "Call from StartNewProcess"
         };
@@ -63,7 +66,8 @@ public class SampleService
         //Отправим тестовое сообщение
         var messageExampleFirst = CreateMessageExampleFirst();
         var idBpmnProcess = "IdBpmnProcessingMain";
-        var tokenProcess = "a81eaccf-e7b1-4c97-b1df-8f163353f678_test_1";
+        var wagon = 1000;
+        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
 
         try
         {

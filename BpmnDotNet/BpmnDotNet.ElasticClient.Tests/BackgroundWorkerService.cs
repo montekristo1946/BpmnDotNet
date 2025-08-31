@@ -71,15 +71,15 @@ public class BackgroundWorkerService : BackgroundService
 
   
 
-    private void Pagination()
-    {
-        var count = _elasticClient.GetHistoryNodeStateCountAsync("8P4W9c9Nhs").Result;
-        var pageSize = (int)count / 3;
-        var documents = _elasticClient
-            .SearchWithPaginationAsync("8P4W9c9Nhs", 2, pageSize).Result;
-
-        if (documents is null) throw new Exception("Failed to set history node state");
-    }
+    // private void Pagination()
+    // {
+    //     var count = _elasticClient.GetHistoryNodeStateCountAsync("8P4W9c9Nhs").Result;
+    //     var pageSize = (int)count / 3;
+    //     var documents = _elasticClient
+    //         .SearchWithPaginationAsync("8P4W9c9Nhs", 2, pageSize).Result;
+    //
+    //     if (documents is null) throw new Exception("Failed to set history node state");
+    // }
 
     private async Task GetLastData()
     {
@@ -151,7 +151,7 @@ public class BackgroundWorkerService : BackgroundService
     
     private void GetAllIdBpmnPlan()
     {
-        var idBpmnProcesss = _elasticClient.GetAllFields<BpmnPlane,string>(
+        var idBpmnProcesss = _elasticClient.GetAllFieldsAsync<BpmnPlane,string>(
             nameof(BpmnPlane.IdBpmnProcess),1000)
             .Result;
         if (idBpmnProcesss?.Any() != true)

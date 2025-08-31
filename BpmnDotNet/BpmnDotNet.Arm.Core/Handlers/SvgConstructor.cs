@@ -35,8 +35,7 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddScalingX(scalingX)
             .AddScalingY(scalingY);
-
-
+        
         const int stokeWidthStart = 2;
         const int stokeWidthEnd = 4;
         var color = "#22242a";
