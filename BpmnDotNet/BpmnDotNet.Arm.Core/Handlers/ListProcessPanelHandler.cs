@@ -63,6 +63,7 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
                 DateLastModified = historyNode.DateLastModified,
                 IdBpmnProcess = historyNode.IdBpmnProcess,
                 State = Map(historyNode.ProcessingStaus),
+                IdStorageHistoryNodeState = id,
             };
             retArray.Add(listProcessPanelDto);
         }

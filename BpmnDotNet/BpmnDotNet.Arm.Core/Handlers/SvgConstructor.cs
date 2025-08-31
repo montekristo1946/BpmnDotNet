@@ -3,6 +3,7 @@ using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.DiagramBuilder;
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Common.Models;
 
 namespace BpmnDotNet.Arm.Core.Handlers;
@@ -21,7 +22,86 @@ public class SvgConstructor : ISvgConstructor
         
         return Task.FromResult(shapes);
     }
-    
+
+    public Task<string> CreatePlane(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows)
+    {
+        var widthWindows = (int) sizeWindows.Width;
+        var heightWindows =(int) sizeWindows.Height;
+        if (plane.Shapes.Any() is false)
+        {
+            return Task.FromResult(string.Empty);
+        }
+        
+        var shapes = CreateColorShapes(plane.Shapes,nodeJobStatus,widthWindows,heightWindows);
+        return Task.FromResult(shapes);
+    }
+
+    private string CreateColorShapes(BpmnShape[] shapes, NodeJobStatus[] nodeJobStatus, int widthWindows, int heightWindows)
+    {
+        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
+
+        var scalingX = CalculateScalingViewportCoordinateX(shapes,widthWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes,heightWindows);
+       
+
+        var viewportBuilder = IBpmnBuild<ViewportBuilder>
+            .Create()
+            .AddScalingX(scalingX)
+            .AddScalingY(scalingY);
+        
+        const int stokeWidthStart = 2;
+        const int stokeWidthEnd = 4;
+        
+        foreach (var shape in shapes)
+        {
+            var color  = GetColor(shape.BpmnElement,nodeJobStatus);
+            var stringShape = shape.Type switch
+            {
+                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
+                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd),
+                ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
+                ElementType.ServiceTask => CreateServiceTask(shape, color),
+                ElementType.SendTask => CreateSendTask(shape, color),
+                ElementType.ReceiveTask => CreateReceiveTask(shape, color),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
+                ElementType.ParallelGateway => CreateParallelGateway(shape, color),
+                ElementType.SubProcess => CreateSubProcess(shape, color),
+                _ => string.Empty
+            };
+
+            viewportBuilder.AddChild(stringShape);
+            var label = AddLabel(shape, color);
+            viewportBuilder.AddChild(label);
+        }
+
+        var viewportString = viewportBuilder.Build();
+        svgRootBuilder.AddChild(viewportString);
+        var retStringSvg = svgRootBuilder.Build();
+        return retStringSvg;
+    }
+
+    private string GetColor(string shapeId, NodeJobStatus[] nodeJobStatus)
+    {
+        var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.ProcessingStaus ?? ProcessingStaus.None;
+        var defaultColor =  "#22242a";
+        var running = "#19aee8";
+        var completed ="#00ae5e";
+        var error = "#f34848";
+
+
+        return state switch
+        {
+            ProcessingStaus.None => defaultColor,
+            ProcessingStaus.Pending => running,
+            ProcessingStaus.Works => running,
+            ProcessingStaus.Complete => completed,
+            ProcessingStaus.Failed => error,
+            ProcessingStaus.WaitingCompletedWays => running,
+            ProcessingStaus.WaitingReceivedMessage => running,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
 
     private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows)
     {

@@ -29,9 +29,9 @@ public partial class Operate : ComponentBase
         _drawingPlanePanel?.UpdatePanel(value);
         _listProcessPanel?.SetIdProcess(value);
     }
-    private void ChoseTokenProcess( string  value )
+    private void IsUpdateNodeJobStatus( string  idUpdateNodeJobStatus )
     {
-       
+        _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
     }
     
     private void UpdateUpdatePanel()
@@ -47,7 +47,7 @@ public partial class Operate : ComponentBase
         return builder =>
         {
             builder.OpenComponent(0, typeof(ListProcessPanel));
-            builder.AddAttribute(1, nameof(ListProcessPanel.ChoseTokenProcess), ChoseTokenProcess);
+            builder.AddAttribute(1, nameof(ListProcessPanel.IsUpdateNodeJobStatus), IsUpdateNodeJobStatus);
             builder.AddComponentReferenceCapture(1, value =>
             {
                 _listProcessPanel = value as ListProcessPanel

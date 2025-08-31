@@ -18,4 +18,12 @@ internal interface IPlanePanelHandler
     /// <param name="idProcess"></param>
     /// <param name="sizeWindows"></param>
     public Task<string> GetPlane(string idProcess, SizeWindows sizeWindows);
+
+    /// <summary>
+    ///     Вернет BpmnPlane с раскрашенными состояниями.
+    /// </summary>
+    /// <param name="idUpdateNodeJobStatus"></param>
+    /// <param name="sizeWindows"></param>
+    /// <returns></returns>
+    Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows);
 }

@@ -88,4 +88,28 @@ public partial class DrawingPlanePanel : ComponentBase
             Logger.LogError("[UpdatePanel] {@Exception}", e.Message);
         }
     }
+
+    public async Task ColorUpdatePanel(string idUpdateNodeJobStatus)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(idUpdateNodeJobStatus))
+            {
+                return;
+            }
+
+            // _idActiveProcess = idProcess;
+
+            _svgToString = await PlaneHandler.GetColorPlane(idUpdateNodeJobStatus, SizeWindows);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+                return Task.CompletedTask;
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("[ColorUpdatePanel] {@Exception}", e.Message);
+        }
+    }
 }

@@ -31,7 +31,7 @@ public class ParallelGatewayBuilder : IBpmnBuild<ParallelGatewayBuilder>
     private string CreateBody()
     {
         var retRes = "<path d=\"m 23,10 0,12.5 -12.5,0 0,5 12.5,0 0,12.5 5,0 0,-12.5 12.5,0 0,-5 -12.5,0 0,-12.5 -5,0 z\" " +
-                     $"style=\"fill: rgb(34, 36, 42); stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; stroke-width: 1px;\"> " +
+                     $"style=\"fill: {_color}; stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; stroke-width: 1px;\"> " +
                      "</path>";
         return retRes;
     }

@@ -1,12 +1,13 @@
 using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.Dto;
+using BpmnDotNet.Common.Dto;
 using Microsoft.AspNetCore.Components;
 
 namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class ListProcessPanel : ComponentBase
 {
-    [Parameter] public Action<string> ChoseTokenProcess { get; set; } = null!;
+    [Parameter] public Action<string> IsUpdateNodeJobStatus { get; set; } = null!;
 
     [Inject] private ILogger<ListProcessPanel> Logger { get; set; } = null!;
 
@@ -35,8 +36,8 @@ public partial class ListProcessPanel : ComponentBase
                     _listProcessPanel = [];
                     _countAllPage = 0;
                     _currentPage = 1;
-                    _lastTokens.Clear(); 
-                    _curentToken= string.Empty;
+                    _lastTokens.Clear();
+                    _curentToken = string.Empty;
                 }
 
                 var currentList = ListProcessPanelHandler
@@ -48,7 +49,7 @@ public partial class ListProcessPanel : ComponentBase
 
                 _listProcessPanel = currentList;
                 _countAllPage = allprocessLine / _countLineOnePage;
-               
+
                 return Task.CompletedTask;
             });
         }
@@ -60,6 +61,13 @@ public partial class ListProcessPanel : ComponentBase
         {
             StateHasChanged();
         }
+    }
+
+    private Task ButtonClickObjectAsync(ListProcessPanelDto table)
+    {
+        _acitveTable = table;
+        IsUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
+        return Task.CompletedTask;
     }
 
     public void SetIdProcess(string value)
@@ -84,12 +92,6 @@ public partial class ListProcessPanel : ComponentBase
             ProcessState.Error => "#f34848",
             _ => "#212529"
         };
-    }
-
-    private Task ButtonClickObjectAsync(ListProcessPanelDto table)
-    {
-        _acitveTable = table;
-        return Task.CompletedTask;
     }
 
 

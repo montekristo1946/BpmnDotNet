@@ -2,6 +2,7 @@ using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.Logging;
 
@@ -25,11 +26,19 @@ public class PlanePanelHandler : IPlanePanelHandler
     {
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(idProcess) ?? new BpmnPlane();
         var svg = await _svgConstructor.CreatePlane(plane,sizeWindows);
-       
-        // var serialization = new XmlSerializationBpmnDiagramSection();
-        // var diagram = serialization.LoadXmlBpmnDiagram(
-        //     "/mnt/Disk_C/git/BpmnDotNet/BpmnDotNet/BpmnDotNet.Arm.Core.Tests/BpmnDiagram/diagram_1.bpmn");
 
+        return svg;
+    }
+
+    public async Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows)
+    {
+        var historyNodeState = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus) ?? new HistoryNodeState();
+       
+        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(historyNodeState.IdBpmnProcess) ?? new BpmnPlane();
+        
+        
+        var svg = await _svgConstructor.CreatePlane(plane,historyNodeState.NodeStaus,sizeWindows);
+        
         return svg;
     }
 }
