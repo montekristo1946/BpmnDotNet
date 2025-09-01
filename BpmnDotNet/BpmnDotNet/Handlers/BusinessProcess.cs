@@ -45,6 +45,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private readonly IPathFinder _pathFinder;
     private bool _idDispose;
+    private long _dateFromInitInstance;
 
 
     public BusinessProcess(IContextBpmnProcess contextBpmnProcess,
@@ -63,6 +64,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
 
         _cts = new CancellationTokenSource(timeout);
+        _dateFromInitInstance = DateTime.Now.Ticks;
         var task = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
         JobStatus = new BusinessProcessJobStatus
         {
@@ -304,7 +306,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                     _contextBpmnProcess.TokenProcess,
                     _nodeStateRegistry.Values.ToArray(),
                     _errorsRegistry.Values.ToArray(),
-                    isCompleted
+                    isCompleted,
+                    _dateFromInitInstance
                 );
             }
         }, ctsToken);

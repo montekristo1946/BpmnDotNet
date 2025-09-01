@@ -32,13 +32,14 @@ public class PlanePanelHandler : IPlanePanelHandler
 
     public async Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows)
     {
-        var historyNodeState = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus) ?? new HistoryNodeState();
+        var historyNodeState = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus,
+            [nameof(HistoryNodeState.ArrayMessageErrors)]) ?? new HistoryNodeState();
        
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(historyNodeState.IdBpmnProcess) ?? new BpmnPlane();
-        
         
         var svg = await _svgConstructor.CreatePlane(plane,historyNodeState.NodeStaus,sizeWindows);
         
         return svg;
     }
+    
 }

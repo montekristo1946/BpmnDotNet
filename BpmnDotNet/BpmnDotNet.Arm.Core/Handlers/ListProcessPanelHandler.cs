@@ -28,8 +28,9 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
 
         return res;
     }
-    
-    public async Task<ListProcessPanelDto[]> GetPagesStates(string idActiveProcess, string lastToken, int countLineOnePage )
+
+    public async Task<ListProcessPanelDto[]> GetPagesStates(string idActiveProcess, string lastToken,
+        int countLineOnePage)
     {
         if (string.IsNullOrEmpty(idActiveProcess))
         {
@@ -45,31 +46,45 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
         {
             countLineOnePage = 10;
         }
-        
-        var  idHistoryNodeState= await _elasticClient.GetIdHistoryNodeStateAsync(idActiveProcess,lastToken,countLineOnePage);
+
+        var idHistoryNodeState =
+            await _elasticClient.GetIdHistoryNodeStateAsync(idActiveProcess, lastToken, countLineOnePage);
 
         var retArray = new List<ListProcessPanelDto>();
         foreach (var id in idHistoryNodeState)
         {
-            var historyNode = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(id,[nameof(HistoryNodeState.NodeStaus)]);
+            var historyNode = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(id,
+            [
+                nameof(HistoryNodeState.NodeStaus),
+                nameof(HistoryNodeState.ArrayMessageErrors)
+            ]);
             if (historyNode == null)
             {
                 continue;
             }
+
             var listProcessPanelDto = new ListProcessPanelDto()
             {
                 TokenProcess = historyNode.TokenProcess,
-                DateCreated = historyNode.DateCreated,
-                DateLastModified = historyNode.DateLastModified,
+                DateCreated = new DateTime(historyNode.DateCreated),
+                DateLastModified = new DateTime(historyNode.DateLastModified),
                 IdBpmnProcess = historyNode.IdBpmnProcess,
                 State = Map(historyNode.ProcessingStaus),
                 IdStorageHistoryNodeState = id,
             };
             retArray.Add(listProcessPanelDto);
         }
-    
+
 
         return retArray.ToArray();
+    }
+
+    public async Task<string[]> GetErrors(string idUpdateNodeJobStatus)
+    {
+        var historyNodeState = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus,
+            [nameof(HistoryNodeState.NodeStaus)]) ?? new HistoryNodeState();
+
+        return historyNodeState?.ArrayMessageErrors ?? [];
     }
 
     private ProcessState Map(ProcessingStaus argProcessingStaus)

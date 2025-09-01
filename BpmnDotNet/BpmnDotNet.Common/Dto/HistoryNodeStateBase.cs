@@ -10,7 +10,7 @@ public class HistoryNodeStateBase
     /// <summary>
     ///     ID, IdBpmnProcess+TokenProcess
     /// </summary>
-    public string Id => $"{IdBpmnProcess}_{TokenProcess}_{DateCreated.Ticks}";
+    public string Id => $"{IdBpmnProcess}_{TokenProcess}_{DateCreated}";
 
     /// <summary>
     ///     ID Bpmn процесса из схемы bpmn.
@@ -25,12 +25,12 @@ public class HistoryNodeStateBase
     /// <summary>
     ///     Время создания документа.
     /// </summary>
-    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public long DateCreated { get; set; } = DateTime.Now.Ticks;
     
     /// <summary>
     ///     Время последнего изменения
     /// </summary>
-    public DateTime DateLastModified { get; set; } = DateTime.MaxValue;
+    public long DateLastModified { get; set; } = DateTime.MaxValue.Ticks;
     
     /// <summary>
     ///     Состояние процесса.

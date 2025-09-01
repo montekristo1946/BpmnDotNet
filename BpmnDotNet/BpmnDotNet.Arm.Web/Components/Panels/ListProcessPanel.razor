@@ -1,11 +1,34 @@
 @using System.Globalization
 
+<div class="p-0 m-0 div-menu-center " style="width: 100%; height: 100%">
+    <div class="row m-0 padding-1px   border-enveloping-custom"
+         style=" width: 100%; height: 18%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
+        <div class="col-12 p-0 m-0 ">
+            <div class="row p-0 m-0  " style=" width: 100%; height: 100%;">
+                <div class="col-2 m-0 padding-2px text-lg-start" style="word-break: break-all; white-space: pre-line;">
+                    @_acitveTable?.TokenProcess
+                </div>
+                <div class="col-10 m-0 padding-1px text-lg-start">
+                    @{
+                        if (_arrErrors.Any() is false)
+                        {
+                            <p class=" p-0 m-0">Process ok</p>
+                        }
 
-<div class="p-0 m-0 div-menu-center" style="width: 100%; height: 100%">
+                        foreach (var line in _arrErrors)
+                        {
+                            <p class=" p-0 m-0">@line</p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
 
-    <div class="p-0 m-0 row"
-         style=" width: 100%; height: 90%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
-        <div class="col-12 p-0 m-0 border-enveloping-custom   ">
+    </div>
+
+    <div class="row m-0  padding-1px  border-enveloping-custom"
+         style=" width: 100%; height: 72%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
+        <div class="col-12 p-0 m-0    ">
 
             <div class="p-1 m-0 "
                  style="display: flex; flex-direction: column; word-break: break-all; white-space: normal;">
@@ -50,16 +73,13 @@
         </div>
 
     </div>
-
-
-        <div class="padding-1px m-0 row"
+    <div class="row padding-1px m-0  border-enveloping-custom"
          style=" width: 100%; height: 10%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
-        <div class="col-12 p-0 m-0 border-enveloping-custom   ">
+        <div class="col-12 p-0 m-0    ">
             <div class="row p-0 m-0  " style=" width: 100%; height: 100%;">
                 <div class="col-4"></div>
-               
-               
-                
+
+
                 <div class="col-1">
                     <div class=" p-0 m-0  bottom-shadow button-panel"
                          title="backward"
@@ -78,13 +98,13 @@
                         </span>
                     </div>
                 </div>
-                
+
                 <div class="col-1">
                     @_currentPage on @_countAllPage
                 </div>
                 <div class="col-5"></div>
             </div>
-            
+
         </div>
 
     </div>

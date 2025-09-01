@@ -8,7 +8,7 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class DrawingPlanePanel : ComponentBase
 {
-    private string _svgToString = string.Empty;
+   
     [Inject] private IPlanePanelHandler PlaneHandler { get; set; } = null!;
 
     [Inject] private ILogger<DrawingPlanePanel> Logger { get; set; } = null!;
@@ -21,6 +21,7 @@ public partial class DrawingPlanePanel : ComponentBase
     private string _idActiveProcess = string.Empty;
 
     private SizeWindows SizeWindows { get; set; } = new SizeWindows();
+    private string _svgToString = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -98,9 +99,8 @@ public partial class DrawingPlanePanel : ComponentBase
                 return;
             }
 
-            // _idActiveProcess = idProcess;
-
             _svgToString = await PlaneHandler.GetColorPlane(idUpdateNodeJobStatus, SizeWindows);
+            
             await InvokeAsync(() =>
             {
                 StateHasChanged();

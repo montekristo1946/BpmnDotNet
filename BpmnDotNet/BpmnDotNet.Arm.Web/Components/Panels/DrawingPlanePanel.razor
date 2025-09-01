@@ -1,29 +1,27 @@
 @using BlazorBrowserInteractLabeler.Web.Common
-<div class="p-0 m-0"  
-     id="@ConstantsArm.DrawingPlanePanel" 
+
+<div class="p-0 m-0 row"
+     id="@ConstantsArm.DrawingPlanePanel"
      style="width:@WidthConvas; height: @HeightConvas; ;
-@CssScale();
-background-position: center ;
-transform-origin: center;">
+     @CssScale();
+     background-position: center ;
+     transform-origin: center;">
 
     @{
         if (string.IsNullOrWhiteSpace(_svgToString))
         {
             <div class=" p-0 m-0 " style="width: 100%;  height: 100%;">
-                <span role="img" class="  ">
-                    <img src="icons/mog_plane.svg" width="100%" height="100%"/>
-                </span>
+                    <span role="img" class="  ">
+                        <img src="icons/mog_plane.svg" width="100%" height="100%"/>
+                    </span>
             </div>
-              
         }
         else
         {
-              
             <div style="width: 100%;  height: 100%; position: absolute;">
                 @GetRenderAnnotation()
             </div>
         }
     }
-  
-
 </div>
+

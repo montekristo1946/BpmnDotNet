@@ -17,7 +17,7 @@ public class SampleService
 
     private ContextData CreateContextData()
     {
-        var wagon = 1008;
+        var wagon = 1010;
         var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
         
         var contextData = new ContextData

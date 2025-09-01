@@ -26,4 +26,6 @@ internal interface IPlanePanelHandler
     /// <param name="sizeWindows"></param>
     /// <returns></returns>
     Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows);
+
+  
 }

@@ -20,8 +20,9 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
     public async Task SetStateProcess(string idBpmnProcess,
         string tokenProcess,
         NodeTaskStatus[] nodeStateRegistry,
-        string[] arrayMessageErrors, 
-        bool isCompleted)
+        string[] arrayMessageErrors,
+        bool isCompleted, 
+        long dateFromInitInstance)
     {
         if (string.IsNullOrWhiteSpace(idBpmnProcess))
         {
@@ -49,7 +50,8 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
             TokenProcess = tokenProcess,
             NodeStaus = nodeJobStatus,
             ArrayMessageErrors = arrayMessageErrors,
-            DateLastModified = DateTime.Now,
+            DateCreated = dateFromInitInstance,
+            DateLastModified = DateTime.Now.Ticks,
             ProcessingStaus = processingStaus,
         };
 

@@ -22,6 +22,7 @@ public partial class ListProcessPanel : ComponentBase
     private int _countAllPage = 0;
     private string _curentToken = string.Empty;
     private Stack<string> _lastTokens = new();
+    private string[] _arrErrors = [];
 
 
     public void UpdatePanel()
@@ -48,7 +49,7 @@ public partial class ListProcessPanel : ComponentBase
                 }
 
                 _listProcessPanel = currentList;
-                _countAllPage = allprocessLine / _countLineOnePage;
+                _countAllPage = (int)Math.Ceiling((double)allprocessLine / _countLineOnePage);
 
                 return Task.CompletedTask;
             });
@@ -63,11 +64,12 @@ public partial class ListProcessPanel : ComponentBase
         }
     }
 
-    private Task ButtonClickObjectAsync(ListProcessPanelDto table)
+    private async Task ButtonClickObjectAsync(ListProcessPanelDto table)
     {
         _acitveTable = table;
         IsUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
-        return Task.CompletedTask;
+        
+        _arrErrors  = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
     }
 
     public void SetIdProcess(string value)
