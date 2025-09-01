@@ -81,11 +81,11 @@ public class BackgroundWorkerService : BackgroundService
     //     if (documents is null) throw new Exception("Failed to set history node state");
     // }
 
-    private async Task GetLastData()
-    {
-        var documents = await _elasticClient.GetLastDataAsync(10, "8P4W9c9Nhs");
-        if (documents is null) throw new Exception("Failed to set history node state");
-    }
+    // private async Task GetLastData()
+    // {
+    //     var documents = await _elasticClient.GetLastDataAsync(10, "8P4W9c9Nhs");
+    //     if (documents is null) throw new Exception("Failed to set history node state");
+    // }
 
     private void GetDataIndex()
     {

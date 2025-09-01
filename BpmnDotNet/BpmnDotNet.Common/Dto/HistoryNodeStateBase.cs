@@ -10,7 +10,7 @@ public class HistoryNodeStateBase
     /// <summary>
     ///     ID, IdBpmnProcess+TokenProcess
     /// </summary>
-    public string Id => $"{IdBpmnProcess}_{TokenProcess}_{DateCreated}";
+    public string Id => $"{Guid.NewGuid()}";
 
     /// <summary>
     ///     ID Bpmn процесса из схемы bpmn.

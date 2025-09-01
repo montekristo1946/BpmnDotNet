@@ -18,7 +18,7 @@ public partial class ListProcessPanel : ComponentBase
     private ListProcessPanelDto _acitveTable = new ListProcessPanelDto();
     private int _currentPage = 1;
 
-    private int _countLineOnePage = 3;
+    private int _countLineOnePage = 9;
     private int _countAllPage = 0;
     private string _curentToken = string.Empty;
     private Stack<string> _lastTokens = new();
@@ -39,6 +39,8 @@ public partial class ListProcessPanel : ComponentBase
                     _currentPage = 1;
                     _lastTokens.Clear();
                     _curentToken = string.Empty;
+                    _arrErrors =  [];
+                    _acitveTable = new ListProcessPanelDto();
                 }
 
                 var currentList = ListProcessPanelHandler

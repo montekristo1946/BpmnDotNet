@@ -5,14 +5,16 @@
          style=" width: 100%; height: 18%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
         <div class="col-12 p-0 m-0 ">
             <div class="row p-0 m-0  " style=" width: 100%; height: 100%;">
-                <div class="col-2 m-0 padding-2px text-lg-start" style="word-break: break-all; white-space: pre-line;">
+                <div class="col-2 m-0  text-lg-start border-enveloping-custom" 
+                     style="word-break: break-all; white-space: pre-line;  height: 100%; padding-left: 5px;">
                     @_acitveTable?.TokenProcess
                 </div>
-                <div class="col-10 m-0 padding-1px text-lg-start">
+                <div class="col-10 m-0  text-lg-start border-enveloping-custom"
+                     style="word-break: break-all; white-space: pre-line;  height: 100%; padding-left: 5px;">
                     @{
-                        if (_arrErrors.Any() is false)
+                        if (_arrErrors.Any() is false && !string.IsNullOrWhiteSpace(_acitveTable?.TokenProcess))
                         {
-                            <p class=" p-0 m-0">Process ok</p>
+                            <p class=" p-0 m-0">Not errors</p>
                         }
 
                         foreach (var line in _arrErrors)
@@ -30,7 +32,7 @@
          style=" width: 100%; height: 72%; overflow-y: scroll; overflow-x: hidden; background-color: #ffffff;">
         <div class="col-12 p-0 m-0    ">
 
-            <div class="p-1 m-0 "
+            <div class="p-0 m-0 "
                  style="display: flex; flex-direction: column; word-break: break-all; white-space: normal;">
 
                 <table>
@@ -100,7 +102,7 @@
                 </div>
 
                 <div class="col-1">
-                    @_currentPage on @_countAllPage
+                    @_currentPage of @_countAllPage
                 </div>
                 <div class="col-5"></div>
             </div>

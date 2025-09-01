@@ -33,7 +33,7 @@ public class SubProcessFirstHandler : IBpmnHandler
 
         await taskNode.ProcessTask;
 
-        throw new Exception("Тестовое сообщение ошибки");
+        await Task.Delay(1, ctsToken);
         
         _logger.LogDebug($"[SubProcessFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {contextSubProcess.ContextSubProcessValue}");

@@ -98,82 +98,82 @@ public class ElasticClient : IElasticClient
     }
 
 
-    public async Task<HistoryNodeState[]> GetLastDataAsync(int count, string valueFind)
-    {
-        try
-        {
-            var client = await GetClient();
-            var field = nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName();
-            var index = StringUtils.CreateIndexName(typeof(HistoryNodeState));
+    // public async Task<HistoryNodeState[]> GetLastDataAsync(int count, string valueFind)
+    // {
+    //     try
+    //     {
+    //         var client = await GetClient();
+    //         var field = nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName();
+    //         var index = StringUtils.CreateIndexName(typeof(HistoryNodeState));
+    //
+    //         var response =  client.SearchAsync<HistoryNodeState>(s => s
+    //             .Indices(index)
+    //             .Query(q => q
+    //                 .Match(m => m
+    //                     .Field(new Field(field))
+    //                     .Query(valueFind)
+    //                 )
+    //             )
+    //             .Sort(sort => sort
+    //                 .Field(p => p.DateCreated, f => f.Order(SortOrder.Desc)))
+    //             .Size(count)
+    //         ).Result;
+    //
+    //         if (!response.IsValidResponse) return [];
+    //
+    //         var retArr = response.Hits.Select(p => p.Source)
+    //             .Where(p => p is not null)
+    //             .ToArray();
+    //
+    //         return retArr!;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError($"[GetLastDataAsync] Error getting Data: {ex.Message}");
+    //     }
+    //
+    //     return [];
+    // }
 
-            var response =  client.SearchAsync<HistoryNodeState>(s => s
-                .Indices(index)
-                .Query(q => q
-                    .Match(m => m
-                        .Field(new Field(field))
-                        .Query(valueFind)
-                    )
-                )
-                .Sort(sort => sort
-                    .Field(p => p.DateCreated, f => f.Order(SortOrder.Desc)))
-                .Size(count)
-            ).Result;
-
-            if (!response.IsValidResponse) return [];
-
-            var retArr = response.Hits.Select(p => p.Source)
-                .Where(p => p is not null)
-                .ToArray();
-
-            return retArr!;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"[GetLastDataAsync] Error getting Data: {ex.Message}");
-        }
-
-        return [];
-    }
-
-    public async Task<HistoryNodeState[]> SearchWithPaginationAsync(
-        string valueFind,
-        int pageNumber,
-        int pageSize)
-    {
-        try
-        {
-            var client = await GetClient();
-            var index = StringUtils.CreateIndexName(typeof(HistoryNodeState));
-
-            var from = (pageNumber - 1) * pageSize;
-            var response =  client.SearchAsync<HistoryNodeState>(s => s
-                .Indices(index)
-                .Query(q => q
-                    .Match(m => m
-                        .Field(f => f.IdBpmnProcess)
-                        .Query(valueFind)
-                    )
-                )
-                .Sort(sort => sort
-                    .Field(p => p.DateCreated, f => f.Order(SortOrder.Desc))
-                )
-                .From(from)
-                .Size(pageSize)
-            ).Result;
-
-            var retArr = response.Hits.Select(p => p.Source)
-                .Where(p => p is not null)
-                .ToArray();
-
-            return retArr!;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"[SearchWithPaginationAsync] Error getting Pagination: {ex.Message}");
-        }
-
-        return [];
-    }
+    // public async Task<HistoryNodeState[]> SearchWithPaginationAsync_(
+    //     string valueFind,
+    //     int pageNumber,
+    //     int pageSize)
+    // {
+    //     try
+    //     {
+    //         var client = await GetClient();
+    //         var index = StringUtils.CreateIndexName(typeof(HistoryNodeState));
+    //
+    //         var from = (pageNumber - 1) * pageSize;
+    //         var response =  client.SearchAsync<HistoryNodeState>(s => s
+    //             .Indices(index)
+    //             .Query(q => q
+    //                 .Match(m => m
+    //                     .Field(f => f.IdBpmnProcess)
+    //                     .Query(valueFind)
+    //                 )
+    //             )
+    //             .Sort(sort => sort
+    //                 .Field(p => p.DateCreated, f => f.Order(SortOrder.Desc))
+    //             )
+    //             .From(from)
+    //             .Size(pageSize)
+    //         ).Result;
+    //
+    //         var retArr = response.Hits.Select(p => p.Source)
+    //             .Where(p => p is not null)
+    //             .ToArray();
+    //
+    //         return retArr!;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError($"[SearchWithPaginationAsync] Error getting Pagination: {ex.Message}");
+    //     }
+    //
+    //     return [];
+    // }
 
     /* public async Task<long> GetHistoryNodeStateCountAsync(string valueFind)
      {
@@ -386,7 +386,7 @@ public class ElasticClient : IElasticClient
                                 .TopHits(th => th
                                     .Size(1)
                                     .Sort(sort => sort
-                                        .Field(f => f.DateCreated, so => so.Order(SortOrder.Desc)))
+                                        .Field(f => f.DateLastModified, so => so.Order(SortOrder.Desc)))
                                     // .Source(src => src
                                         // .Filter()
                                         // .Filter(

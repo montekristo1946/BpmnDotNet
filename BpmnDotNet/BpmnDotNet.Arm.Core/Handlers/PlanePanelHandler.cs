@@ -22,9 +22,9 @@ public class PlanePanelHandler : IPlanePanelHandler
         _svgConstructor = svgConstructor ?? throw new ArgumentNullException(nameof(svgConstructor));
     }
     
-    public async Task<string> GetPlane(string idProcess, SizeWindows sizeWindows)
+    public async Task<string> GetPlane(string IdBpmnProcess, SizeWindows sizeWindows)
     {
-        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(idProcess) ?? new BpmnPlane();
+        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(IdBpmnProcess) ?? new BpmnPlane();
         var svg = await _svgConstructor.CreatePlane(plane,sizeWindows);
 
         return svg;

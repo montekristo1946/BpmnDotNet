@@ -15,9 +15,9 @@ internal interface IPlanePanelHandler
     /// <summary>
     ///     Вернет BpmnPlane для отрисовки.
     /// </summary>
-    /// <param name="idProcess"></param>
+    /// <param name="IdBpmnProcess"></param>
     /// <param name="sizeWindows"></param>
-    public Task<string> GetPlane(string idProcess, SizeWindows sizeWindows);
+    public Task<string> GetPlane(string IdBpmnProcess, SizeWindows sizeWindows);
 
     /// <summary>
     ///     Вернет BpmnPlane с раскрашенными состояниями.

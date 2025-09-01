@@ -25,27 +25,6 @@ public interface IElasticClient
     /// <returns></returns>
     public Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes = null);
 
-    /// <summary>
-    ///     Запросить последних count данных.
-    /// </summary>
-    /// <param name="count"></param>
-    /// <param name="valueFind"></param>
-    /// <returns></returns>
-    public Task<HistoryNodeState[]> GetLastDataAsync(int count, string valueFind);
-
-    /// <summary>
-    ///     Пагинация для HistoryNodeState.
-    /// </summary>
-    /// <param name="valueFind"></param>
-    /// <param name="pageNumber"></param>
-    /// <param name="pageSize"></param>
-    /// <returns></returns>
-    public Task<HistoryNodeState[]> SearchWithPaginationAsync(
-        string valueFind,
-        int pageNumber = 1,
-        int pageSize = 10);
-
-
 
     /// <summary>
     /// Получить все записи по полю TField из TIndex. 
