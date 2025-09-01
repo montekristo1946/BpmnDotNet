@@ -17,7 +17,11 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task SetStateProcess(string idBpmnProcess, string tokenProcess, NodeTaskStatus[] nodeStateRegistry)
+    public async Task SetStateProcess(string idBpmnProcess,
+        string tokenProcess,
+        NodeTaskStatus[] nodeStateRegistry,
+        string[] arrayMessageErrors, 
+        bool isCompleted)
     {
         if (string.IsNullOrWhiteSpace(idBpmnProcess))
         {
@@ -29,6 +33,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         }
         
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
+        ArgumentNullException.ThrowIfNull(arrayMessageErrors);
 
         var nodeJobStatus = nodeStateRegistry.Select(p => new NodeJobStatus()
         {
@@ -36,11 +41,16 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
             ProcessingStaus = p.ProcessingStaus,
         }).ToArray();
 
+        var processingStaus = CalculateProcessingStaus(nodeStateRegistry,isCompleted);
+        
         var historyNodeState = new HistoryNodeState()
         {
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess,
             NodeStaus = nodeJobStatus,
+            ArrayMessageErrors = arrayMessageErrors,
+            DateLastModified = DateTime.Now,
+            ProcessingStaus = processingStaus,
         };
 
         var resSetData = await _elasticClient.SetDataAsync(historyNodeState);
@@ -49,5 +59,26 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         {
             _logger.LogError($"[SetStateProcess] Failed to set history node state: {idBpmnProcess} {tokenProcess}");
         }
+    }
+
+    private ProcessingStaus CalculateProcessingStaus(NodeTaskStatus[] nodeStateRegistry, bool isCompleted)
+    {
+        if (isCompleted)
+        {
+            return ProcessingStaus.Complete;
+        }
+        
+        if (nodeStateRegistry.Any() is false)
+        {
+            return ProcessingStaus.None;
+        }
+        
+        var errors = nodeStateRegistry.FirstOrDefault(p=>p.ProcessingStaus == ProcessingStaus.Failed);
+        if (errors is not null)
+        {
+            return ProcessingStaus.Failed;
+        }
+        
+        return ProcessingStaus.Works;
     }
 }

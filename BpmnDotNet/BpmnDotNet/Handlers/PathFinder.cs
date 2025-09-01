@@ -66,6 +66,7 @@ public class PathFinder : IPathFinder
         return retArr;
     }
 
+    //TODO: ошибка.
     public string GetConditionRouteWithExclusiveGateWay(IContextBpmnProcess context, IElement currentNode)
     {
         var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
@@ -84,7 +85,13 @@ public class PathFinder : IPathFinder
             throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
                                            $"Couldn't find the condition from gateway:{currentNode.IdElement}");
 
-        return conditionName;
+        var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p=>p == conditionName) ?? string.Empty;
+            
+        if(string.IsNullOrWhiteSpace(checkPatch))
+            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
+                                           $"There is no such way from gateway:{currentNode.IdElement}");
+        
+        return checkPatch;
     }
 
     private IEnumerable<IElement> EndEventGetNextNode(IElement currentNode, IElement[] elementsSrc)

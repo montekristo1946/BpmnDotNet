@@ -11,4 +11,9 @@ public class HistoryNodeState:HistoryNodeStateBase
     ///     Текущее состояние нод.
     /// </summary>
     public NodeJobStatus[] NodeStaus { get; set; } = [];
+
+    /// <summary>
+    ///     Сообщения об ошибках.
+    /// </summary>
+    public string[] ArrayMessageErrors { get; set; } = [];
 }

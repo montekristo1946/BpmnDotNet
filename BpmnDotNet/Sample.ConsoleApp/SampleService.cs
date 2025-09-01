@@ -17,12 +17,12 @@ public class SampleService
 
     private ContextData CreateContextData()
     {
-        var wagon = 1005;
+        var wagon = 1008;
         var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
         
         var contextData = new ContextData
         {
-            IdBpmnProcess = Constants.IdBpmnProcessing_2,
+            IdBpmnProcess = Constants.IdBpmnProcessingMain,
             TokenProcess = tokenProcess,
             TestValue = 25,
             TestValue2 = "Call from StartNewProcess"

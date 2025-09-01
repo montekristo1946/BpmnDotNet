@@ -15,19 +15,18 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private readonly IContextBpmnProcess _contextBpmnProcess;
 
-
     private readonly CancellationTokenSource _cts;
 
     private readonly AutoResetEvent _eventsHolder = new(false);
+
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
+
+    private readonly ILogger<IBusinessProcess> _logger;
 
     /// <summary>
     ///     Handlers для обработки.
     /// </summary>
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers;
-
-    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
-
-    private readonly ILogger<IBusinessProcess> _logger;
 
     /// <summary>
     ///     Хранилище сообщений
@@ -39,15 +38,20 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// </summary>
     private readonly ConcurrentDictionary<string, NodeTaskStatus> _nodeStateRegistry = new();
 
+    /// <summary>
+    ///     Сообщения с ошибками выполнения.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, string> _errorsRegistry = new();
+
     private readonly IPathFinder _pathFinder;
     private bool _idDispose;
-    
-    
+
+
     public BusinessProcess(IContextBpmnProcess contextBpmnProcess,
         ILogger<IBusinessProcess> logger,
         BpmnProcessDto bpmnShema, IPathFinder pathFinder,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        TimeSpan timeout, 
+        TimeSpan timeout,
         IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _contextBpmnProcess = contextBpmnProcess ?? throw new ArgumentNullException(nameof(contextBpmnProcess));
@@ -55,7 +59,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _bpmnShema = bpmnShema ?? throw new ArgumentNullException(nameof(bpmnShema));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
         _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
-        _historyNodeStateWriter = historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
+        _historyNodeStateWriter =
+            historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
 
         _cts = new CancellationTokenSource(timeout);
         var task = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
@@ -271,14 +276,6 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 NodeRegistryChangeState(nodeId, ProcessingStaus.Complete);
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
-                
-                //Запишем состояние процесса в бд.
-               await _historyNodeStateWriter.SetStateProcess(
-                    _contextBpmnProcess.IdBpmnProcess, 
-                    _contextBpmnProcess.TokenProcess,
-                    _nodeStateRegistry.Values.ToArray()
-                    );
-               
                 CheckFinalProcessing(nodeId);
             }
             catch (OperationCanceledException)
@@ -292,16 +289,38 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 _logger.LogError(ex,
                     $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
                 NodeRegistryChangeState(nodeId, ProcessingStaus.Failed);
+
+                ErrorsRegistryUpdate(nodeId, ex.Message);
             }
             finally
             {
                 _eventsHolder.Set();
+                
+                var currentNode = GetIElement(nodeId);
+                var isCompleted = currentNode.ElementType == ElementType.EndEvent;
+                //Запишем состояние процесса в бд.
+                await _historyNodeStateWriter.SetStateProcess(
+                    _contextBpmnProcess.IdBpmnProcess,
+                    _contextBpmnProcess.TokenProcess,
+                    _nodeStateRegistry.Values.ToArray(),
+                    _errorsRegistry.Values.ToArray(),
+                    isCompleted
+                );
             }
         }, ctsToken);
 
         return retTask;
     }
 
+    private void ErrorsRegistryUpdate(string nodeId, string message)
+    {
+        _errorsRegistry.AddOrUpdate(
+            nodeId,
+            _ => message,
+            (keyOld, oldMessage) =>
+                message
+        );
+    }
 
     private void NodeRegistryChangeState(string nodeId, ProcessingStaus staus, Task? taskRunNode = null)
     {
@@ -336,12 +355,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private void CheckFinalProcessing(string currentNodeId)
     {
         var currentNode = GetIElement(currentNodeId);
-        if (currentNode.ElementType == ElementType.EndEvent)
+        if (currentNode.ElementType != ElementType.EndEvent)
         {
-            _logger.LogDebug("[CheckFinalProcessing] EndEvent completed");
-            _cts.Cancel();
-            _eventsHolder.Set();
+            return;
         }
+
+        _logger.LogDebug("[CheckFinalProcessing] EndEvent completed");
+        _cts.Cancel();
+        _eventsHolder.Set();
     }
 
     private void FillNextNodesToPending(string currentNodeId)
