@@ -69,7 +69,7 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
                 DateCreated = new DateTime(historyNode.DateCreated),
                 DateLastModified = new DateTime(historyNode.DateLastModified),
                 IdBpmnProcess = historyNode.IdBpmnProcess,
-                State = Map(historyNode.ProcessingStaus),
+                State = Map(((HistoryNodeStateBase)historyNode).ProcessStatus),
                 IdStorageHistoryNodeState = id,
             };
             retArray.Add(listProcessPanelDto);
@@ -87,14 +87,15 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
         return historyNodeState?.ArrayMessageErrors ?? [];
     }
 
-    private ProcessState Map(ProcessingStaus argProcessingStaus)
+    private ProcessState Map(ProcessStatus argStatusType)
     {
-        return argProcessingStaus switch
+        return argStatusType switch
         {
-            ProcessingStaus.Complete => ProcessState.Completed,
-            ProcessingStaus.Failed => ProcessState.Error,
-            ProcessingStaus.None => ProcessState.None,
-            _ => ProcessState.Running
+            ProcessStatus.Complete => ProcessState.Completed,
+            ProcessStatus.Error => ProcessState.Error,
+            ProcessStatus.Works => ProcessState.Works,
+            ProcessStatus.None => ProcessState.None,
+            _ => ProcessState.Works
         };
     }
 

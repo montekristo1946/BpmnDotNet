@@ -90,7 +90,7 @@ public partial class ListProcessPanel : ComponentBase
     {
         return tableState switch
         {
-            ProcessState.Running => "#19aee8",
+            ProcessState.Works => "#19aee8",
             ProcessState.None => "#212529",
             ProcessState.Completed => "#00ae5e",
             ProcessState.Error => "#f34848",

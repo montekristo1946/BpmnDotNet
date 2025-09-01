@@ -8,7 +8,7 @@ public class BusinessProcessJobStatus
     /// <summary>
     ///     Текущее состояние.
     /// </summary>
-    public ProcessingStaus ProcessingStaus { get; set; } = ProcessingStaus.None;
+    public StatusType StatusType { get; set; } = StatusType.None;
 
     /// <summary>
     ///     ID Bpmn процесса из схемы bpmn.

@@ -47,10 +47,10 @@ public class SampleService
     public void StartNewProcess()
     {
         var tasks = new List<Task>();
-        var startID = 4000;
+        var startID = 0;
         
-        var totalCount = 1000;
-        var batchSize = 2;
+        var totalCount = 3000;
+        var batchSize = 5;
         var sw = new Stopwatch();
         sw.Restart();
         for (int i = 0; i < totalCount; i += batchSize)

@@ -1,9 +1,9 @@
 namespace BpmnDotNet.Common.Dto;
 
 /// <summary>
-///     Статусы процессов.
+///     Статусы нод.
 /// </summary>
-public enum ProcessingStaus
+public enum StatusType
 {
     /// <summary>
     ///     Не определенное состояние.

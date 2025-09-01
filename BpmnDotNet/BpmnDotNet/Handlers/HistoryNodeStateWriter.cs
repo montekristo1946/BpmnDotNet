@@ -39,7 +39,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         var nodeJobStatus = nodeStateRegistry.Select(p => new NodeJobStatus()
         {
             IdNode = p.IdNode,
-            ProcessingStaus = p.ProcessingStaus,
+            StatusType = p.StatusType,
         }).ToArray();
 
         var processingStaus = CalculateProcessingStaus(nodeStateRegistry,isCompleted);
@@ -52,7 +52,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
             ArrayMessageErrors = arrayMessageErrors,
             DateCreated = dateFromInitInstance,
             DateLastModified = DateTime.Now.Ticks,
-            ProcessingStaus = processingStaus,
+            ProcessStatus = processingStaus,
         };
 
         var resSetData = await _elasticClient.SetDataAsync(historyNodeState);
@@ -63,24 +63,24 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         }
     }
 
-    private ProcessingStaus CalculateProcessingStaus(NodeTaskStatus[] nodeStateRegistry, bool isCompleted)
+    private ProcessStatus CalculateProcessingStaus(NodeTaskStatus[] nodeStateRegistry, bool isCompleted)
     {
         if (isCompleted)
         {
-            return ProcessingStaus.Complete;
+            return ProcessStatus.Complete;
         }
         
         if (nodeStateRegistry.Any() is false)
         {
-            return ProcessingStaus.None;
+            return ProcessStatus.None;
         }
         
-        var errors = nodeStateRegistry.FirstOrDefault(p=>p.ProcessingStaus == ProcessingStaus.Failed);
+        var errors = nodeStateRegistry.FirstOrDefault(p=>p.StatusType == StatusType.Failed);
         if (errors is not null)
         {
-            return ProcessingStaus.Failed;
+            return ProcessStatus.Error;
         }
         
-        return ProcessingStaus.Works;
+        return ProcessStatus.Works;
     }
 }

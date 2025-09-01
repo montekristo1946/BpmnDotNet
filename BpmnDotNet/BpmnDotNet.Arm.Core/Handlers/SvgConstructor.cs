@@ -82,7 +82,7 @@ public class SvgConstructor : ISvgConstructor
 
     private string GetColor(string shapeId, NodeJobStatus[] nodeJobStatus)
     {
-        var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.ProcessingStaus ?? ProcessingStaus.None;
+        var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.StatusType ?? StatusType.None;
         var defaultColor =  "#22242a";
         var running = "#19aee8";
         var completed ="#00ae5e";
@@ -91,13 +91,13 @@ public class SvgConstructor : ISvgConstructor
 
         return state switch
         {
-            ProcessingStaus.None => defaultColor,
-            ProcessingStaus.Pending => running,
-            ProcessingStaus.Works => running,
-            ProcessingStaus.Complete => completed,
-            ProcessingStaus.Failed => error,
-            ProcessingStaus.WaitingCompletedWays => running,
-            ProcessingStaus.WaitingReceivedMessage => running,
+            StatusType.None => defaultColor,
+            StatusType.Pending => running,
+            StatusType.Works => running,
+            StatusType.Complete => completed,
+            StatusType.Failed => error,
+            StatusType.WaitingCompletedWays => running,
+            StatusType.WaitingReceivedMessage => running,
             _ => throw new ArgumentOutOfRangeException()
         };
     }

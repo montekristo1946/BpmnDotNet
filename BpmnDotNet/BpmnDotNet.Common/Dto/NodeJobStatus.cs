@@ -11,7 +11,7 @@ public class NodeJobStatus
     public string IdNode { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Состояние узла на Bpmn схеме.
+    ///     Состояние ноды на Bpmn схеме.
     /// </summary>
-    public ProcessingStaus ProcessingStaus { get; set; } = ProcessingStaus.None;
+    public StatusType StatusType { get; set; } = StatusType.None;
 }

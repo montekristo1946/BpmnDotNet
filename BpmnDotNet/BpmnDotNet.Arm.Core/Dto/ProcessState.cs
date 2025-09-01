@@ -9,7 +9,7 @@ public enum ProcessState
     None = 0,
 
     [Display(Name = "Running")] [Description("Running")]
-    Running = 1,
+    Works = 1,
 
     [Display(Name = "Completed")] [Description("Completed")]
     Completed = 2,

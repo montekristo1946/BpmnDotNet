@@ -10,7 +10,7 @@ public class HistoryNodeStateBase
     /// <summary>
     ///     ID, IdBpmnProcess+TokenProcess
     /// </summary>
-    public string Id => $"{Guid.NewGuid()}";
+    public string Id => $"{IdBpmnProcess}_{TokenProcess}";
 
     /// <summary>
     ///     ID Bpmn процесса из схемы bpmn.
@@ -35,5 +35,5 @@ public class HistoryNodeStateBase
     /// <summary>
     ///     Состояние процесса.
     /// </summary>
-    public ProcessingStaus ProcessingStaus { get; set; } = ProcessingStaus.None;
+    public ProcessStatus ProcessStatus { get; set; } = ProcessStatus.None;
 }
