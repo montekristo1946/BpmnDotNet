@@ -306,6 +306,7 @@ public class ElasticClient : IElasticClient
 
     public async Task<int> GetAllGroupFromTokenAsync(string idActiveProcess)
     {
+        var countAnalized = 10000;
         try
         {
             var client = await GetClient();
@@ -321,7 +322,7 @@ public class ElasticClient : IElasticClient
                 .Aggregations(aggs => aggs
                     .Add("unique_combinations", c =>
                         c.Composite(l => l
-                            .Size(1000)
+                            .Size(countAnalized)
                             .Sources(src =>
                                 src.Add(keySort, t =>
                                     t.Terms(descriptor => descriptor
@@ -367,6 +368,8 @@ public class ElasticClient : IElasticClient
                         .Value(idActiveProcess)
                     )
                 )
+                .Sort(sort => sort
+                    .Field(f=>f.DateCreated, so =>so.Order(SortOrder.Desc)))
                 .Aggregations(aggs => aggs
                     .Add("tokens", t => t
                         .Composite(c =>
@@ -387,18 +390,6 @@ public class ElasticClient : IElasticClient
                                     .Size(1)
                                     .Sort(sort => sort
                                         .Field(f => f.DateLastModified, so => so.Order(SortOrder.Desc)))
-                                    // .Source(src => src
-                                        // .Filter()
-                                        // .Filter(
-                                            // f => f
-                                            // .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()))
-                                            // .Includes(new Field(nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName()))
-                                            // .Includes(new Field(nameof(HistoryNodeState.TokenProcess).ToElasticsearchFieldName()))
-                                            // .Includes(new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()))
-                                            // .Includes(new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()))
-                                            // .Includes(new Field(nameof(HistoryNodeState.ProcessingStaus).ToElasticsearchFieldName()))
-                                        // )
-                                    // )
                                 ))
                         )
                     )
