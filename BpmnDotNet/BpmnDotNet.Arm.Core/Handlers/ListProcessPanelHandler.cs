@@ -17,60 +17,48 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
     }
 
-    public async Task<int> GetCountAllPages(string idActiveProcess)
+    public async Task<int> GetCountAllPages(string idActiveProcess, string [] processStatus = null)
     {
         if (string.IsNullOrEmpty(idActiveProcess))
         {
             return 0;
         }
 
-        var res = await _elasticClient.GetAllGroupFromTokenAsync(idActiveProcess);
+        var res = await _elasticClient.GetCountHistoryNodeState(idActiveProcess,processStatus);
 
         return res;
     }
 
-    public async Task<ListProcessPanelDto[]> GetPagesStates(string idActiveProcess, string lastToken,
-        int countLineOnePage)
+    public async Task<ListProcessPanelDto[]> GetPagesStates(
+        string idBpmnProcess,
+        int from, 
+        int size, 
+        string [] processStatus = null)
     {
-        if (string.IsNullOrEmpty(idActiveProcess))
+        if (string.IsNullOrEmpty(idBpmnProcess))
         {
             return [];
         }
 
-        if (string.IsNullOrEmpty(lastToken))
+        if (size ==0)
         {
-            lastToken = "*";
+            return [];
         }
 
-        if (countLineOnePage == 0)
-        {
-            countLineOnePage = 10;
-        }
-
-        var idHistoryNodeState =
-            await _elasticClient.GetIdHistoryNodeStateAsync(idActiveProcess, lastToken, countLineOnePage);
+        var historyNodes =
+            await _elasticClient.GetHistoryNodeStateAsync(idBpmnProcess, from, size,processStatus);
 
         var retArray = new List<ListProcessPanelDto>();
-        foreach (var id in idHistoryNodeState)
+        foreach (var historyNode in historyNodes)
         {
-            var historyNode = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(id,
-            [
-                nameof(HistoryNodeState.NodeStaus),
-                nameof(HistoryNodeState.ArrayMessageErrors)
-            ]);
-            if (historyNode == null)
-            {
-                continue;
-            }
-
             var listProcessPanelDto = new ListProcessPanelDto()
             {
                 TokenProcess = historyNode.TokenProcess,
                 DateCreated = new DateTime(historyNode.DateCreated),
                 DateLastModified = new DateTime(historyNode.DateLastModified),
                 IdBpmnProcess = historyNode.IdBpmnProcess,
-                State = Map(((HistoryNodeStateBase)historyNode).ProcessStatus),
-                IdStorageHistoryNodeState = id,
+                State = Map(historyNode.ProcessStatus),
+                IdStorageHistoryNodeState = historyNode.Id,
             };
             retArray.Add(listProcessPanelDto);
         }
@@ -91,7 +79,7 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
     {
         return argStatusType switch
         {
-            ProcessStatus.Complete => ProcessState.Completed,
+            ProcessStatus.Completed => ProcessState.Completed,
             ProcessStatus.Error => ProcessState.Error,
             ProcessStatus.Works => ProcessState.Works,
             ProcessStatus.None => ProcessState.None,

@@ -126,7 +126,7 @@ internal class BpmnClient : IBpmnClient
     {
         foreach (var status in _bpmnProcesses.Values)
         {
-            if (status.StatusType != StatusType.Complete && !isForce)
+            if (status.StatusType != StatusType.Completed && !isForce)
                 continue;
 
             var resRemote = _bpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);

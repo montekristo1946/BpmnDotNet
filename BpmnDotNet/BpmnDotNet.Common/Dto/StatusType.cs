@@ -23,7 +23,7 @@ public enum StatusType
     /// <summary>
     ///     Удачно завершен.
     /// </summary>
-    Complete = 3,
+    Completed = 3,
 
     /// <summary>
     ///     Не удачно завершен.

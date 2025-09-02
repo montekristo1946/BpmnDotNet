@@ -18,7 +18,7 @@ public enum ProcessStatus
     /// <summary>
     ///     Удачно завершен.
     /// </summary>
-    Complete = 2,
+    Completed = 2,
 
     /// <summary>
     ///     Не удачно завершен.

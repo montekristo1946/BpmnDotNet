@@ -47,7 +47,7 @@ public class ElasticClient : IElasticClient
         try
         {
             var client = await GetClient();
-            var response =  client.IndexAsync(historyNodeState).Result;
+            var response = client.IndexAsync(historyNodeState).Result;
             if (!response.IsValidResponse)
             {
                 _logger.LogError($"[SetHistoryNodeState] Fail:{response.Result}");
@@ -71,14 +71,14 @@ public class ElasticClient : IElasticClient
             var excludes = Array.Empty<string>();
             if (sourceExcludes is not null)
             {
-                excludes = sourceExcludes.Select(p=>p.ToElasticsearchFieldName()).ToArray();
+                excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
             }
-         
-            
+
+
             var client = await GetClient();
             var index = StringUtils.CreateIndexName(typeof(T));
-            var response =  client
-                .GetAsync<T>(index, id, g=>g
+            var response = client
+                .GetAsync<T>(index, id, g => g
                     .SourceExcludes(excludes))
                 .Result;
 
@@ -304,146 +304,249 @@ public class ElasticClient : IElasticClient
         throw new InvalidOperationException($"Failed to reconnect to Elasticsearch after {_maxRetryCount} attempts");
     }
 
-    public async Task<int> GetAllGroupFromTokenAsync(string idActiveProcess)
+    // public async Task<int> GetAllGroupFromTokenAsync(string idActiveProcess)
+    // {
+    //     var countAnalized = 10000;
+    //     try
+    //     {
+    //         var client = await GetClient();
+    //         var keySort = "tokenProcess";
+    //         var response = client.SearchAsync<HistoryNodeState>(s => s
+    //             .Size(0)
+    //             .Query(q => q
+    //                 .Term(t => t
+    //                     .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+    //                     .Value(idActiveProcess)
+    //                 )
+    //             )
+    //             .Aggregations(aggs => aggs
+    //                 .Add("unique_combinations", c =>
+    //                     c.Composite(l => l
+    //                         .Size(countAnalized)
+    //                         .Sources(src =>
+    //                             src.Add(keySort, t =>
+    //                                 t.Terms(descriptor => descriptor
+    //                                     .Field(f => f.TokenProcess.Suffix("keyword"))
+    //                                 )
+    //                             )
+    //                         ))
+    //                 )
+    //             )
+    //         ).Result;
+    //
+    //         if (!response.IsValidResponse || response.Aggregations is null)
+    //         {
+    //             return 0;
+    //         }
+    //
+    //         var compositeAgg = response.Aggregations.GetComposite("unique_combinations");
+    //
+    //         return compositeAgg?.Buckets?.Count ?? 0;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "GetAllGroupFromToken failed");
+    //     }
+    //
+    //     return 0;
+    // }
+
+
+    // public async Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
+    //     int countLineOnePage)
+    // {
+    //     try
+    //     {
+    //         var client = await GetClient();
+    //         var keySort = "tokenProcess";
+    //
+    //         var response = client.SearchAsync<HistoryNodeState>(s => s
+    //             .Size(0)
+    //             .Query(q => q
+    //                 .Term(t => t
+    //                     .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+    //                     .Value(idActiveProcess)
+    //                 )
+    //             )
+    //             .Sort(sort => sort
+    //                 .Field(f => f.DateCreated, so => so.Order(SortOrder.Desc)))
+    //             .Aggregations(aggs => aggs
+    //                 .Add("tokens", t => t
+    //                     .Composite(c =>
+    //                         c.Size(countLineOnePage)
+    //                             .Sources(src =>
+    //                                 src.Add(keySort, t =>
+    //                                     t.Terms(descriptor => descriptor
+    //                                         .Field(f => f.TokenProcess.Suffix("keyword"))
+    //                                     )
+    //                                 )
+    //                             )
+    //                             .After(a => a.Add(aftKey =>
+    //                                 aftKey.TokenProcess, afterKeyValue))
+    //                     )
+    //                     .Aggregations(subAggs => subAggs
+    //                         .Add("latest_doc", ld => ld
+    //                             .TopHits(th => th
+    //                                 .Size(1)
+    //                                 .Sort(sort => sort
+    //                                     .Field(f => f.DateLastModified, so => so.Order(SortOrder.Desc)))
+    //                             ))
+    //                     )
+    //                 )
+    //             )).Result;
+    //
+    //
+    //         if (!response.IsValidResponse || response.Aggregations is null)
+    //         {
+    //             return [];
+    //         }
+    //
+    //         var bucketsHistory = response.Aggregations.GetComposite("tokens")?.Buckets;
+    //
+    //         var retIds = bucketsHistory?.Select(bucket =>
+    //         {
+    //             var retId = string.Empty;
+    //             var docks = bucket.Aggregations?.FirstOrDefault().Value;
+    //             switch (docks)
+    //             {
+    //                 case null:
+    //                     break;
+    //                 case TopHitsAggregate compositeAgg:
+    //                     retId = compositeAgg?.Hits?.Hits?.FirstOrDefault()?.Id ?? string.Empty;
+    //                     break;
+    //             }
+    //
+    //             return retId;
+    //         })?.ToArray();
+    //
+    //         return retIds ?? [];
+    //         // foreach (var bucket in bucketsHistory)
+    //         // {
+    //         //
+    //         //     foreach (var docks  in bucket.Aggregations)
+    //         //     {
+    //         //
+    //         //         // var valueDoc = docks.Value as TopHitsAggregate;
+    //         //         
+    //         //         if (docks.Value  is TopHitsAggregate compositeAgg)
+    //         //         {
+    //         //             // Работаем с composite агрегацией
+    //         //             // foreach (var t in compositeAgg.Hits)
+    //         //             // {
+    //         //             //     // Обработка бакетов
+    //         //             // }
+    //         //             var t = compositeAgg.Hits.Hits.FirstOrDefault();
+    //         //             Console.WriteLine();
+    //         //         }
+    //         //         Console.WriteLine();
+    //         //    
+    //         //     }
+    //         //
+    //         // }
+    //         return [];
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "GetHistoryNodeStateAsync failed");
+    //     }
+    //
+    //     return [];
+    // }
+
+    public async Task<int> GetCountHistoryNodeState(string idBpmnProcess, string[] processStatus = null, int sizeSample = 10000)
     {
-        var countAnalized = 10000;
+        var fieldsValue = GetFields(processStatus);
+
         try
         {
             var client = await GetClient();
-            var keySort = "tokenProcess";
-            var response = client.SearchAsync<HistoryNodeState>(s => s
-                .Size(0)
+
+            var searchRequest = client.SearchAsync<HistoryNodeState>(s => s
+                .Size(sizeSample)
                 .Query(q => q
-                    .Term(t => t
-                        .Field(f => f.IdBpmnProcess.Suffix("keyword"))
-                        .Value(idActiveProcess)
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t
+                                .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+                                .Value(idBpmnProcess)),
+                            m => m.Terms(t => t
+                                .Field(f => f.ProcessStatus.Suffix("keyword"))
+                                .Terms(teams => teams.Value(fieldsValue)))
+                        )
                     )
                 )
-                .Aggregations(aggs => aggs
-                    .Add("unique_combinations", c =>
-                        c.Composite(l => l
-                            .Size(countAnalized)
-                            .Sources(src =>
-                                src.Add(keySort, t =>
-                                    t.Terms(descriptor => descriptor
-                                        .Field(f => f.TokenProcess.Suffix("keyword"))
-                                    )
-                                )
-                            ))
+                .Sort(s => s
+                    .Field(f => f
+                        .Field("dateCreated")
+                        .Order(SortOrder.Desc)
                     )
                 )
-            ).Result;
+                .Source(src => src
+                    .Filter(f => f
+                            .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()))
+                    )
+                )).Result;
 
-            if (!response.IsValidResponse || response.Aggregations is null)
-            {
-                return 0;
-            }
-
-            var compositeAgg = response.Aggregations.GetComposite("unique_combinations");
-
-            return compositeAgg?.Buckets?.Count ?? 0;
+            var retValue = searchRequest.Hits.Count;
+            return retValue;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetAllGroupFromToken failed");
+            _logger.LogError(ex, "GetCountHistoryNodeState failed");
         }
 
         return 0;
     }
-    
 
-    public async Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
-        int countLineOnePage)
+    public async Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size,string [] processStatus = null)
     {
+        var fieldsValue = GetFields(processStatus);
+
         try
         {
             var client = await GetClient();
-            var keySort = "tokenProcess";
 
-            var response = client.SearchAsync<HistoryNodeState>(s => s
-                .Size(0)
+            var searchRequest = client.SearchAsync<HistoryNodeState>(s => s
+                .From(from)
+                .Size(size)
                 .Query(q => q
-                    .Term(t => t
-                        .Field(f => f.IdBpmnProcess.Suffix("keyword"))
-                        .Value(idActiveProcess)
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t
+                                .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+                                .Value(idBpmnProcess)),
+                            m => m.Terms(t => t
+                                .Field(f => f.ProcessStatus.Suffix("keyword"))
+                                .Terms(teams => teams.Value(fieldsValue)))
+                        )
                     )
                 )
-                .Sort(sort => sort
-                    .Field(f=>f.DateCreated, so =>so.Order(SortOrder.Desc)))
-                .Aggregations(aggs => aggs
-                    .Add("tokens", t => t
-                        .Composite(c =>
-                            c.Size(countLineOnePage)
-                                .Sources(src =>
-                                    src.Add(keySort, t =>
-                                        t.Terms(descriptor => descriptor
-                                            .Field(f => f.TokenProcess.Suffix("keyword"))
-                                        )
-                                    )
-                                )
-                                .After(a => a.Add(aftKey =>
-                                    aftKey.TokenProcess, afterKeyValue))
-                        )
-                        .Aggregations(subAggs => subAggs
-                            .Add("latest_doc", ld => ld
-                                .TopHits(th => th
-                                    .Size(1)
-                                    .Sort(sort => sort
-                                        .Field(f => f.DateLastModified, so => so.Order(SortOrder.Desc)))
-                                ))
-                        )
+                .Sort(s => s
+                    .Field(f => f
+                        .Field("dateCreated")
+                        .Order(SortOrder.Desc)
+                    )
+                )
+                .Source(src => src
+                    .Filter(f => f
+                            .Includes(new Field[]
+                            {
+                                new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()),
+                                new Field(nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName()),
+                                new Field(nameof(HistoryNodeState.TokenProcess).ToElasticsearchFieldName()),
+                                new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()),
+                                new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()),
+                                new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName())
+                            })
                     )
                 )).Result;
-
-
-            if (!response.IsValidResponse || response.Aggregations is null)
-            {
-                return [];
-            }
-
-            var bucketsHistory = response.Aggregations.GetComposite("tokens")?.Buckets;
-
-            var retIds = bucketsHistory?.Select(bucket =>
-            {
-                var retId = string.Empty;
-                var docks = bucket.Aggregations?.FirstOrDefault().Value;
-                switch (docks)
-                {
-                    case null:
-                        break;
-                    case TopHitsAggregate compositeAgg:
-                        retId = compositeAgg?.Hits?.Hits?.FirstOrDefault()?.Id ??  string.Empty;
-                        break;
-                }
-
-                return retId;
-            })?.ToArray();
-
-            return retIds?? [];
-            // foreach (var bucket in bucketsHistory)
-            // {
-            //
-            //     foreach (var docks  in bucket.Aggregations)
-            //     {
-            //
-            //         // var valueDoc = docks.Value as TopHitsAggregate;
-            //         
-            //         if (docks.Value  is TopHitsAggregate compositeAgg)
-            //         {
-            //             // Работаем с composite агрегацией
-            //             // foreach (var t in compositeAgg.Hits)
-            //             // {
-            //             //     // Обработка бакетов
-            //             // }
-            //             var t = compositeAgg.Hits.Hits.FirstOrDefault();
-            //             Console.WriteLine();
-            //         }
-            //         Console.WriteLine();
-            //    
-            //     }
-            //
-            // }
-            return [];
+            
+            var retArr = searchRequest?.Hits
+                ?.Select(p => p.Source)
+                ?.Where(p => p is not null)
+                ?.ToArray() ?? [];
+            
+            return retArr!;
         }
         catch (Exception ex)
         {
@@ -451,5 +554,23 @@ public class ElasticClient : IElasticClient
         }
 
         return [];
+    }
+
+    private static FieldValue[] GetFields(string[]? processStatus)
+    {
+        var allFields = new FieldValue[]
+        {
+            nameof(ProcessStatus.None),
+            nameof(ProcessStatus.Works),
+            nameof(ProcessStatus.Completed),
+            nameof(ProcessStatus.Error)
+        };
+        var fieldsValue = processStatus?.Select(p =>
+        {
+            FieldValue f = p;
+            return f;
+        }).ToArray() ?? allFields;
+        
+        return fieldsValue;
     }
 }

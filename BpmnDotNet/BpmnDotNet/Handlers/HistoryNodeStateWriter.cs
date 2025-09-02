@@ -67,7 +67,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
     {
         if (isCompleted)
         {
-            return ProcessStatus.Complete;
+            return ProcessStatus.Completed;
         }
         
         if (nodeStateRegistry.Any() is false)

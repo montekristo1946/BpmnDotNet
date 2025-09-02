@@ -7,21 +7,23 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class ListProcessPanel : ComponentBase
 {
-    [Parameter] public Action<string> IsUpdateNodeJobStatus { get; set; } = null!;
+    [Parameter] public Action<string> IsColorUpdateNodeJobStatus { get; set; } = null!;
+    
+    [Parameter] public Action<string> IsBaseUpdateNodeJobStatus { get; set; } = null!;
 
     [Inject] private ILogger<ListProcessPanel> Logger { get; set; } = null!;
 
     [Inject] private IListProcessPanelHandler ListProcessPanelHandler { get; set; } = null!;
 
     private ListProcessPanelDto[] _listProcessPanel = [];
-    private string _idActiveProcess = string.Empty;
+    private string _activeIdBpmnProcess = string.Empty;
     private ListProcessPanelDto _acitveTable = new ListProcessPanelDto();
-    private int _currentPage = 1;
+    private int _currentPage = 0;
 
     private int _countLineOnePage = 9;
     private int _countAllPage = 0;
-    private string _curentToken = string.Empty;
-    private Stack<string> _lastTokens = new();
+    // private string _curentToken = string.Empty;
+    // private Stack<string> _lastTokens = new();
     private string[] _arrErrors = [];
 
 
@@ -31,20 +33,19 @@ public partial class ListProcessPanel : ComponentBase
         {
             InvokeAsync(() =>
             {
-                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_idActiveProcess).Result;
+                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_activeIdBpmnProcess, null).Result;
                 if (allprocessLine == 0)
                 {
                     _listProcessPanel = [];
                     _countAllPage = 0;
-                    _currentPage = 1;
-                    _lastTokens.Clear();
-                    _curentToken = string.Empty;
-                    _arrErrors =  [];
-                    _acitveTable = new ListProcessPanelDto();
+                    _currentPage = 0;
+                    ClearValue();
                 }
 
+                var from = _currentPage * _countLineOnePage;
                 var currentList = ListProcessPanelHandler
-                    .GetPagesStates(_idActiveProcess, _curentToken, _countLineOnePage).Result;
+                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, null).Result;
+                
                 if (currentList.Any() is false)
                 {
                     return Task.CompletedTask;
@@ -66,25 +67,35 @@ public partial class ListProcessPanel : ComponentBase
         }
     }
 
-    private async Task ButtonClickObjectAsync(ListProcessPanelDto table)
+    private void ClearValue()
     {
-        _acitveTable = table;
-        IsUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
-        
-        _arrErrors  = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
+        // _curentToken = string.Empty;
+        _arrErrors =  [];
+        _acitveTable = new ListProcessPanelDto();
     }
-
     public void SetIdProcess(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            _idActiveProcess = string.Empty;
+            _activeIdBpmnProcess = string.Empty;
             return;
         }
 
-        _idActiveProcess = value;
+        _activeIdBpmnProcess = value;
+        ClearValue();
         UpdatePanel();
     }
+
+    
+    private async Task ButtonClickObjectAsync(ListProcessPanelDto table)
+    {
+        _acitveTable = table;
+        IsColorUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
+        
+        _arrErrors  = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
+    }
+
+
 
     private string GetColorState(ProcessState tableState)
     {
@@ -106,9 +117,11 @@ public partial class ListProcessPanel : ComponentBase
             return;
         }
 
-        _lastTokens.Push(_curentToken);
-        _curentToken = _listProcessPanel.LastOrDefault()?.TokenProcess ?? string.Empty;
+        ClearValue();
+        // _curentToken = _listProcessPanel.LastOrDefault()?.TokenProcess ?? string.Empty;
         _currentPage += 1;
+        IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
+       
         UpdatePanel();
     }
 
@@ -119,14 +132,12 @@ public partial class ListProcessPanel : ComponentBase
             return;
         }
 
-        if (!_lastTokens.TryPop(out var token))
-        {
-            return;
-        }
 
-        _curentToken = token ?? string.Empty;
+        // _curentToken = token ?? string.Empty;
 
         _currentPage -= 1;
+        IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
+        ClearValue();
         UpdatePanel();
     }
 }

@@ -94,7 +94,7 @@ public class SvgConstructor : ISvgConstructor
             StatusType.None => defaultColor,
             StatusType.Pending => running,
             StatusType.Works => running,
-            StatusType.Complete => completed,
+            StatusType.Completed => completed,
             StatusType.Failed => error,
             StatusType.WaitingCompletedWays => running,
             StatusType.WaitingReceivedMessage => running,

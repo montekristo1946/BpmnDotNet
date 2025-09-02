@@ -34,20 +34,39 @@ public interface IElasticClient
     /// <returns></returns>
     public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
 
+    // /// <summary>
+    // /// Сколько всего групп конкретного процесса для пагинации. В расчет берется первая 1000;
+    // /// </summary>
+    // /// <param name="idActiveProcess"></param>
+    // /// <returns></returns>
+    // public Task<int> GetAllGroupFromTokenAsync(string idActiveProcess);
+    
+    // /// <summary>
+    // /// Получить 
+    // /// </summary>
+    // /// <param name="idActiveProcess"></param>
+    // /// <param name="afterKeyValueparam>
+    // /// <param name="countLineOnePage"></param>
+    // /// <returns></returns>
+    // public Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
+    //     int countLineOnePage);
+
+    //-----------------------------------
     /// <summary>
-    /// Сколько всего групп конкретного процесса для пагинации. В расчет берется первая 1000;
+    /// Общее количество полей.
     /// </summary>
-    /// <param name="idActiveProcess"></param>
+    /// <param name="idBpmnProcess"></param>
+    /// <param name="processStatus"></param>
+    /// <param name="sizeSample"></param>
     /// <returns></returns>
-    public Task<int> GetAllGroupFromTokenAsync(string idActiveProcess);
+    public Task<int> GetCountHistoryNodeState(string idBpmnProcess, string [] processStatus = null, int sizeSample = 10000);
     
     /// <summary>
-    /// Получить 
+    /// Выдача результатов пагинация
     /// </summary>
-    /// <param name="idActiveProcess"></param>
-    /// <param name="afterKeyValueparam>
-    /// <param name="countLineOnePage"></param>
+    /// <param name="idBpmnProcess"></param>
+    /// <param name="from">С какого элемента</param>
+    /// <param name="size">Сколько элементов.</param>
     /// <returns></returns>
-    public Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
-        int countLineOnePage);
+    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string [] processStatus = null);
 }

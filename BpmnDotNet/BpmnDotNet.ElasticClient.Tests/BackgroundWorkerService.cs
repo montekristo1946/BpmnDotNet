@@ -55,7 +55,9 @@ public class BackgroundWorkerService : BackgroundService
                     // Pagination();
                     // LoadXmlBpmn();
                     // GetXmlBpmn();
-                    GetAllIdBpmnPlan();
+                    // GetAllIdBpmnPlan();
+                    // GetCountHistoryNodeState();
+                    GetHistoryNodeStateAsync();
                     break;
                 case 'q':
                     Console.WriteLine("Quitting");
@@ -69,7 +71,8 @@ public class BackgroundWorkerService : BackgroundService
         Console.ReadLine();
     }
 
-  
+ 
+
 
     // private void Pagination()
     // {
@@ -158,5 +161,23 @@ public class BackgroundWorkerService : BackgroundService
             throw new Exception("Failed to set history node state");
         
         // public Task<string[]> GetAllId<T>()
+    }
+    
+    private void GetCountHistoryNodeState()
+    {
+        var processStatus = "Completed";
+        var count =  _elasticClient.GetCountHistoryNodeState("IdBpmnProcessingMain",["Completed","None","Works","Error"]).Result;
+     
+        if ( count ==0)
+            throw new Exception("Failed to set history node state");
+    }
+    
+    private void GetHistoryNodeStateAsync()
+    {
+        var processStatus = "Completed";
+        var res =  _elasticClient.GetHistoryNodeStateAsync("IdBpmnProcessingMain",0,10,["Completed","None","Works","Error"]).Result;
+     
+        if ( res.Any() is false )
+            throw new Exception("Failed to set history node state");
     }
 }

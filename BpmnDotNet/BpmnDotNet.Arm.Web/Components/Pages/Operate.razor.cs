@@ -26,10 +26,10 @@ public partial class Operate : ComponentBase
     
     private void ChoseIdProcess( string  value )
     {
-        _drawingPlanePanel?.UpdatePanel(value);
+        _drawingPlanePanel?.BaseUpdatePanel(value);
         _listProcessPanel?.SetIdProcess(value);
     }
-    private void IsUpdateNodeJobStatus( string  idUpdateNodeJobStatus )
+    private void IsColorUpdateNodeJobStatus( string  idUpdateNodeJobStatus )
     {
         _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
     }
@@ -37,7 +37,7 @@ public partial class Operate : ComponentBase
     private void UpdateUpdatePanel()
     {
         _filterPanel?.UpdatePanel();
-        _drawingPlanePanel?.UpdatePanel();
+        _drawingPlanePanel?.BaseUpdatePanel();
         _listProcessPanel?.UpdatePanel();
         
     }
@@ -47,8 +47,9 @@ public partial class Operate : ComponentBase
         return builder =>
         {
             builder.OpenComponent(0, typeof(ListProcessPanel));
-            builder.AddAttribute(1, nameof(ListProcessPanel.IsUpdateNodeJobStatus), IsUpdateNodeJobStatus);
-            builder.AddComponentReferenceCapture(1, value =>
+            builder.AddAttribute(1, nameof(ListProcessPanel.IsColorUpdateNodeJobStatus), IsColorUpdateNodeJobStatus);
+            builder.AddAttribute(2, nameof(ListProcessPanel.IsBaseUpdateNodeJobStatus), ChoseIdProcess);
+            builder.AddComponentReferenceCapture(3, value =>
             {
                 _listProcessPanel = value as ListProcessPanel
                                     ?? throw new InvalidOperationException(

@@ -157,7 +157,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _logger.LogDebug("[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
 
-        JobStatus.StatusType = StatusType.Complete;
+        JobStatus.StatusType = StatusType.Completed;
         return Task.CompletedTask;
     }
 
@@ -247,7 +247,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             var checkCalls = incomingPath.All(p =>
             {
                 var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
-                return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Complete;
+                return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
             });
 
             if (checkCalls) NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
@@ -275,7 +275,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 var handler = GetHandler(nodeId);
                 await handler(_contextBpmnProcess, ctsToken);
 
-                NodeRegistryChangeState(nodeId, StatusType.Complete);
+                NodeRegistryChangeState(nodeId, StatusType.Completed);
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
                 
@@ -405,16 +405,16 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         if (currentNode.ElementType == ElementType.ExclusiveGateway)
         {
             var idNode = _pathFinder.GetConditionRouteWithExclusiveGateWay(_contextBpmnProcess, currentNode);
-            NodeRegistryChangeState(idNode, StatusType.Complete);
-            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {idNode} State: {StatusType.Complete}");
+            NodeRegistryChangeState(idNode, StatusType.Completed);
+            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {idNode} State: {StatusType.Completed}");
             return;
         }
 
         var flowsId = GetOutgoingPath(currentNode);
         foreach (var flow in flowsId)
         {
-            NodeRegistryChangeState(flow, StatusType.Complete);
-            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {flow} State: {StatusType.Complete}");
+            NodeRegistryChangeState(flow, StatusType.Completed);
+            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {flow} State: {StatusType.Completed}");
         }
     }
 
