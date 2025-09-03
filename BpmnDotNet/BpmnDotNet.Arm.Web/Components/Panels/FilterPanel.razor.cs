@@ -12,7 +12,11 @@ public partial class FilterPanel : ComponentBase
     [Parameter] public Action<string> ChoseIdProcess { get; set; } = null!;
 
     private string[] _arrayProcessId = [];
-
+    private bool _isCheckFilterNone { get; init; } = true;
+    private bool _isCheckFilterWorks { get; init; } = true;
+    private bool _isCheckFilterCompleted { get; init; } = true;
+    private bool _isCheckFilterError { get; init; } = true;
+    
     private Task ButtonClickObjectAsync(string process)
     {
         ChoseIdProcess?.Invoke(process);
@@ -34,5 +38,22 @@ public partial class FilterPanel : ComponentBase
         {
             Logger.LogError("[FilterPanel:UpdatePanel] {@Exception}", e.Message);
         }
+    }
+
+    private void ChangeNone(ChangeEventArgs obj)
+    {
+        
+    }
+    private void ChangeWorks(ChangeEventArgs obj)
+    {
+        
+    }
+    private void ChangeCompleted(ChangeEventArgs obj)
+    {
+        
+    }
+    private void ChangeError(ChangeEventArgs obj)
+    {
+        
     }
 }
