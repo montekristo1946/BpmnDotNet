@@ -16,7 +16,7 @@ public class ListProcessPanelDto
     ///     Время создания документа.
     /// </summary>
     public DateTime DateCreated { get; init; } = DateTime.Now;
-    
+
     /// <summary>
     ///     Время последнего изменения
     /// </summary>
@@ -27,8 +27,8 @@ public class ListProcessPanelDto
     ///     Состояние процесса.
     /// </summary>
     public ProcessState State { get; init; } = ProcessState.None;
-    
-    
+
+
     /// <summary>
     ///     IdStorageHistoryNodeState.
     /// </summary>

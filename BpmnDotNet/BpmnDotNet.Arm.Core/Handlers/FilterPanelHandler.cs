@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Arm.Core.Handlers;
 
-public class FilterPanelHandler:IFilterPanelHandler
+public class FilterPanelHandler : IFilterPanelHandler
 {
     private readonly ILogger<FilterPanelHandler> _logger;
-    private readonly IElasticClient  _elasticClient;
+    private readonly IElasticClient _elasticClient;
 
     public FilterPanelHandler(ILogger<FilterPanelHandler> logger, IElasticClient elasticClient)
     {
@@ -18,8 +18,8 @@ public class FilterPanelHandler:IFilterPanelHandler
 
     public async Task<string[]> GetAllProcessId()
     {
-       var bpmnPlanes = await _elasticClient.GetAllFieldsAsync<BpmnPlane,string>(nameof(BpmnPlane.IdBpmnProcess),100);
+        var bpmnPlanes = await _elasticClient.GetAllFieldsAsync<BpmnPlane, string>(nameof(BpmnPlane.IdBpmnProcess), 100);
 
-       return bpmnPlanes ?? [];
+        return bpmnPlanes ?? [];
     }
 }

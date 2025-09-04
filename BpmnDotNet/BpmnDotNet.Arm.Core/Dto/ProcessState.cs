@@ -5,15 +5,19 @@ namespace BpmnDotNet.Arm.Core.Dto;
 
 public enum ProcessState
 {
-    [Display(Name = "Не заданно")] [Description("None")]
+    [Display(Name = "Не заданно")]
+    [Description("None")]
     None = 0,
 
-    [Display(Name = "Running")] [Description("Running")]
+    [Display(Name = "Running")]
+    [Description("Running")]
     Works = 1,
 
-    [Display(Name = "Completed")] [Description("Completed")]
+    [Display(Name = "Completed")]
+    [Description("Completed")]
     Completed = 2,
-    
-    [Display(Name = "Error")] [Description("Error")]
+
+    [Display(Name = "Error")]
+    [Description("Error")]
     Error = 3,
 }

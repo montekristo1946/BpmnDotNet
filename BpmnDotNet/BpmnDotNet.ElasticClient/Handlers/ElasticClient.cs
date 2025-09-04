@@ -498,7 +498,7 @@ public class ElasticClient : IElasticClient
         return 0;
     }
 
-    public async Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size,string [] processStatus = null)
+    public async Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus = null)
     {
         var fieldsValue = GetFields(processStatus);
 
@@ -540,12 +540,12 @@ public class ElasticClient : IElasticClient
                             })
                     )
                 )).Result;
-            
+
             var retArr = searchRequest?.Hits
                 ?.Select(p => p.Source)
                 ?.Where(p => p is not null)
                 ?.ToArray() ?? [];
-            
+
             return retArr!;
         }
         catch (Exception ex)
@@ -570,7 +570,7 @@ public class ElasticClient : IElasticClient
             FieldValue f = p;
             return f;
         }).ToArray() ?? allFields;
-        
+
         return fieldsValue;
     }
 }

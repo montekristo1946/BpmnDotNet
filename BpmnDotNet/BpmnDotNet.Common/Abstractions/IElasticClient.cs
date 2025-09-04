@@ -40,7 +40,7 @@ public interface IElasticClient
     // /// <param name="idActiveProcess"></param>
     // /// <returns></returns>
     // public Task<int> GetAllGroupFromTokenAsync(string idActiveProcess);
-    
+
     // /// <summary>
     // /// Получить 
     // /// </summary>
@@ -59,8 +59,8 @@ public interface IElasticClient
     /// <param name="processStatus"></param>
     /// <param name="sizeSample"></param>
     /// <returns></returns>
-    public Task<int> GetCountHistoryNodeState(string idBpmnProcess, string [] processStatus = null, int sizeSample = 10000);
-    
+    public Task<int> GetCountHistoryNodeState(string idBpmnProcess, string[] processStatus = null, int sizeSample = 10000);
+
     /// <summary>
     /// Выдача результатов пагинация
     /// </summary>
@@ -68,5 +68,5 @@ public interface IElasticClient
     /// <param name="from">С какого элемента</param>
     /// <param name="size">Сколько элементов.</param>
     /// <returns></returns>
-    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string [] processStatus = null);
+    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus = null);
 }

@@ -26,7 +26,7 @@ internal class BpmnClient : IBpmnClient
     private volatile bool _disposed;
 
     public BpmnClient(BpmnProcessDto[] businessProcessDtos,
-        ILoggerFactory loggerFactory, 
+        ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter)
     {
@@ -49,7 +49,7 @@ internal class BpmnClient : IBpmnClient
         var logger = _loggerFactory.CreateLogger<BusinessProcess>();
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
 
-        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout,_historyNodeStateWriter);
+        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout, _historyNodeStateWriter);
 
         var resAdd = _bpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
         if (resAdd is false)

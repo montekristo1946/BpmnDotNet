@@ -8,7 +8,7 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 public partial class ListProcessPanel : ComponentBase
 {
     [Parameter] public Action<string> IsColorUpdateNodeJobStatus { get; set; } = null!;
-    
+
     [Parameter] public Action<string> IsBaseUpdateNodeJobStatus { get; set; } = null!;
 
     [Inject] private ILogger<ListProcessPanel> Logger { get; set; } = null!;
@@ -17,15 +17,20 @@ public partial class ListProcessPanel : ComponentBase
 
     private ListProcessPanelDto[] _listProcessPanel = [];
     private string _activeIdBpmnProcess = string.Empty;
-    private ListProcessPanelDto _acitveTable = new ListProcessPanelDto();
+    private ListProcessPanelDto _acitveTable = new();
     private int _currentPage = 0;
 
     private int _countLineOnePage = 10;
     private int _countAllPage = 0;
     private string[] _arrErrors = [];
-    private string[] _filters = [nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed), nameof(ProcessStatus.Error)];
-    
-        
+
+    private string[] _filters =
+    [
+        nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed),
+        nameof(ProcessStatus.Error)
+    ];
+
+
     public void UpdatePanel()
     {
         try
@@ -44,7 +49,7 @@ public partial class ListProcessPanel : ComponentBase
                 var from = _currentPage * _countLineOnePage;
                 var currentList = ListProcessPanelHandler
                     .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filters).Result;
-                
+
                 if (currentList.Any() is false)
                 {
                     return Task.CompletedTask;
@@ -68,9 +73,10 @@ public partial class ListProcessPanel : ComponentBase
 
     private void ClearValue()
     {
-        _arrErrors =  [];
+        _arrErrors = [];
         _acitveTable = new ListProcessPanelDto();
     }
+
     public void SetIdProcess(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -84,15 +90,14 @@ public partial class ListProcessPanel : ComponentBase
         UpdatePanel();
     }
 
-    
+
     private async Task ButtonClickObjectAsync(ListProcessPanelDto table)
     {
         _acitveTable = table;
         IsColorUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
-        
-        _arrErrors  = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
-    }
 
+        _arrErrors = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
+    }
 
 
     private string GetColorState(ProcessState tableState)
@@ -118,7 +123,7 @@ public partial class ListProcessPanel : ComponentBase
         ClearValue();
         _currentPage += 1;
         IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
-       
+
         UpdatePanel();
     }
 

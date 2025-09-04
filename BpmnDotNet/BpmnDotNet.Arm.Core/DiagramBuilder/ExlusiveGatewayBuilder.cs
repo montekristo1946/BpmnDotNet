@@ -17,12 +17,12 @@ public class ExlusiveGatewayBuilder : IBpmnBuild<ExlusiveGatewayBuilder>
     {
         var hider =
             $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
-        
+
         _svgStorage.AppendLine(hider);
         _svgStorage.AppendLine(CreatePolygon());
         _svgStorage.AppendLine(CreateBody());
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
-        
+
         var footer = "</g>";
         _svgStorage.AppendLine(footer);
         return _svgStorage.ToString();

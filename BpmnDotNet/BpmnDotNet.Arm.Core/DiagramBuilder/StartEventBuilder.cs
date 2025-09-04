@@ -15,7 +15,7 @@ public class StartEventBuilder : IBpmnBuild<StartEventBuilder>
     {
         var hider = $"\t<g data-element-id=\"{_id}\" style=\"display: block;\" " +
                     $"transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
-        
+
         var footer = "\t</g>";
         _svgStorage.AppendLine(hider);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));

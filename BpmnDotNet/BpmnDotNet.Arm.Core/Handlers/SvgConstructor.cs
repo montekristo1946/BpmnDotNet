@@ -12,27 +12,27 @@ public class SvgConstructor : ISvgConstructor
 {
     public Task<string> CreatePlane(BpmnPlane plane, SizeWindows sizeWindows)
     {
-        var widthWindows = (int) sizeWindows.Width;
-        var heightWindows =(int) sizeWindows.Height;
+        var widthWindows = (int)sizeWindows.Width;
+        var heightWindows = (int)sizeWindows.Height;
         if (plane.Shapes.Any() is false)
         {
             return Task.FromResult(string.Empty);
         }
-        var shapes = CreateShapes(plane.Shapes,widthWindows,heightWindows);
-        
+        var shapes = CreateShapes(plane.Shapes, widthWindows, heightWindows);
+
         return Task.FromResult(shapes);
     }
 
     public Task<string> CreatePlane(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows)
     {
-        var widthWindows = (int) sizeWindows.Width;
-        var heightWindows =(int) sizeWindows.Height;
+        var widthWindows = (int)sizeWindows.Width;
+        var heightWindows = (int)sizeWindows.Height;
         if (plane.Shapes.Any() is false)
         {
             return Task.FromResult(string.Empty);
         }
-        
-        var shapes = CreateColorShapes(plane.Shapes,nodeJobStatus,widthWindows,heightWindows);
+
+        var shapes = CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows);
         return Task.FromResult(shapes);
     }
 
@@ -40,21 +40,21 @@ public class SvgConstructor : ISvgConstructor
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
-        var scalingX = CalculateScalingViewportCoordinateX(shapes,widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes,heightWindows);
-       
+        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+
 
         var viewportBuilder = IBpmnBuild<ViewportBuilder>
             .Create()
             .AddScalingX(scalingX)
             .AddScalingY(scalingY);
-        
+
         const int stokeWidthStart = 2;
         const int stokeWidthEnd = 4;
-        
+
         foreach (var shape in shapes)
         {
-            var color  = GetColor(shape.BpmnElement,nodeJobStatus);
+            var color = GetColor(shape.BpmnElement, nodeJobStatus);
             var stringShape = shape.Type switch
             {
                 ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
@@ -83,9 +83,9 @@ public class SvgConstructor : ISvgConstructor
     private string GetColor(string shapeId, NodeJobStatus[] nodeJobStatus)
     {
         var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.StatusType ?? StatusType.None;
-        var defaultColor =  "#22242a";
+        var defaultColor = "#22242a";
         var running = "#19aee8";
-        var completed ="#00ae5e";
+        var completed = "#00ae5e";
         var error = "#f34848";
 
 
@@ -107,15 +107,15 @@ public class SvgConstructor : ISvgConstructor
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
-        var scalingX = CalculateScalingViewportCoordinateX(shapes,widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes,heightWindows);
-       
+        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+
 
         var viewportBuilder = IBpmnBuild<ViewportBuilder>
             .Create()
             .AddScalingX(scalingX)
             .AddScalingY(scalingY);
-        
+
         const int stokeWidthStart = 2;
         const int stokeWidthEnd = 4;
         var color = "#22242a";
@@ -174,7 +174,7 @@ public class SvgConstructor : ISvgConstructor
         var retValue = (double)widthWindows / maxX;
         return retValue;
     }
-    
+
 
     private string CreateSubProcess(BpmnShape shape, string color)
     {

@@ -18,9 +18,9 @@ public class SampleService
 
     private ContextData CreateContextData(int tokenId)
     {
-        
+
         var tokenProcess = $"Train_{DateTime.Now.Ticks}_{tokenId}";
-        
+
         var contextData = new ContextData
         {
             IdBpmnProcess = Constants.IdBpmnProcessingMain,
@@ -48,7 +48,7 @@ public class SampleService
     {
         var tasks = new List<Task>();
         var startID = 0;
-        
+
         var totalCount = 3000;
         var batchSize = 5;
         var sw = new Stopwatch();
@@ -56,12 +56,12 @@ public class SampleService
         for (int i = 0; i < totalCount; i += batchSize)
         {
             var currentBatchSize = Math.Min(batchSize, totalCount - i);
-           
-            
+
+
             // Обработка текущей партии
             for (int j = i; j < i + currentBatchSize; j++)
             {
-                Console.WriteLine($"  Элемент {j}: значение = {j}"); 
+                Console.WriteLine($"  Элемент {j}: значение = {j}");
                 var tokenId = startID + j;
                 var timeout = TimeSpan.FromMinutes(10);
                 var contextData = CreateContextData(tokenId);
@@ -70,12 +70,12 @@ public class SampleService
             }
             Task.WaitAll(tasks.ToArray());
             Console.WriteLine($"Run Part {currentBatchSize}");
-           
-           
+
+
         }
         sw.Stop();
         Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
-      
+
     }
 
     public void SendMessage()

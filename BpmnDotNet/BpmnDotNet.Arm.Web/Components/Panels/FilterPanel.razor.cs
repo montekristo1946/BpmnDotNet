@@ -86,7 +86,7 @@ public partial class FilterPanel : ComponentBase
         {
             _isCheckFilterWorks = newValue;
         }
-    
+
         var processStatus = CreateFilterStatus();
         SetStatusFilter?.Invoke(processStatus);
     }

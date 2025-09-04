@@ -47,7 +47,7 @@ public class PathFinderTests
         var message = " [GetConditionRouteWithExclusiveGateWay] There is no such way from gateway:idGateway";
         Assert.Equal(message, exception.Message);
     }
-    
+
     [Fact]
     public void GetConditionRouteWithExclusiveGateWay_CheckFalsePath_TruePath()
     {

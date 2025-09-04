@@ -7,9 +7,9 @@ internal interface IHistoryNodeStateWriter
 {
     Task SetStateProcess(
         string idBpmnProcess,
-        string tokenProcess, 
+        string tokenProcess,
         NodeTaskStatus[] nodeStateRegistry,
-        string[] arrayMessageErrors, 
+        string[] arrayMessageErrors,
         bool isCompleted,
         long dateFromInitInstance);
 }

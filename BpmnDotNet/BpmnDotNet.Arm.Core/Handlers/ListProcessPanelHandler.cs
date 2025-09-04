@@ -17,36 +17,36 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
     }
 
-    public async Task<int> GetCountAllPages(string idActiveProcess, string [] processStatus = null)
+    public async Task<int> GetCountAllPages(string idActiveProcess, string[] processStatus = null)
     {
         if (string.IsNullOrEmpty(idActiveProcess))
         {
             return 0;
         }
 
-        var res = await _elasticClient.GetCountHistoryNodeState(idActiveProcess,processStatus);
+        var res = await _elasticClient.GetCountHistoryNodeState(idActiveProcess, processStatus);
 
         return res;
     }
 
     public async Task<ListProcessPanelDto[]> GetPagesStates(
         string idBpmnProcess,
-        int from, 
-        int size, 
-        string [] processStatus = null)
+        int from,
+        int size,
+        string[] processStatus = null)
     {
         if (string.IsNullOrEmpty(idBpmnProcess))
         {
             return [];
         }
 
-        if (size ==0)
+        if (size == 0)
         {
             return [];
         }
 
         var historyNodes =
-            await _elasticClient.GetHistoryNodeStateAsync(idBpmnProcess, from, size,processStatus);
+            await _elasticClient.GetHistoryNodeStateAsync(idBpmnProcess, from, size, processStatus);
 
         var retArray = new List<ListProcessPanelDto>();
         foreach (var historyNode in historyNodes)

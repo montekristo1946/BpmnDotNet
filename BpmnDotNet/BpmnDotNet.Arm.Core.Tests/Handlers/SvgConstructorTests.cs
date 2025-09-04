@@ -29,6 +29,6 @@ public class SvgConstructorTests
         var res = await _svgConstructor.CreatePlane(_string, size);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
-        Assert.Equal(37567,res.Length);
+        Assert.Equal(37567, res.Length);
     }
 }

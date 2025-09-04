@@ -18,13 +18,13 @@ public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>
         var hider =
             $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
         var mainRect = IBpmnBuild<RectBuilder>.Create().AddColor(_color).Build();
-        
+
         _svgStorage.AppendLine(hider);
         _svgStorage.AppendLine(mainRect);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(CreateEnvelope());
-    
-        
+
+
         var footer = "</g>";
         _svgStorage.AppendLine(footer);
         return _svgStorage.ToString();

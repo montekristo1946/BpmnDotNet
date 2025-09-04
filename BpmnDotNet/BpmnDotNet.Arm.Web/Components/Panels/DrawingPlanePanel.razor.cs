@@ -8,7 +8,7 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class DrawingPlanePanel : ComponentBase
 {
-   
+
     [Inject] private IPlanePanelHandler PlaneHandler { get; set; } = null!;
 
     [Inject] private ILogger<DrawingPlanePanel> Logger { get; set; } = null!;
@@ -100,7 +100,7 @@ public partial class DrawingPlanePanel : ComponentBase
             }
 
             _svgToString = await PlaneHandler.GetColorPlane(idUpdateNodeJobStatus, SizeWindows);
-            
+
             await InvokeAsync(() =>
             {
                 StateHasChanged();

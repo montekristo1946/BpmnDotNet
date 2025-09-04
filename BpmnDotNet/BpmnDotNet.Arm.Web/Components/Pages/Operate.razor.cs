@@ -13,8 +13,8 @@ public partial class Operate : ComponentBase
     private FilterPanel? _filterPanel;
     public RenderFragment ListProcessPanelTemplate { get; set; }
     private ListProcessPanel? _listProcessPanel;
-    
-    
+
+
     protected override Task OnInitializedAsync()
     {
         BpmnPlanePanelTemplate = CreateBpmnPlanePanelTemplate();
@@ -23,28 +23,28 @@ public partial class Operate : ComponentBase
         ListProcessPanelTemplate = CreateListProcessPanelTemplate();
         return Task.CompletedTask;
     }
-    
-    private void ChoseIdProcess( string  value )
+
+    private void ChoseIdProcess(string value)
     {
         _drawingPlanePanel?.BaseUpdatePanel(value);
         _listProcessPanel?.SetIdProcess(value);
     }
-    
-    private void SetStatusFilter( string [] filters )
+
+    private void SetStatusFilter(string[] filters)
     {
         _listProcessPanel?.SetStatusFilter(filters);
     }
-    private void IsColorUpdateNodeJobStatus( string  idUpdateNodeJobStatus )
+    private void IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
     {
         _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
     }
-    
+
     private void UpdateUpdatePanel()
     {
         _filterPanel?.UpdatePanel();
         _drawingPlanePanel?.BaseUpdatePanel();
         _listProcessPanel?.UpdatePanel();
-        
+
     }
 
     private RenderFragment CreateListProcessPanelTemplate()
@@ -65,7 +65,7 @@ public partial class Operate : ComponentBase
         };
     }
 
-    
+
 
     private RenderFragment CreateFilterPanelTemplate()
     {
@@ -85,7 +85,7 @@ public partial class Operate : ComponentBase
         };
     }
 
-    
+
 
 
 
@@ -122,5 +122,5 @@ public partial class Operate : ComponentBase
         };
     }
 
-  
+
 }

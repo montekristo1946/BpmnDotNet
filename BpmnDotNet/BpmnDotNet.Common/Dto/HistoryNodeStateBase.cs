@@ -26,12 +26,12 @@ public class HistoryNodeStateBase
     ///     Время создания документа.
     /// </summary>
     public long DateCreated { get; set; } = DateTime.Now.Ticks;
-    
+
     /// <summary>
     ///     Время последнего изменения
     /// </summary>
     public long DateLastModified { get; set; } = DateTime.MaxValue.Ticks;
-    
+
     /// <summary>
     ///     Состояние процесса.
     /// </summary>

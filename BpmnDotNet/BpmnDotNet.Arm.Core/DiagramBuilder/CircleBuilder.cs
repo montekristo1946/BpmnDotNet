@@ -9,14 +9,14 @@ public class CircleBuilder : IBpmnBuild<CircleBuilder>
     private int _radius;
     private int _strokeWidth = 0;
     private readonly StringBuilder _svgStorage = new();
-    
+
     public string Build()
     {
         var hider = $"\t<circle cx=\"{_radius}\" cy=\"{_radius}\" r=\"{_radius}\"";
 
         var body = $"\t\tstyle=\"stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; " +
                    $"stroke-width: {_strokeWidth}px; fill: white; fill-opacity: 0.95;\">";
-                  
+
 
         var footer = "\t</circle>";
 
@@ -32,7 +32,7 @@ public class CircleBuilder : IBpmnBuild<CircleBuilder>
     {
         return this;
     }
-    
+
     public CircleBuilder AddRadius(int r)
     {
         _radius = r;
@@ -45,7 +45,7 @@ public class CircleBuilder : IBpmnBuild<CircleBuilder>
         return this;
     }
 
-    public CircleBuilder AddStokeWidth( int strokeWidth)
+    public CircleBuilder AddStokeWidth(int strokeWidth)
     {
         _strokeWidth = strokeWidth;
         return this;

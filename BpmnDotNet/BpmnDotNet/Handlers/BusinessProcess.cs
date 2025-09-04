@@ -278,7 +278,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 NodeRegistryChangeState(nodeId, StatusType.Completed);
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
-                
+
             }
             catch (OperationCanceledException)
             {

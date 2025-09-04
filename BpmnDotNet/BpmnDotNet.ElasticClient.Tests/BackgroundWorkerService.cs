@@ -71,7 +71,7 @@ public class BackgroundWorkerService : BackgroundService
         Console.ReadLine();
     }
 
- 
+
 
 
     // private void Pagination()
@@ -151,33 +151,33 @@ public class BackgroundWorkerService : BackgroundService
             _elasticClient.GetDataFromIdAsync<BpmnPlane>("IdBpmnProcessingMain_638914914391324271").Result;
         if (reshistoryNodeState is null) throw new Exception("Failed to set history node state");
     }
-    
+
     private void GetAllIdBpmnPlan()
     {
-        var idBpmnProcesss = _elasticClient.GetAllFieldsAsync<BpmnPlane,string>(
-            nameof(BpmnPlane.IdBpmnProcess),1000)
+        var idBpmnProcesss = _elasticClient.GetAllFieldsAsync<BpmnPlane, string>(
+            nameof(BpmnPlane.IdBpmnProcess), 1000)
             .Result;
         if (idBpmnProcesss?.Any() != true)
             throw new Exception("Failed to set history node state");
-        
+
         // public Task<string[]> GetAllId<T>()
     }
-    
+
     private void GetCountHistoryNodeState()
     {
         var processStatus = "Completed";
-        var count =  _elasticClient.GetCountHistoryNodeState("IdBpmnProcessingMain",["Completed","None","Works","Error"]).Result;
-     
-        if ( count ==0)
+        var count = _elasticClient.GetCountHistoryNodeState("IdBpmnProcessingMain", ["Completed", "None", "Works", "Error"]).Result;
+
+        if (count == 0)
             throw new Exception("Failed to set history node state");
     }
-    
+
     private void GetHistoryNodeStateAsync()
     {
         var processStatus = "Completed";
-        var res =  _elasticClient.GetHistoryNodeStateAsync("IdBpmnProcessingMain",0,10,["Completed","None","Works","Error"]).Result;
-     
-        if ( res.Any() is false )
+        var res = _elasticClient.GetHistoryNodeStateAsync("IdBpmnProcessingMain", 0, 10, ["Completed", "None", "Works", "Error"]).Result;
+
+        if (res.Any() is false)
             throw new Exception("Failed to set history node state");
     }
 }

@@ -4,20 +4,20 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class SequenceFlowBuilder: IBpmnBuild<SequenceFlowBuilder>
+public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private Bound[] _bounds = [];
     private string _color = string.Empty;
     private string _id = string.Empty;
-    
+
     public string Build()
     {
         var firstLine = $"<g data-element-id=\"{_id}\" style=\"display: block;\">";
         var marker = Guid.NewGuid();
         var arrPoints = _bounds.Select(p => $"{p.X},{p.Y}L").ToArray();
         var pathPoints = string.Join("", arrPoints);
-        
+
         var defs =
             $"\t<defs>\n" +
             $"\t\t<marker id=\"{marker}\" viewBox=\"0 0 20 20\" refX=\"11\" refY=\"10\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto\">\n" +
@@ -37,8 +37,8 @@ public class SequenceFlowBuilder: IBpmnBuild<SequenceFlowBuilder>
         _svgStorage.AppendLine(footer);
 
         return _svgStorage.ToString();
-        
-      
+
+
     }
 
     public SequenceFlowBuilder AddId(string id)
@@ -46,7 +46,7 @@ public class SequenceFlowBuilder: IBpmnBuild<SequenceFlowBuilder>
         _id = id;
         return this;
     }
-    
+
     public SequenceFlowBuilder AddChild(string childElement)
     {
         return this;
@@ -57,7 +57,7 @@ public class SequenceFlowBuilder: IBpmnBuild<SequenceFlowBuilder>
         _bounds = bounds;
         return this;
     }
-    
+
     public SequenceFlowBuilder AddColor(string color)
     {
         _color = color;

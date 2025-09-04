@@ -3,11 +3,11 @@ using BpmnDotNet.Arm.Core.Abstractions;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class TspanBuilder: IBpmnBuild<TspanBuilder>
+public class TspanBuilder : IBpmnBuild<TspanBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
-    private  int _symbolInOneLine = 15;
+    private int _symbolInOneLine = 15;
     private const int FontSize = 11;
     private int _paddingY = 0;
     private int _paddingX = 0;
@@ -21,7 +21,7 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
         for (var i = 0; i < allLines.Length; i++)
         {
             var body = allLines[i];
-            var y = i * FontSize+FontSize+_paddingY;
+            var y = i * FontSize + FontSize + _paddingY;
             var x = _paddingX;
             var hider = $"<tspan x=\"{x}\" y=\"{y}\">";
             var footer = " </tspan>";
@@ -53,10 +53,10 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
         return retArr.ToArray();
     }
 
-    private string [] SplitLinesFromWhiteSpace(string input)
+    private string[] SplitLinesFromWhiteSpace(string input)
     {
         var arrWord = input.Split(' ');
-        var segments = arrWord.Aggregate(new List<StringBuilder> { new () }, 
+        var segments = arrWord.Aggregate(new List<StringBuilder> { new() },
                 (list, str) =>
                 {
                     var last = list.Last();
@@ -72,7 +72,7 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
                 })
             .Select(sb => sb.ToString())
             .ToArray();
-        
+
         return segments.ToArray();
     }
 
@@ -92,7 +92,7 @@ public class TspanBuilder: IBpmnBuild<TspanBuilder>
         _paddingY = value;
         return this;
     }
-    
+
     public TspanBuilder AddPaddingX(int value)
     {
         _paddingX = value;

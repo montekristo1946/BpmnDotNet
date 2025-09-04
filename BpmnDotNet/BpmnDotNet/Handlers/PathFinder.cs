@@ -85,12 +85,12 @@ public class PathFinder : IPathFinder
             throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
                                            $"Couldn't find the condition from gateway:{currentNode.IdElement}");
 
-        var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p=>p == conditionName) ?? string.Empty;
-            
-        if(string.IsNullOrWhiteSpace(checkPatch))
+        var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p => p == conditionName) ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(checkPatch))
             throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
                                            $"There is no such way from gateway:{currentNode.IdElement}");
-        
+
         return checkPatch;
     }
 

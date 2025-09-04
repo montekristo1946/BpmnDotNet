@@ -5,7 +5,7 @@ namespace BpmnDotNet.Arm.Core.Abstractions;
 
 public interface IListProcessPanelHandler
 {
-    Task<int> GetCountAllPages(string idActiveProcess, string [] processStatus = null);
+    Task<int> GetCountAllPages(string idActiveProcess, string[] processStatus = null);
 
     /// <summary>
     /// Страницы для отрисовки.
@@ -20,12 +20,12 @@ public interface IListProcessPanelHandler
         int from,
         int size,
         string[] processStatus = null);
-    
+
     /// <summary>
     ///     Вернет список ошибок по данному процессую
     /// </summary>
     /// <param name="idUpdateNodeJobStatus"></param>
     /// <returns></returns>
     Task<string[]> GetErrors(string idUpdateNodeJobStatus);
-    
+
 }

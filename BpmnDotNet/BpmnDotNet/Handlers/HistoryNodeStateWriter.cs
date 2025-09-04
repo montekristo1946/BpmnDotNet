@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;
 
-internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
+internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 {
     private readonly IElasticClient _elasticClient;
     private readonly ILogger<HistoryNodeStateWriter> _logger;
@@ -21,7 +21,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         string tokenProcess,
         NodeTaskStatus[] nodeStateRegistry,
         string[] arrayMessageErrors,
-        bool isCompleted, 
+        bool isCompleted,
         long dateFromInitInstance)
     {
         if (string.IsNullOrWhiteSpace(idBpmnProcess))
@@ -32,7 +32,7 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         {
             throw new ArgumentNullException(nameof(tokenProcess));
         }
-        
+
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(arrayMessageErrors);
 
@@ -42,8 +42,8 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
             StatusType = p.StatusType,
         }).ToArray();
 
-        var processingStaus = CalculateProcessingStaus(nodeStateRegistry,isCompleted);
-        
+        var processingStaus = CalculateProcessingStaus(nodeStateRegistry, isCompleted);
+
         var historyNodeState = new HistoryNodeState()
         {
             IdBpmnProcess = idBpmnProcess,
@@ -69,18 +69,18 @@ internal class HistoryNodeStateWriter:IHistoryNodeStateWriter
         {
             return ProcessStatus.Completed;
         }
-        
+
         if (nodeStateRegistry.Any() is false)
         {
             return ProcessStatus.None;
         }
-        
-        var errors = nodeStateRegistry.FirstOrDefault(p=>p.StatusType == StatusType.Failed);
+
+        var errors = nodeStateRegistry.FirstOrDefault(p => p.StatusType == StatusType.Failed);
         if (errors is not null)
         {
             return ProcessStatus.Error;
         }
-        
+
         return ProcessStatus.Works;
     }
 }

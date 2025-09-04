@@ -19,8 +19,8 @@ internal static class BpmnClientBuilder
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
-        LoadBpmnInElastic(allBpmnFiles,elasticClient);
-        return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder,historyNodeStateWriter);
+        LoadBpmnInElastic(allBpmnFiles, elasticClient);
+        return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder, historyNodeStateWriter);
     }
 
     private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClient elasticClient)
@@ -28,12 +28,12 @@ internal static class BpmnClientBuilder
         var xmlBpmnLoader = new XmlSerializationBpmnDiagramSection();
         foreach (var allBpmnFile in allBpmnFiles)
         {
-           var plane= xmlBpmnLoader.LoadXmlBpmnDiagram(allBpmnFile);
-           var res =elasticClient.SetDataAsync(plane).Result;
-           if (!res)
-           {
-               throw new InvalidOperationException($"Failed to set data for file {allBpmnFile}");
-           }
+            var plane = xmlBpmnLoader.LoadXmlBpmnDiagram(allBpmnFile);
+            var res = elasticClient.SetDataAsync(plane).Result;
+            if (!res)
+            {
+                throw new InvalidOperationException($"Failed to set data for file {allBpmnFile}");
+            }
         }
     }
 

@@ -27,8 +27,8 @@ public static class ServiceCollectionExtensions
             var pathFinder = options.GetRequiredService<IPathFinder>();
             var elasticClient = options.GetRequiredService<IElasticClient>();
             var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
-            
-            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder,elasticClient,historyNodeStateWriter);
+
+            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder, elasticClient, historyNodeStateWriter);
         });
 
 
