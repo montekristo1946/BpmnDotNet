@@ -16,6 +16,7 @@ public partial class FilterPanel : ComponentBase
     private bool _isCheckFilterWorks { get; init; } = true;
     private bool _isCheckFilterCompleted { get; init; } = true;
     private bool _isCheckFilterError { get; init; } = true;
+    private string _filterTocken = String.Empty;
     
     private Task ButtonClickObjectAsync(string process)
     {
@@ -55,5 +56,11 @@ public partial class FilterPanel : ComponentBase
     private void ChangeError(ChangeEventArgs obj)
     {
         
+    }
+
+    private void SetFilterToken(ChangeEventArgs changeEventArgs)
+    {
+        if (changeEventArgs?.Value == null || !int.TryParse(changeEventArgs.Value.ToString(), out int newValue))
+            return;
     }
 }
