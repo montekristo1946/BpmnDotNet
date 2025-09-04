@@ -103,8 +103,7 @@
 
                 <div class="col-1">
                     @{
-                        var value = _currentPage+1;
-                        
+                        var value = (_currentPage==0 && _countAllPage ==0) ?0 :_currentPage+1;
                     }
                      @value of @_countAllPage
                 </div>
