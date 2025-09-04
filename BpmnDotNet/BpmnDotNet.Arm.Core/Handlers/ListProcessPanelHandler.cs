@@ -64,7 +64,7 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
         }
 
 
-        return retArray.ToArray();
+        return [..retArray];
     }
 
     public async Task<string[]> GetErrors(string idUpdateNodeJobStatus)
@@ -73,6 +73,29 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
             [nameof(HistoryNodeState.NodeStaus)]) ?? new HistoryNodeState();
 
         return historyNodeState?.ArrayMessageErrors ?? [];
+    }
+
+    public async Task<ListProcessPanelDto[]> GetHistoryNodeFromTokenMaskAsync(string idBpmnProcess, string filterToken, int sizeSample)
+    {
+        var historyNodes = await _elasticClient.GetHistoryNodeFromTokenMaskAsync(idBpmnProcess,filterToken,sizeSample);
+        var retArray = new List<ListProcessPanelDto>();
+       
+        foreach (var historyNode in historyNodes)
+        {
+            var listProcessPanelDto = new ListProcessPanelDto()
+            {
+                TokenProcess = historyNode.TokenProcess,
+                DateCreated = new DateTime(historyNode.DateCreated),
+                DateLastModified = new DateTime(historyNode.DateLastModified),
+                IdBpmnProcess = historyNode.IdBpmnProcess,
+                State = Map(historyNode.ProcessStatus),
+                IdStorageHistoryNodeState = historyNode.Id,
+            };
+            retArray.Add(listProcessPanelDto);
+        }
+
+
+        return [..retArray];
     }
 
     private ProcessState Map(ProcessStatus argStatusType)

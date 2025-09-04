@@ -14,12 +14,14 @@ public partial class FilterPanel : ComponentBase
 
     [Parameter] public Action<string[]> SetStatusFilter { get; set; } = null!;
 
+    [Parameter] public Action<string> SetFilterToken { get; set; } = null!;
+
     private string[] _arrayProcessId = [];
     private bool _isCheckFilterNone { get; set; } = true;
     private bool _isCheckFilterWorks { get; set; } = true;
     private bool _isCheckFilterCompleted { get; set; } = true;
     private bool _isCheckFilterError { get; set; } = true;
-    private string _filterTocken = String.Empty;
+    private string _filterToken = " *part token*";
 
     private Task ButtonClickObjectAsync(string process)
     {
@@ -111,9 +113,17 @@ public partial class FilterPanel : ComponentBase
         SetStatusFilter?.Invoke(processStatus);
     }
 
-    private void SetFilterToken(ChangeEventArgs changeEventArgs)
+    private void OnChangeFilterToken(ChangeEventArgs changeEventArgs)
     {
-        if (changeEventArgs?.Value == null || !int.TryParse(changeEventArgs.Value.ToString(), out int newValue))
+        if (changeEventArgs?.Value == null )
             return;
+
+        _filterToken = changeEventArgs.Value.ToString() ?? string.Empty;
+        
+    }
+
+    private void OnclickButtonSearch()
+    {
+        SetFilterToken?.Invoke(_filterToken);
     }
 }

@@ -57,7 +57,8 @@ public class BackgroundWorkerService : BackgroundService
                     // GetXmlBpmn();
                     // GetAllIdBpmnPlan();
                     // GetCountHistoryNodeState();
-                    GetHistoryNodeStateAsync();
+                    // GetHistoryNodeStateAsync();
+                    GetHistoryNodeFromTokenMask();
                     break;
                 case 'q':
                     Console.WriteLine("Quitting");
@@ -71,24 +72,9 @@ public class BackgroundWorkerService : BackgroundService
         Console.ReadLine();
     }
 
+ 
 
-
-
-    // private void Pagination()
-    // {
-    //     var count = _elasticClient.GetHistoryNodeStateCountAsync("8P4W9c9Nhs").Result;
-    //     var pageSize = (int)count / 3;
-    //     var documents = _elasticClient
-    //         .SearchWithPaginationAsync("8P4W9c9Nhs", 2, pageSize).Result;
-    //
-    //     if (documents is null) throw new Exception("Failed to set history node state");
-    // }
-
-    // private async Task GetLastData()
-    // {
-    //     var documents = await _elasticClient.GetLastDataAsync(10, "8P4W9c9Nhs");
-    //     if (documents is null) throw new Exception("Failed to set history node state");
-    // }
+    
 
     private void GetDataIndex()
     {
@@ -176,6 +162,14 @@ public class BackgroundWorkerService : BackgroundService
     {
         var processStatus = "Completed";
         var res = _elasticClient.GetHistoryNodeStateAsync("IdBpmnProcessingMain", 0, 10, ["Completed", "None", "Works", "Error"]).Result;
+
+        if (res.Any() is false)
+            throw new Exception("Failed to set history node state");
+    }
+    
+    private void GetHistoryNodeFromTokenMask()
+    {
+        var res = _elasticClient.GetHistoryNodeFromTokenMaskAsync("IdBpmnProcessingMain", "*_395*").Result;
 
         if (res.Any() is false)
             throw new Exception("Failed to set history node state");

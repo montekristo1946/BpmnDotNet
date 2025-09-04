@@ -116,9 +116,9 @@
         
         
         <div class="row p-0" style="margin: 0.5vh 0 0 0">
-            <div class="col-2 p-0  div-menu-start" style="margin: 0 0.5vh 0 0.5vh">
+            <div class="col-12 p-0  div-menu-start" style="margin: 0 0.5vh 0 0.5vh">
                 <p class="m-0 text-vertical-center" style="padding: 0 0 0 5px;">
-                    Filter
+                    Filter from Token:
                 </p>
             </div>
         </div>
@@ -128,13 +128,14 @@
                 <input type="text"
                        class="form-control text-start color-text-main " data-mdb-toggle="tooltip"
                        data-mdb-placement="right"
-                       title="Время экспозиции" placeholder="" aria-describedby="button-addon1"
+                       title="*value*" placeholder="" aria-describedby="button-addon1"
                        
-                       value="@_filterTocken"
-                       @onchange="(SetFilterToken)">
+                       value="@_filterToken"
+                       @onchange="(OnChangeFilterToken)">
             </div>
             
-            <div class="col-2 p-0 m-0 div-menu-center  border-enveloping-custom bottom-shadow" style="width: 4vw">
+            <div class="col-2 p-0 m-0 div-menu-center  border-enveloping-custom bottom-shadow" style="width: 4vw"
+                 @onclick="(OnclickButtonSearch)">
                 <p class="m-0 text-vertical-center" >
                     Search
                 </p>

@@ -24,12 +24,13 @@ public partial class ListProcessPanel : ComponentBase
     private int _countAllPage = 0;
     private string[] _arrErrors = [];
 
-    private string[] _filters =
+    private string[] _filtersProcessStatus =
     [
         nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed),
         nameof(ProcessStatus.Error)
     ];
 
+    private string _filterToken = string.Empty;
 
     public void UpdatePanel()
     {
@@ -37,7 +38,8 @@ public partial class ListProcessPanel : ComponentBase
         {
             InvokeAsync(() =>
             {
-                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_activeIdBpmnProcess, _filters).Result;
+                var allprocessLine = ListProcessPanelHandler
+                    .GetCountAllPages(_activeIdBpmnProcess, _filtersProcessStatus).Result;
                 if (allprocessLine == 0)
                 {
                     _listProcessPanel = [];
@@ -48,7 +50,7 @@ public partial class ListProcessPanel : ComponentBase
 
                 var from = _currentPage * _countLineOnePage;
                 var currentList = ListProcessPanelHandler
-                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filters).Result;
+                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filtersProcessStatus).Result;
 
                 if (currentList.Any() is false)
                 {
@@ -115,7 +117,7 @@ public partial class ListProcessPanel : ComponentBase
 
     private void Forward()
     {
-        if (_currentPage >= _countAllPage)
+        if (_currentPage >= _countAllPage-1)
         {
             return;
         }
@@ -134,9 +136,6 @@ public partial class ListProcessPanel : ComponentBase
             return;
         }
 
-
-        // _curentToken = token ?? string.Empty;
-
         _currentPage -= 1;
         IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
         ClearValue();
@@ -145,8 +144,50 @@ public partial class ListProcessPanel : ComponentBase
 
     public void SetStatusFilter(string[] filters)
     {
-        _filters = filters;
+        _filtersProcessStatus = filters;
         ClearValue();
         UpdatePanel();
+    }
+
+    public void SetFilterToken(string filterToken)
+    {
+        _filterToken = filterToken;
+        UpdateFilterToken();
+    }
+
+    public void UpdateFilterToken()
+    {
+        try
+        {
+            InvokeAsync(() =>
+            {
+                _listProcessPanel = [];
+                _countAllPage = 0;
+                _currentPage = 0;
+                ClearValue();
+
+
+                var sizeSample = 100;
+                var currentList = ListProcessPanelHandler
+                    .GetHistoryNodeFromTokenMaskAsync(_activeIdBpmnProcess, _filterToken, sizeSample).Result;
+
+                if (currentList.Any() is false)
+                {
+                    return Task.CompletedTask;
+                }
+
+                _listProcessPanel = currentList;
+
+                return Task.CompletedTask;
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("[ListProcessPanel:UpdatePanel] {@Exception}", e.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 }

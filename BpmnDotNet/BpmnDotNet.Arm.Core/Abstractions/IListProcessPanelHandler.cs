@@ -5,6 +5,12 @@ namespace BpmnDotNet.Arm.Core.Abstractions;
 
 public interface IListProcessPanelHandler
 {
+    /// <summary>
+    /// Общее количество отсортированных по processStatus.
+    /// </summary>
+    /// <param name="idActiveProcess"></param>
+    /// <param name="processStatus"></param>
+    /// <returns></returns>
     Task<int> GetCountAllPages(string idActiveProcess, string[] processStatus = null);
 
     /// <summary>
@@ -22,10 +28,18 @@ public interface IListProcessPanelHandler
         string[] processStatus = null);
 
     /// <summary>
-    ///     Вернет список ошибок по данному процессую
+    ///     Вернет список ошибок по данному процесу.
     /// </summary>
     /// <param name="idUpdateNodeJobStatus"></param>
     /// <returns></returns>
     Task<string[]> GetErrors(string idUpdateNodeJobStatus);
 
+    /// <summary>
+    ///  Страницы для отрисовки. Отсортированные по filterToken (маске).
+    /// </summary>
+    /// <param name="activeIdBpmnProcess"></param>
+    /// <param name="filterToken"></param>
+    /// <param name="sizeSample"></param>
+    /// <returns></returns>
+    Task<ListProcessPanelDto[]> GetHistoryNodeFromTokenMaskAsync(string activeIdBpmnProcess, string filterToken, int sizeSample);
 }

@@ -34,6 +34,15 @@ public partial class Operate : ComponentBase
     {
         _listProcessPanel?.SetStatusFilter(filters);
     }
+    
+    private void SetFilterToken(string filterToken)
+    {
+        _listProcessPanel?.SetFilterToken(filterToken);
+        
+    }
+
+  
+    
     private void IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
     {
         _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
@@ -64,9 +73,7 @@ public partial class Operate : ComponentBase
             builder.CloseComponent();
         };
     }
-
-
-
+    
     private RenderFragment CreateFilterPanelTemplate()
     {
         return builder =>
@@ -74,7 +81,8 @@ public partial class Operate : ComponentBase
             builder.OpenComponent(0, typeof(FilterPanel));
             builder.AddAttribute(1, nameof(FilterPanel.ChoseIdProcess), ChoseIdProcess);
             builder.AddAttribute(2, nameof(FilterPanel.SetStatusFilter), SetStatusFilter);
-            builder.AddComponentReferenceCapture(3, value =>
+            builder.AddAttribute(3, nameof(FilterPanel.SetFilterToken), SetFilterToken);
+            builder.AddComponentReferenceCapture(4, value =>
             {
                 _filterPanel = value as FilterPanel
                                ?? throw new InvalidOperationException(
@@ -84,10 +92,7 @@ public partial class Operate : ComponentBase
             builder.CloseComponent();
         };
     }
-
-
-
-
+    
 
     private RenderFragment CreateBpmnPlanePanelTemplate()
     {

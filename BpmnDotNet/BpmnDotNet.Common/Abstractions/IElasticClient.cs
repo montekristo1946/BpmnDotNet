@@ -33,25 +33,7 @@ public interface IElasticClient
     /// <typeparam name="TField"></typeparam>
     /// <returns></returns>
     public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
-
-    // /// <summary>
-    // /// Сколько всего групп конкретного процесса для пагинации. В расчет берется первая 1000;
-    // /// </summary>
-    // /// <param name="idActiveProcess"></param>
-    // /// <returns></returns>
-    // public Task<int> GetAllGroupFromTokenAsync(string idActiveProcess);
-
-    // /// <summary>
-    // /// Получить 
-    // /// </summary>
-    // /// <param name="idActiveProcess"></param>
-    // /// <param name="afterKeyValueparam>
-    // /// <param name="countLineOnePage"></param>
-    // /// <returns></returns>
-    // public Task<string[]> GetIdHistoryNodeStateAsync(string idActiveProcess, string afterKeyValue,
-    //     int countLineOnePage);
-
-    //-----------------------------------
+    
     /// <summary>
     /// Общее количество полей.
     /// </summary>
@@ -69,4 +51,12 @@ public interface IElasticClient
     /// <param name="size">Сколько элементов.</param>
     /// <returns></returns>
     public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus = null);
+
+    /// <summary>
+    /// Поиск HistoryNodeState по маске в поле Token
+    /// </summary>
+    /// <param name="idBpmnProcess"></param>
+    /// <param name="mask"></param>
+    /// <returns></returns>
+    public Task<HistoryNodeState[]> GetHistoryNodeFromTokenMaskAsync(string idBpmnProcess, string mask, int sizeSample = 100);
 }
