@@ -29,6 +29,11 @@ public partial class Operate : ComponentBase
         _drawingPlanePanel?.BaseUpdatePanel(value);
         _listProcessPanel?.SetIdProcess(value);
     }
+    
+    private void SetStatusFilter( string [] filters )
+    {
+        _listProcessPanel?.SetStatusFilter(filters);
+    }
     private void IsColorUpdateNodeJobStatus( string  idUpdateNodeJobStatus )
     {
         _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
@@ -68,7 +73,8 @@ public partial class Operate : ComponentBase
         {
             builder.OpenComponent(0, typeof(FilterPanel));
             builder.AddAttribute(1, nameof(FilterPanel.ChoseIdProcess), ChoseIdProcess);
-            builder.AddComponentReferenceCapture(1, value =>
+            builder.AddAttribute(2, nameof(FilterPanel.SetStatusFilter), SetStatusFilter);
+            builder.AddComponentReferenceCapture(3, value =>
             {
                 _filterPanel = value as FilterPanel
                                ?? throw new InvalidOperationException(

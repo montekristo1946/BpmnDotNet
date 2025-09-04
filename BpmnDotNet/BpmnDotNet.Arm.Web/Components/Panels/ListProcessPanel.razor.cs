@@ -22,18 +22,17 @@ public partial class ListProcessPanel : ComponentBase
 
     private int _countLineOnePage = 10;
     private int _countAllPage = 0;
-    // private string _curentToken = string.Empty;
-    // private Stack<string> _lastTokens = new();
     private string[] _arrErrors = [];
-
-
+    private string[] _filters = [nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed), nameof(ProcessStatus.Error)];
+    
+        
     public void UpdatePanel()
     {
         try
         {
             InvokeAsync(() =>
             {
-                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_activeIdBpmnProcess, null).Result;
+                var allprocessLine = ListProcessPanelHandler.GetCountAllPages(_activeIdBpmnProcess, _filters).Result;
                 if (allprocessLine == 0)
                 {
                     _listProcessPanel = [];
@@ -44,7 +43,7 @@ public partial class ListProcessPanel : ComponentBase
 
                 var from = _currentPage * _countLineOnePage;
                 var currentList = ListProcessPanelHandler
-                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, null).Result;
+                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filters).Result;
                 
                 if (currentList.Any() is false)
                 {
@@ -117,7 +116,6 @@ public partial class ListProcessPanel : ComponentBase
         }
 
         ClearValue();
-        // _curentToken = _listProcessPanel.LastOrDefault()?.TokenProcess ?? string.Empty;
         _currentPage += 1;
         IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
        
@@ -136,6 +134,13 @@ public partial class ListProcessPanel : ComponentBase
 
         _currentPage -= 1;
         IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
+        ClearValue();
+        UpdatePanel();
+    }
+
+    public void SetStatusFilter(string[] filters)
+    {
+        _filters = filters;
         ClearValue();
         UpdatePanel();
     }

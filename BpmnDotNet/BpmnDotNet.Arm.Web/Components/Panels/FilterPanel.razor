@@ -100,7 +100,7 @@
                 <div class="p-0 m-0 text-vertical-center">
                     <input class=" m-0  "
                            type="checkbox"
-                           @onchange="(ChangeCompleted)"
+                           @onchange="(ChangeError)"
                            checked="@_isCheckFilterError"
                            value="@_isCheckFilterError"
                            style="height: 1.8vh; width: 100%"/>
@@ -109,7 +109,7 @@
 
             <div class="col-4 p-0 m-0 div-menu-start" style="">
                 <p class="m-0 text-vertical-center" style="">
-                    ChangeError
+                    Error
                 </p>
             </div>
         </div>
@@ -134,7 +134,7 @@
                        @onchange="(SetFilterToken)">
             </div>
             
-            <div class="col-2 p-0 m-0 div-menu-center  border-enveloping-custom bottom-shadow">
+            <div class="col-2 p-0 m-0 div-menu-center  border-enveloping-custom bottom-shadow" style="width: 4vw">
                 <p class="m-0 text-vertical-center" >
                     Search
                 </p>
