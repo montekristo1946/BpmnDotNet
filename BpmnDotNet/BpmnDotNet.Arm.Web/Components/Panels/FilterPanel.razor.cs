@@ -21,7 +21,7 @@ public partial class FilterPanel : ComponentBase
     private bool _isCheckFilterWorks { get; set; } = true;
     private bool _isCheckFilterCompleted { get; set; } = true;
     private bool _isCheckFilterError { get; set; } = true;
-    private string _filterToken = " *part token*";
+    private string _filterToken = "*value*";
 
     private Task ButtonClickObjectAsync(string process)
     {
