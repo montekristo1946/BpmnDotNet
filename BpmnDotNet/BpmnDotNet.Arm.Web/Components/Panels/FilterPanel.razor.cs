@@ -29,15 +29,15 @@ public partial class FilterPanel : ComponentBase
         return Task.CompletedTask;
     }
 
-    public void UpdatePanel()
+    public async Task UpdatePanel()
     {
         try
         {
-            InvokeAsync(() =>
+            await InvokeAsync(async () =>
             {
-                _arrayProcessId = FilterPanelHandler.GetAllProcessId().Result;
+                _arrayProcessId = await FilterPanelHandler.GetAllProcessId();
                 StateHasChanged();
-                return Task.CompletedTask;
+              
             });
         }
         catch (Exception e)
