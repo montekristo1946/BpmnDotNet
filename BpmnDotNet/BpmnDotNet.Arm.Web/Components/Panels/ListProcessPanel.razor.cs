@@ -32,14 +32,14 @@ public partial class ListProcessPanel : ComponentBase
 
     private string _filterToken = string.Empty;
 
-    public void UpdatePanel()
+    public async Task UpdatePanel()
     {
         try
         {
-            InvokeAsync(() =>
+            await InvokeAsync(async () =>
             {
-                var allprocessLine = ListProcessPanelHandler
-                    .GetCountAllPages(_activeIdBpmnProcess, _filtersProcessStatus).Result;
+                var allprocessLine = await ListProcessPanelHandler
+                    .GetCountAllPages(_activeIdBpmnProcess, _filtersProcessStatus);
                 if (allprocessLine == 0)
                 {
                     _listProcessPanel = [];
@@ -49,18 +49,18 @@ public partial class ListProcessPanel : ComponentBase
                 }
 
                 var from = _currentPage * _countLineOnePage;
-                var currentList = ListProcessPanelHandler
-                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filtersProcessStatus).Result;
+                var currentList = await ListProcessPanelHandler
+                    .GetPagesStates(_activeIdBpmnProcess, from, _countLineOnePage, _filtersProcessStatus);
 
                 if (currentList.Any() is false)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 _listProcessPanel = currentList;
                 _countAllPage = (int)Math.Ceiling((double)allprocessLine / _countLineOnePage);
 
-                return Task.CompletedTask;
+                return;
             });
         }
         catch (Exception e)
@@ -155,11 +155,11 @@ public partial class ListProcessPanel : ComponentBase
         UpdateFilterToken();
     }
 
-    public void UpdateFilterToken()
+    public async Task UpdateFilterToken()
     {
         try
         {
-            InvokeAsync(() =>
+            await InvokeAsync(async () =>
             {
                 _listProcessPanel = [];
                 _countAllPage = 0;
@@ -168,17 +168,17 @@ public partial class ListProcessPanel : ComponentBase
 
 
                 var sizeSample = 100;
-                var currentList = ListProcessPanelHandler
-                    .GetHistoryNodeFromTokenMaskAsync(_activeIdBpmnProcess, _filterToken, sizeSample).Result;
+                var currentList = await ListProcessPanelHandler
+                    .GetHistoryNodeFromTokenMaskAsync(_activeIdBpmnProcess, _filterToken, sizeSample);
 
                 if (currentList.Any() is false)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 _listProcessPanel = currentList;
 
-                return Task.CompletedTask;
+                return;
             });
         }
         catch (Exception e)

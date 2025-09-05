@@ -253,7 +253,10 @@ public class ElasticClient : IElasticClient
 
     private async Task<ElasticsearchClient> GetClient()
     {
-        if (_client == null || !Ping()) await Reconnect();
+        if (_client == null || !Ping())
+        {
+            await Reconnect();
+        }
 
         return _client ?? throw new InvalidOperationException("Elasticsearch client is null");
     }
@@ -280,10 +283,6 @@ public class ElasticClient : IElasticClient
         {
             try
             {
-                _logger.LogError("Attempting to reconnect to Elasticsearch (attempt {RetryCount})",
-                    retryCount + 1);
-
-                // Создаем нового клиента
                 _client = new ElasticsearchClient(_settings);
 
                 if (Ping())
@@ -291,6 +290,8 @@ public class ElasticClient : IElasticClient
                     _logger.LogInformation("Successfully reconnected to Elasticsearch");
                     return;
                 }
+                _logger.LogError("Attempting to reconnect to Elasticsearch (attempt {RetryCount})",
+                    retryCount + 1);
             }
             catch (Exception ex)
             {
@@ -462,7 +463,7 @@ public class ElasticClient : IElasticClient
         {
             var client = await GetClient();
 
-            var searchRequest = client.SearchAsync<HistoryNodeState>(s => s
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
                 .Size(sizeSample)
                 .Query(q => q
                     .Bool(b => b
@@ -486,7 +487,7 @@ public class ElasticClient : IElasticClient
                     .Filter(f => f
                         .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()))
                     )
-                )).Result;
+                ));
 
             var retValue = searchRequest.Hits.Count;
             return retValue;
@@ -508,7 +509,7 @@ public class ElasticClient : IElasticClient
         {
             var client = await GetClient();
 
-            var searchRequest = client.SearchAsync<HistoryNodeState>(s => s
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
                 .From(from)
                 .Size(size)
                 .Query(q => q
@@ -541,7 +542,7 @@ public class ElasticClient : IElasticClient
                             new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName())
                         })
                     )
-                )).Result;
+                ));
 
             var retArr = searchRequest?.Hits
                 ?.Select(p => p.Source)
@@ -564,7 +565,7 @@ public class ElasticClient : IElasticClient
         try
         {
             var client = await GetClient();
-            var searchRequest = client.SearchAsync<HistoryNodeState>(s => s
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
                 .Size(sizeSample)
                 .Query(q => q
                     .Bool(b => b
@@ -599,7 +600,7 @@ public class ElasticClient : IElasticClient
                         })
                     )
                 )
-            ).Result;
+            );
 
             var retArr = searchRequest?.Hits
                 ?.Select(p => p.Source)
@@ -610,7 +611,7 @@ public class ElasticClient : IElasticClient
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetHistoryNodeStateAsync failed");
+            _logger.LogError(ex, "GetHistoryNodeFromTokenMaskAsync failed");
         }
 
         return [];
