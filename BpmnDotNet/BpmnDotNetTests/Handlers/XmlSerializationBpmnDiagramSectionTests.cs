@@ -17,8 +17,8 @@ public class XmlSerializationBpmnDiagramSectionTests
     {
         var diagram = _xmlSerializationProcessSection.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_1.bpmn");
 
-        Assert.Equal("BPMNPlane_1", diagram.Id);
-        Assert.Equal(28, diagram.Shapes.Count());
+        Assert.Equal("IdBpmnProcessingMain", diagram.Id);
+        Assert.Equal(28,diagram.Shapes.Length);
         Assert.Equal("IdBpmnProcessingMain", diagram.IdBpmnProcess);
     }
 }
