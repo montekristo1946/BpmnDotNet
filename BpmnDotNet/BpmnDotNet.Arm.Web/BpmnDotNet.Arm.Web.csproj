@@ -4,7 +4,7 @@
         <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-
+        <IsPackable>false</IsPackable>
         <RootNamespace>BpmnDotNet.Arm.Web</RootNamespace>
     </PropertyGroup>
 

@@ -17,6 +17,7 @@
 2. [Инструкция по использованию](./Documents/Developer.md)
 3. [BpmnDotNet.ElasticClient](./BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
 4. [BpmnDotNet.Arm.Web](./BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
+5. [BpmnDotNet](./BpmnDotNet/BpmnDotNet/READMI.md)
 
 ## Кому это подойдет:
 1. Небольшой проект в котором не требуются распределенные вызовы обработчиков.
