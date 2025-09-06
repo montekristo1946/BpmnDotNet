@@ -4,7 +4,6 @@ using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
-using BpmnDotNet.ElasticClient.Tests.Configs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,17 +11,15 @@ namespace BpmnDotNet.ElasticClient.Tests;
 
 public class BackgroundWorkerService : BackgroundService
 {
-    private readonly AppSettings _config;
     private readonly IElasticClient _elasticClient;
     private readonly Fixture _fixture;
     private readonly ILogger<BackgroundWorkerService> _logger;
     private readonly IXmlSerializationBpmnDiagramSection _xmlSerializationProcessSection;
 
-    public BackgroundWorkerService(ILogger<BackgroundWorkerService> logger, AppSettings config,
+    public BackgroundWorkerService(ILogger<BackgroundWorkerService> logger,
         IElasticClient elasticClient, IXmlSerializationBpmnDiagramSection xmlSerializationProcessSection)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _config = config ?? throw new ArgumentNullException(nameof(config));
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         _xmlSerializationProcessSection = xmlSerializationProcessSection;
         _fixture = new Fixture();
@@ -33,12 +30,10 @@ public class BackgroundWorkerService : BackgroundService
         await Produce();
     }
 
-    private async Task Produce()
+    private Task Produce()
     {
         var keepRunning = true;
-
-        // _sampleService.StartNewProcess();
-
+        
         while (keepRunning)
         {
             _logger.LogDebug(@"a) Send 1 start \n q) Quit");
@@ -51,8 +46,6 @@ public class BackgroundWorkerService : BackgroundService
                     break;
                 case 's':
                     // GetDataIndex();
-                    // await GetLastData();
-                    // Pagination();
                     // LoadXmlBpmn();
                     // GetXmlBpmn();
                     // GetAllIdBpmnPlan();
@@ -70,12 +63,10 @@ public class BackgroundWorkerService : BackgroundService
 
         _logger.LogDebug("Consumer listening - press ENTER to quit");
         Console.ReadLine();
+        return Task.CompletedTask;
     }
 
- 
-
     
-
     private void GetDataIndex()
     {
         var document = _elasticClient
@@ -107,15 +98,9 @@ public class BackgroundWorkerService : BackgroundService
                 NodeStaus = _fixture.Build<NodeJobStatus>().CreateMany(15).ToArray()
             };
             var reshistoryNodeState = _elasticClient.SetDataAsync(historyNodeState).Result;
-            if (!reshistoryNodeState) throw new Exception("Failed to set history node state");
-
-
-            // var resUi = _elasticClient.SetDataAsync(UIBpmnDiagram).Result;
-            // if (!resUi)
-            // {
-            //     throw new Exception("Failed to set SetUIBpmnDiagramAsync");
-            // }
-
+            if (!reshistoryNodeState) 
+                throw new Exception("Failed to set history node state");
+            
             if (i > 0 && i % 100 == 0) _logger.LogDebug($"processed:{i}");
         }
 
@@ -145,8 +130,6 @@ public class BackgroundWorkerService : BackgroundService
             .Result;
         if (idBpmnProcesss?.Any() != true)
             throw new Exception("Failed to set history node state");
-
-        // public Task<string[]> GetAllId<T>()
     }
 
     private void GetCountHistoryNodeState()

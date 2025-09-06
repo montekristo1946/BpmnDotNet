@@ -22,9 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Configs\appsettings.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="BpmnDiagram\diagram_1.bpmn">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

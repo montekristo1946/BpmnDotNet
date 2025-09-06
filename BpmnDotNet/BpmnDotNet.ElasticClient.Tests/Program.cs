@@ -3,7 +3,6 @@ using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.ElasticClient;
 using BpmnDotNet.ElasticClient.Handlers;
 using BpmnDotNet.ElasticClient.Tests;
-using BpmnDotNet.ElasticClient.Tests.Configs;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,25 +12,15 @@ using Serilog.Events;
 using Serilog.Sinks.RollingFileSizeLimit.Extensions;
 using Serilog.Sinks.RollingFileSizeLimit.Impl;
 
-var configPath = Path.Combine(Directory.GetCurrentDirectory(), "Configs", "appsettings.json");
-
 await Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((hostContext, config) =>
     {
-        // Добавляем наш файл конфигурации
-        config.AddJsonFile(configPath, false, true);
-
         // Можно добавить другие источники конфигурации
         config.AddEnvironmentVariables();
     })
     .ConfigureServices((hostContext, services) =>
     {
-        // Регистрируем конфигурацию
-        services.AddSingleton(hostContext.Configuration.GetSection("AppSettings").Get<AppSettings>()
-                              ?? throw new InvalidOperationException("AppSettings configuration section is missing"));
-
         // Регистрируем сервисы с разными временами жизни
-
 
         services.AddScoped<ElasticClientConfig>();
         services.AddScoped<IElasticClient, ElasticClient>();
