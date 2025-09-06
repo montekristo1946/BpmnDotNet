@@ -12,12 +12,10 @@ public class Producer
     public void Produce()
     {
         var keepRunning = true;
-
-        // _sampleService.StartNewProcess();
-
+        
         while (keepRunning)
         {
-            Console.WriteLine(@"a) Send 1 start \n q) Quit");
+            Console.WriteLine(@"a) start process s) send received message q) Quit");
             var key = char.ToLower(Console.ReadKey(true).KeyChar);
 
             switch (key)

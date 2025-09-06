@@ -29,6 +29,7 @@ public class SampleService
             TestValue2 = "Call from StartNewProcess"
         };
 
+        //Регистрируем сообщение которое нужно ожидать.
         contextData.RegistrationMessagesType.TryAdd(nameof(ReceiveTaskFirstHandle), typeof(MessageExampleFirst));
 
         return contextData;
@@ -56,8 +57,7 @@ public class SampleService
         for (int i = 0; i < totalCount; i += batchSize)
         {
             var currentBatchSize = Math.Min(batchSize, totalCount - i);
-
-
+            
             // Обработка текущей партии
             for (int j = i; j < i + currentBatchSize; j++)
             {
@@ -70,8 +70,6 @@ public class SampleService
             }
             Task.WaitAll(tasks.ToArray());
             Console.WriteLine($"Run Part {currentBatchSize}");
-
-
         }
         sw.Stop();
         Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");

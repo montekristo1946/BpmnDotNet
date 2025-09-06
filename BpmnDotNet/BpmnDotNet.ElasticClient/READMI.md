@@ -1,7 +1,7 @@
 # BpmnDotNet.ElasticClient
 
 ## Назначение:
-Биллиотека для работы с elastic. Реализует интерфей IElasticClient.
+Библиотека для работы с elastic. Реализует интерфейса IElasticClient.
 
 ## Запустить эластику.
 ~~~

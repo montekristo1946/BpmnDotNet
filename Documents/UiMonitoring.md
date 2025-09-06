@@ -1,7 +1,7 @@
 # Визуальная часть.
 
 ## Настройка
-Запустить сервисы
+Для работы сервиса необходимо запустить:
 1. [BpmnDotNet.ElasticClient](../BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
 2. [BpmnDotNet.Arm.Web](../BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
 
