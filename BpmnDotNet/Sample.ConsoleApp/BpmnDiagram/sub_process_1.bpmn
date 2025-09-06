@@ -5,10 +5,10 @@
       <bpmn:outgoing>Flow_1y2qpel</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1y2qpel" sourceRef="StartEvent_1" targetRef="ServiceTaskFifthHandler" />
-    <bpmn:endEvent id="Event_19p8yqr">
+    <bpmn:endEvent id="End_event_sub">
       <bpmn:incoming>Flow_0ugh517</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0ugh517" sourceRef="ServiceTaskFifthHandler" targetRef="Event_19p8yqr" />
+    <bpmn:sequenceFlow id="Flow_0ugh517" sourceRef="ServiceTaskFifthHandler" targetRef="End_event_sub" />
     <bpmn:serviceTask id="ServiceTaskFifthHandler" name="ServiceTaskFifthHandler">
       <bpmn:incoming>Flow_1y2qpel</bpmn:incoming>
       <bpmn:outgoing>Flow_0ugh517</bpmn:outgoing>
@@ -19,7 +19,7 @@
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_19p8yqr_di" bpmnElement="Event_19p8yqr">
+      <bpmndi:BPMNShape id="Event_19p8yqr_di" bpmnElement="End_event_sub">
         <dc:Bounds x="402" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0rap1mk_di" bpmnElement="ServiceTaskFifthHandler">

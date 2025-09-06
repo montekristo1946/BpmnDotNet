@@ -1,0 +1,31 @@
+@page "/Operate"
+@rendermode InteractiveServer
+
+<div class="m-0 padding-1px"
+     style="background-color: #eff0f1; height: 99.8vh; width: 100vw;     overflow-x: hidden;     overflow-y: hidden;">
+
+     <div class="row m-0 p-0 border-enveloping-custom" style=" height: 5.0vh; width: 99.9vw; background-color: #eceff3">
+          @MenuPanelTemplate
+     </div>
+
+     <div class="row m-0 padding-1px " style=" height: 94.7vh; width: 100vw;">
+          
+          <div class="col-2 m-0 padding-1px border-enveloping-custom"
+               style="background-color: #eceff3; width: 20.0%;  height: 100%;">
+               @FilterPanelTemplate
+          </div>
+
+          <div class="col-10 m-0"
+               style="overflow-y: hidden; background-color: #f8f9fa; height: 100%; width: 80.0%; padding: 0 1px 1px 1px;">
+
+               <div class="row  p-0  border-enveloping-custom" style=" height: 60%; width: 100%; margin: 0 0 1px 0;">
+                    @BpmnPlanePanelTemplate
+               </div>
+
+               <div class="row m-0 p-0 border-enveloping-custom"
+                    style=" height: 40%; width: 100%; background-color: #eceff3">
+                    @ListProcessPanelTemplate
+               </div>
+          </div>
+     </div>
+</div>

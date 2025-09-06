@@ -1,0 +1,13 @@
+<svg viewBox="-1 -1 55 55" width="1em" height="1em" 
+     xmlns="http://www.w3.org/2000/svg">
+
+    <g class="djs-visual">
+        <polygon points="25,0 50,25 25,50 0,25"
+                 style="stroke-linecap: round; stroke-linejoin: round; stroke: rgb(34, 36, 42); stroke-width: 2px; fill: white; fill-opacity: 0.95;">
+        </polygon>
+        <path
+                d="m 16,15 7.42857142857143,9.714285714285715 -7.42857142857143,9.714285714285715 3.428571428571429,0 5.714285714285715,-7.464228571428572 5.714285714285715,7.464228571428572 3.428571428571429,0 -7.42857142857143,-9.714285714285715 7.42857142857143,-9.714285714285715 -3.428571428571429,0 -5.714285714285715,7.464228571428572 -5.714285714285715,-7.464228571428572 -3.428571428571429,0 z"
+                style="fill: rgb(34, 36, 42); stroke-linecap: round; stroke-linejoin: round; stroke: rgb(34, 36, 42); stroke-width: 1px;">
+        </path>
+    </g>
+</svg>

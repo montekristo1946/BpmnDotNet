@@ -1,6 +1,6 @@
 using System.Globalization;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
+using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Common.Abstractions;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 
@@ -8,10 +8,10 @@ namespace Sample.ConsoleApp.Handlers;
 
 public class SubProcessFirstHandler : IBpmnHandler
 {
-    public string TaskDefinitionId { get; init; } = nameof(SubProcessFirstHandler);
+    private readonly IBpmnClient _bpmnClient;
 
     private readonly ILogger<SubProcessFirstHandler> _logger;
-    private readonly IBpmnClient _bpmnClient;
+
     public SubProcessFirstHandler(ILoggerFactory loggerFactory, IBpmnClient bpmnClient)
     {
         _bpmnClient = bpmnClient ?? throw new ArgumentNullException(nameof(bpmnClient));
@@ -19,9 +19,11 @@ public class SubProcessFirstHandler : IBpmnHandler
         _logger = loggerFactory.CreateLogger<SubProcessFirstHandler>();
     }
 
+    public string TaskDefinitionId { get; init; } = nameof(SubProcessFirstHandler);
+
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
-        _logger.LogDebug($"[SubProcessFirstHandler:AsyncJobHandler] SubProcessFirstHandler run ");
+        _logger.LogDebug("[SubProcessFirstHandler:AsyncJobHandler] SubProcessFirstHandler run ");
         var cont = context as ContextData;
 
 
@@ -31,6 +33,7 @@ public class SubProcessFirstHandler : IBpmnHandler
 
         await taskNode.ProcessTask;
 
+        await Task.Delay(1, ctsToken);
 
         _logger.LogDebug($"[SubProcessFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {contextSubProcess.ContextSubProcessValue}");
@@ -38,9 +41,9 @@ public class SubProcessFirstHandler : IBpmnHandler
 
     private ContextSubProcess CreateContextSubProcess()
     {
-        return new ContextSubProcess()
+        return new ContextSubProcess
         {
-            ContextSubProcessValue = "text sub process",
+            ContextSubProcessValue = "text sub process"
         };
     }
 }

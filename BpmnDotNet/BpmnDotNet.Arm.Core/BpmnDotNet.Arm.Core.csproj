@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BpmnDotNet.Common\BpmnDotNet.Common.csproj"/>
+        <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj"/>
+    </ItemGroup>
+
+</Project>

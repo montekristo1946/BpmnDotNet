@@ -1,0 +1,4 @@
+{
+  "UseUrls": "http://localhost:5002",
+  "ElasticConnectionUrl":  "http://localhost:9200"
+}

@@ -1,5 +1,6 @@
-using System.Collections.Concurrent;
-using BpmnDotNet.Interfaces.Handlers;
+using System.Diagnostics;
+using BpmnDotNet.Abstractions.Handlers;
+using Sample.ConsoleApp.Common;
 using Sample.ConsoleApp.Context;
 using Sample.ConsoleApp.Handlers;
 using Sample.ConsoleApp.Messages;
@@ -15,24 +16,28 @@ public class SampleService
         _bpmnClient = bpmnClient;
     }
 
-    private ContextData CreateContextData()
+    private ContextData CreateContextData(int tokenId)
     {
-        var contextData = new ContextData()
+
+        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{tokenId}";
+
+        var contextData = new ContextData
         {
-            IdBpmnProcess = Common.Constants.IdBpmnProcessing_2,
-            TokenProcess = Guid.NewGuid().ToString() + "_test_1",
+            IdBpmnProcess = Constants.IdBpmnProcessingMain,
+            TokenProcess = tokenProcess,
             TestValue = 25,
-            TestValue2 = "Call from StartNewProcess",
+            TestValue2 = "Call from StartNewProcess"
         };
 
+        //Регистрируем сообщение которое нужно ожидать.
         contextData.RegistrationMessagesType.TryAdd(nameof(ReceiveTaskFirstHandle), typeof(MessageExampleFirst));
 
         return contextData;
     }
 
-    object CreateMessageExampleFirst()
+    private object CreateMessageExampleFirst()
     {
-        return new MessageExampleFirst()
+        return new MessageExampleFirst
         {
             Age = (int)DateTime.Now.Ticks,
             Name = "John Doe",
@@ -43,19 +48,32 @@ public class SampleService
     public void StartNewProcess()
     {
         var tasks = new List<Task>();
+        var startID = 80000;
 
-        for (var j = 0; j < 1; j++)
+        var totalCount = 50000;
+        var batchSize = 5;
+        var sw = new Stopwatch();
+        sw.Restart();
+        for (int i = 0; i < totalCount; i += batchSize)
         {
-            for (int i = 0; i < 1; i++)
+            var currentBatchSize = Math.Min(batchSize, totalCount - i);
+            
+            // Обработка текущей партии
+            for (int j = i; j < i + currentBatchSize; j++)
             {
+                Console.WriteLine($"  Элемент {j}: значение = {j}");
+                var tokenId = startID + j;
                 var timeout = TimeSpan.FromMinutes(10);
-                var contextData = CreateContextData();
+                var contextData = CreateContextData(tokenId);
                 var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
                 tasks.Add(taskNode.ProcessTask);
             }
-
             Task.WaitAll(tasks.ToArray());
+            Console.WriteLine($"Run Part {currentBatchSize}");
         }
+        sw.Stop();
+        Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
+
     }
 
     public void SendMessage()
@@ -63,14 +81,15 @@ public class SampleService
         //Отправим тестовое сообщение
         var messageExampleFirst = CreateMessageExampleFirst();
         var idBpmnProcess = "IdBpmnProcessingMain";
-        var tokenProcess = "a81eaccf-e7b1-4c97-b1df-8f163353f678_test_1";
+        var wagon = 1000;
+        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
 
         try
         {
             _bpmnClient.SendMessage(
                 idBpmnProcess,
                 tokenProcess,
-                messageType: typeof(MessageExampleFirst),
+                typeof(MessageExampleFirst),
                 messageExampleFirst);
         }
         catch (Exception e)

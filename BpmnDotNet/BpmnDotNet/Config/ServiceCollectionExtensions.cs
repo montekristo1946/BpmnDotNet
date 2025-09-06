@@ -1,6 +1,8 @@
 using System.Reflection;
+using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.ElasticClient;
 using BpmnDotNet.Handlers;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
-
+        services.AddScoped<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
         services.AddScoped<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
@@ -23,7 +25,10 @@ public static class ServiceCollectionExtensions
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
             var pathFinder = options.GetRequiredService<IPathFinder>();
-            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder);
+            var elasticClient = options.GetRequiredService<IElasticClient>();
+            var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
+
+            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder, elasticClient, historyNodeStateWriter);
         });
 
 
@@ -31,10 +36,9 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Регистрация по прастранству имен.
+    ///     Регистрация по пространству имен.
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="predicate">Filter registered handlers based on type</param>
     /// <typeparam name="THandler"></typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
@@ -61,9 +65,15 @@ public static class ServiceCollectionExtensions
     }
 
 
-    private static Assembly GetAssembly<THandler>() => typeof(THandler).Assembly;
+    private static Assembly GetAssembly<THandler>()
+    {
+        return typeof(THandler).Assembly;
+    }
 
-    private static bool IsClass(Type type) => !type.IsInterface && !type.IsAbstract;
+    private static bool IsClass(Type type)
+    {
+        return !type.IsInterface && !type.IsAbstract;
+    }
 
     private static void RegisterAssembly(
         IServiceCollection services,
@@ -85,15 +95,10 @@ public static class ServiceCollectionExtensions
             .Where(a => a.ImplementedHandlerInterfaces.Any());
 
         if (!string.IsNullOrEmpty(namespaceFilter))
-        {
             typesToAutoRegister = typesToAutoRegister.Where(a =>
                 a.Type.Namespace != null && a.Type.Namespace.StartsWith(namespaceFilter));
-        }
 
-        foreach (var type in typesToAutoRegister)
-        {
-            RegisterType(services, type.Type);
-        }
+        foreach (var type in typesToAutoRegister) RegisterType(services, type.Type);
     }
 
     private static void RegisterType(IServiceCollection services, Type typeToRegister)
@@ -101,8 +106,6 @@ public static class ServiceCollectionExtensions
         var implementedHandlerInterfaces = GetImplementedHandlerInterfaces(typeToRegister).ToArray();
 
         foreach (var handlerInterface in implementedHandlerInterfaces)
-        {
             services.AddScoped(handlerInterface, typeToRegister);
-        }
     }
 }

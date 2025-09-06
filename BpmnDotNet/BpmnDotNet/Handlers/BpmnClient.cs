@@ -1,34 +1,38 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection.Metadata;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Elements;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;
 
-public class BpmnClient : IBpmnClient
+internal class BpmnClient : IBpmnClient
 {
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
 
     private readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus>
         _bpmnProcesses = new();
 
-    private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
-
     private readonly Task _cleanerTask;
     private readonly CancellationTokenSource _cts = new();
-    private volatile bool _disposed;
-    private readonly IPathFinder _pathFinder;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<BpmnClient> _logger;
 
-    public BpmnClient(BpmnProcessDto[] businessProcessDtos, ILoggerFactory loggerFactory, IPathFinder pathFinder)
+    private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
+    private readonly ILogger<BpmnClient> _logger;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly IPathFinder _pathFinder;
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
+    private volatile bool _disposed;
+
+    public BpmnClient(BpmnProcessDto[] businessProcessDtos,
+        ILoggerFactory loggerFactory,
+        IPathFinder pathFinder,
+        IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
+        _historyNodeStateWriter = historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
         _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
@@ -45,7 +49,7 @@ public class BpmnClient : IBpmnClient
         var logger = _loggerFactory.CreateLogger<BusinessProcess>();
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
 
-        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout);
+        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout, _historyNodeStateWriter);
 
         var resAdd = _bpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
         if (resAdd is false)
@@ -73,15 +77,27 @@ public class BpmnClient : IBpmnClient
     {
         var resGet = _bpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
-        {
             throw new InvalidOperationException(
                 $"[SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
-        }
 
         var resAdd = bpmn.Process.AddMessageToQueue(messageType, message);
         if (!resAdd)
             throw new InvalidOperationException(
                 $"[SendMessage] Not Add message : {idBpmnProcess} {tokenProcess} {messageType}");
+    }
+
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+        _disposed = true;
+        ClearBpmnProcessesDictionary(true);
+
+        _cts?.Cancel();
+        _cleanerTask.Wait();
+        _cleanerTask.Dispose();
+        _cts?.Dispose();
     }
 
     private async Task CleaningBpmnProcesses(CancellationToken cts)
@@ -110,7 +126,7 @@ public class BpmnClient : IBpmnClient
     {
         foreach (var status in _bpmnProcesses.Values)
         {
-            if (status.ProcessingStaus != ProcessingStaus.Complete && !isForce)
+            if (status.StatusType != StatusType.Completed && !isForce)
                 continue;
 
             var resRemote = _bpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);
@@ -144,24 +160,8 @@ public class BpmnClient : IBpmnClient
         string idBpmnProcess)
     {
         if (!bpmnProcessDtos.TryGetValue(idBpmnProcess, out var bpmn))
-        {
             throw new InvalidOperationException($"Not find BpmnProcessDto: {idBpmnProcess}");
-        }
 
         return bpmn;
-    }
-
-
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-        _disposed = true;
-        ClearBpmnProcessesDictionary(true);
-
-        _cts?.Cancel();
-        _cleanerTask.Wait();
-        _cleanerTask.Dispose();
-        _cts?.Dispose();
     }
 }

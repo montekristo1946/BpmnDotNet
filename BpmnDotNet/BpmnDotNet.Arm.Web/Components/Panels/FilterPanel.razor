@@ -1,0 +1,146 @@
+<div class="m-0 padding-1px" style="height:100%; width: 100%;">
+
+    <div class="padding-1px border-enveloping-custom "
+         style="background-color: #f8f9fa; height: 80%; width: 100%; 
+         overflow-x: hidden;  overflow-y: auto;
+         margin: 0 0 1px 0">
+
+        <div class="m-0 padding-1px ">
+            <div class="row m-0 p-0 text-center ">
+                <p class="" style="height : 25%; margin-top: auto; margin-bottom: auto; ">
+                    List of bpmn processes 
+                </p>
+            </div>
+        </div>
+        
+        @{
+            foreach (var process in _arrayProcessId)
+            {
+                <div class="m-0 padding-1px">
+                    <div class="row m-0  border-enveloping-custom bottom-shadow"
+                         style="background-color: #ffffff; padding: 0 3px 0 3px"
+                         @onclick="@(() => ButtonClickObjectAsync(process))">
+                        @process
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="m-0 padding-1px border-enveloping-custom "
+         style="background-color: #f8f9fa; height:20%; width: 100%; overflow-x: hidden;  overflow-y: auto;">
+
+        <div class="m-0 padding-1px ">
+            <div class="row m-0 p-0 text-center ">
+                <p class="" style="height : 25%; margin-top: auto; margin-bottom: auto; ">
+                    Filter
+                </p>
+            </div>
+        </div>
+
+        <div class="row p-0 m-0" style="">
+            <div class="col-1"></div>
+            <div class="col-2 p-0 m-0 div-menu-center">
+                <div class="p-0 m-0 text-vertical-center">
+                    <input class=" m-0  "
+                           type="checkbox"
+                           @onchange="(ChangeNone)"
+                           checked="@_isCheckFilterNone"
+                           value="@_isCheckFilterNone"
+                           style="height: 1.8vh; width: 100%"/>
+                </div>
+            </div>
+
+            <div class="col-3 p-0 m-0 div-menu-start" style="">
+                <p class="m-0 text-vertical-center" style="">
+                    None
+                </p>
+            </div>
+            
+            <div class="col-2 p-0 m-0 div-menu-center">
+                <div class="p-0 m-0 text-vertical-center">
+                    <input class=" m-0  "
+                           type="checkbox"
+                           @onchange="(ChangeWorks)"
+                           checked="@_isCheckFilterWorks"
+                           value="@_isCheckFilterWorks"
+                           style="height: 1.8vh; width: 100%"/>
+                </div>
+            </div>
+
+            <div class="col-3 p-0 m-0 div-menu-start" style="">
+                <p class="m-0 text-vertical-center" style="">
+                    Works
+                </p>
+            </div>
+        </div>
+        
+       
+        
+        <div class="row p-0 " style="margin: 0.5vh 0 0 0">
+            <div class="col-1"></div>
+            <div class="col-2 p-0 m-0 div-menu-center">
+                <div class="p-0 m-0 text-vertical-center">
+                    <input class=" m-0  "
+                           type="checkbox"
+                           @onchange="(ChangeCompleted)"
+                           checked="@_isCheckFilterCompleted"
+                           value="@_isCheckFilterCompleted"
+                           style="height: 1.8vh; width: 100%"/>
+                </div>
+            </div>
+
+            <div class="col-3 p-0 m-0 div-menu-start" style="">
+                <p class="m-0 text-vertical-center" style="">
+                    Completed
+                </p>
+            </div>
+            
+            <div class="col-2 p-0 m-0 div-menu-center">
+                <div class="p-0 m-0 text-vertical-center">
+                    <input class=" m-0  "
+                           type="checkbox"
+                           @onchange="(ChangeError)"
+                           checked="@_isCheckFilterError"
+                           value="@_isCheckFilterError"
+                           style="height: 1.8vh; width: 100%"/>
+                </div>
+            </div>
+
+            <div class="col-4 p-0 m-0 div-menu-start" style="">
+                <p class="m-0 text-vertical-center" style="">
+                    Error
+                </p>
+            </div>
+        </div>
+        
+        
+        <div class="row p-0" style="margin: 0.5vh 0 0 0">
+            <div class="col-12 p-0  div-menu-start" style="margin: 0 0.5vh 0 0.5vh">
+                <p class="m-0 text-vertical-center" style="padding: 0 0 0 5px;">
+                    Filter from Token:
+                </p>
+            </div>
+        </div>
+        
+        <div class="row p-0" style="margin: 0.5vh 0 0 0">
+            <div class="col-9 p-0  " style="margin: 0 0.5vh 0 0.5vh">
+                <input type="text"
+                       class="form-control text-start color-text-main " data-mdb-toggle="tooltip"
+                       data-mdb-placement="right"
+                       title="*value*" placeholder="" aria-describedby="button-addon1"
+                       
+                       value="@_filterToken"
+                       @onchange="(OnChangeFilterToken)">
+            </div>
+            
+            <div class="col-2 p-0 m-0   border-enveloping-custom bottom-shadow" style="width: 4vw"
+                 @onclick="(OnclickButtonSearch)">
+                <p class="m-0 " style="display: flex; justify-content: center; align-items: center; height: 100%" >
+                    Search
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>

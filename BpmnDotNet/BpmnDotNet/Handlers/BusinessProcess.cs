@@ -1,66 +1,99 @@
 using System.Collections.Concurrent;
-using System.Globalization;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Models;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Elements;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;
 
 internal class BusinessProcess : IBusinessProcess, IDisposable
 {
-    public BusinessProcessJobStatus JobStatus { get; private set; }
+    private readonly BpmnProcessDto _bpmnShema;
 
     private readonly IContextBpmnProcess _contextBpmnProcess;
+
+    private readonly CancellationTokenSource _cts;
+
+    private readonly AutoResetEvent _eventsHolder = new(false);
+
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
+
     private readonly ILogger<IBusinessProcess> _logger;
-    private readonly BpmnProcessDto _bpmnShema;
-    private readonly IPathFinder _pathFinder;
 
     /// <summary>
-    /// Handlers для обработки.
+    ///     Handlers для обработки.
     /// </summary>
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers;
 
     /// <summary>
-    /// Хранилище сообщений
+    ///     Хранилище сообщений
     /// </summary>
     private readonly ConcurrentDictionary<Type, object> _messagesStore = new();
 
     /// <summary>
-    /// Очередь для вызовов.
+    ///     Очередь для вызовов.
     /// </summary>
-    private readonly ConcurrentDictionary<string, NodeJobStatus> _nodeStateRegistry = new();
+    private readonly ConcurrentDictionary<string, NodeTaskStatus> _nodeStateRegistry = new();
 
+    /// <summary>
+    ///     Сообщения с ошибками выполнения.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, string> _errorsRegistry = new();
 
-    private readonly CancellationTokenSource _cts;
-    private bool _idDispose = false;
+    private readonly IPathFinder _pathFinder;
+    private bool _idDispose;
+    private long _dateFromInitInstance;
 
-    private readonly AutoResetEvent _eventsHolder = new(false);
 
     public BusinessProcess(IContextBpmnProcess contextBpmnProcess,
         ILogger<IBusinessProcess> logger,
         BpmnProcessDto bpmnShema, IPathFinder pathFinder,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        TimeSpan timeout)
+        TimeSpan timeout,
+        IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _contextBpmnProcess = contextBpmnProcess ?? throw new ArgumentNullException(nameof(contextBpmnProcess));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _bpmnShema = bpmnShema ?? throw new ArgumentNullException(nameof(bpmnShema));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
         _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
+        _historyNodeStateWriter =
+            historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
 
         _cts = new CancellationTokenSource(timeout);
+        _dateFromInitInstance = DateTime.Now.Ticks;
         var task = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
-        JobStatus = new BusinessProcessJobStatus()
+        JobStatus = new BusinessProcessJobStatus
         {
-            ProcessingStaus = ProcessingStaus.Works,
+            StatusType = StatusType.Works,
             IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
             TokenProcess = contextBpmnProcess.TokenProcess,
             ProcessTask = task,
             Process = this
         };
+    }
 
+    public BusinessProcessJobStatus JobStatus { get; }
+
+    public bool AddMessageToQueue(Type messageType, object message)
+    {
+        try
+        {
+            _messagesStore.AddOrUpdate(
+                messageType,
+                _ => message,
+                (key, oldMessage) => message);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+        }
+
+        return false;
     }
 
 
@@ -73,31 +106,13 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _idDispose = true;
     }
 
-    public bool AddMessageToQueue(Type messageType, object message)
-    {
-        try
-        {
-            _messagesStore.AddOrUpdate(
-                key: messageType,
-                addValueFactory: _ => message,
-                updateValueFactory: (key, oldMessage) => message);
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, e.Message);
-        }
-
-        return false;
-    }
-
     public void ForceCancel()
     {
         _cts.Cancel();
     }
 
     /// <summary>
-    /// Главный поток процесса.
+    ///     Главный поток процесса.
     /// </summary>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
@@ -115,14 +130,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             {
                 UpdateParallelGatewayState();
                 CheckMessagesStore();
-                foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+                foreach (var nodeState in _nodeStateRegistry)
                 {
-                    var isPending = nodeState.Value.ProcessingStaus == ProcessingStaus.Pending;
+                    var isPending = nodeState.Value.StatusType == StatusType.Pending;
                     if (!isPending)
                         continue;
 
                     var taskNode = ExecutionNodes(nodeState.Key, ctsToken);
-                    NodeRegistryChangeState(nodeState.Key, ProcessingStaus.Works, taskNode);
+                    NodeRegistryChangeState(nodeState.Key, StatusType.Works, taskNode);
                 }
 
                 _eventsHolder.WaitOne(forcedRepetition);
@@ -142,16 +157,18 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _logger.LogDebug("[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
 
-        JobStatus.ProcessingStaus = ProcessingStaus.Complete;
+        JobStatus.StatusType = StatusType.Completed;
         return Task.CompletedTask;
     }
 
     private void CheckMessagesStore()
     {
-        foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+        foreach (var nodeState in _nodeStateRegistry)
         {
-            if (nodeState.Value.ProcessingStaus != ProcessingStaus.WaitingReceivedMessage)
+            if (nodeState.Value.StatusType != StatusType.WaitingReceivedMessage)
+            {
                 continue;
+            }
 
             var typeMessageInNode = GetTypeNameMessage(_contextBpmnProcess, nodeState.Key);
             var resGet = _messagesStore.TryGetValue(typeMessageInNode, out var message);
@@ -163,7 +180,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             var resAddMessage = AddMessageInContext(_contextBpmnProcess, typeMessageInNode, message);
             if (resAddMessage)
             {
-                NodeRegistryChangeState(nodeState.Key, ProcessingStaus.Pending, null);
+                NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
             }
         }
     }
@@ -215,13 +232,13 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     }
 
     /// <summary>
-    ///  Ожидающие путь, проверим что выполнили перед ними все flow.
+    ///     Ожидающие путь, проверим что выполнили перед ними все flow.
     /// </summary>
     private void UpdateParallelGatewayState()
     {
-        foreach (KeyValuePair<string, NodeJobStatus> nodeState in _nodeStateRegistry)
+        foreach (var nodeState in _nodeStateRegistry)
         {
-            if (nodeState.Value.ProcessingStaus != ProcessingStaus.WaitingCompletedWays)
+            if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
                 continue;
 
             var currentNode = GetIElement(nodeState.Key);
@@ -230,13 +247,10 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             var checkCalls = incomingPath.All(p =>
             {
                 var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
-                return resGet && nodeJobStatus is not null && nodeJobStatus.ProcessingStaus == ProcessingStaus.Complete;
+                return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
             });
 
-            if (checkCalls)
-            {
-                NodeRegistryChangeState(nodeState.Key, ProcessingStaus.Pending, null);
-            }
+            if (checkCalls) NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
         }
     }
 
@@ -247,8 +261,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
         foreach (var node in currentNodes)
         {
-            NodeRegistryChangeState(node.IdElement, ProcessingStaus.Pending, null);
-            _logger.LogDebug($"[AddStartEvent] init Node: {node.IdElement} State: {ProcessingStaus.Pending}");
+            NodeRegistryChangeState(node.IdElement, StatusType.Pending);
+            _logger.LogDebug($"[AddStartEvent] init Node: {node.IdElement} State: {StatusType.Pending}");
         }
     }
 
@@ -261,11 +275,10 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 var handler = GetHandler(nodeId);
                 await handler(_contextBpmnProcess, ctsToken);
 
-                NodeRegistryChangeState(nodeId, ProcessingStaus.Complete);
+                NodeRegistryChangeState(nodeId, StatusType.Completed);
                 FillFlowNodesToCompleted(nodeId);
                 FillNextNodesToPending(nodeId);
 
-                CheckFinalProcessing(nodeId);
             }
             catch (OperationCanceledException)
             {
@@ -277,10 +290,25 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             {
                 _logger.LogError(ex,
                     $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
-                NodeRegistryChangeState(nodeId, ProcessingStaus.Failed);
+                NodeRegistryChangeState(nodeId, StatusType.Failed);
+
+                ErrorsRegistryUpdate(nodeId, ex.Message);
             }
             finally
             {
+                var currentNode = GetIElement(nodeId);
+                var isCompleted = currentNode.ElementType == ElementType.EndEvent;
+                //Запишем состояние процесса в бд.
+                await _historyNodeStateWriter.SetStateProcess(
+                    _contextBpmnProcess.IdBpmnProcess,
+                    _contextBpmnProcess.TokenProcess,
+                    _nodeStateRegistry.Values.ToArray(),
+                    _errorsRegistry.Values.ToArray(),
+                    isCompleted,
+                    _dateFromInitInstance
+                );
+                _logger.LogDebug($"Test {nodeId}");
+                CheckFinalProcessing(nodeId);
                 _eventsHolder.Set();
             }
         }, ctsToken);
@@ -288,25 +316,34 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         return retTask;
     }
 
-
-    private void NodeRegistryChangeState(string nodeId, ProcessingStaus staus, Task? taskRunNode = null)
+    private void ErrorsRegistryUpdate(string nodeId, string message)
     {
-        var stateNew = new NodeJobStatus()
+        _errorsRegistry.AddOrUpdate(
+            nodeId,
+            _ => message,
+            (keyOld, oldMessage) =>
+                message
+        );
+    }
+
+    private void NodeRegistryChangeState(string nodeId, StatusType staus, Task? taskRunNode = null)
+    {
+        var stateNew = new NodeTaskStatus
         {
-            ProcessingStaus = staus,
+            StatusType = staus,
             IdNode = nodeId,
             TaskRunNode = taskRunNode
         };
 
         _nodeStateRegistry.AddOrUpdate(
-            key: nodeId,
-            addValueFactory: _ => stateNew,
-            updateValueFactory: (keyOld, oldMessage) =>
-                new NodeJobStatus()
+            nodeId,
+            _ => stateNew,
+            (keyOld, oldMessage) =>
+                new NodeTaskStatus
                 {
-                    ProcessingStaus = staus,
+                    StatusType = staus,
                     IdNode = keyOld,
-                    TaskRunNode = taskRunNode ?? oldMessage.TaskRunNode,
+                    TaskRunNode = taskRunNode ?? oldMessage.TaskRunNode
                 }
         );
     }
@@ -322,12 +359,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private void CheckFinalProcessing(string currentNodeId)
     {
         var currentNode = GetIElement(currentNodeId);
-        if (currentNode.ElementType == ElementType.EndEvent)
+        if (currentNode.ElementType != ElementType.EndEvent)
         {
-            _logger.LogDebug("[CheckFinalProcessing] EndEvent completed");
-            _cts.Cancel();
-            _eventsHolder.Set();
+            return;
         }
+
+        _logger.LogDebug("[CheckFinalProcessing] EndEvent completed");
+        _cts.Cancel();
+        _eventsHolder.Set();
     }
 
     private void FillNextNodesToPending(string currentNodeId)
@@ -342,20 +381,20 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             var state = node.ElementType switch
             {
-                ElementType.StartEvent => ProcessingStaus.Pending,
-                ElementType.EndEvent => ProcessingStaus.Pending,
-                ElementType.SequenceFlow => ProcessingStaus.Pending,
-                ElementType.ExclusiveGateway => ProcessingStaus.Pending,
-                ElementType.ServiceTask => ProcessingStaus.Pending,
-                ElementType.SendTask => ProcessingStaus.Pending,
-                ElementType.SubProcess => ProcessingStaus.Pending,
-                ElementType.ReceiveTask => ProcessingStaus.WaitingReceivedMessage,
-                ElementType.ParallelGateway => ProcessingStaus.WaitingCompletedWays,
+                ElementType.StartEvent => StatusType.Pending,
+                ElementType.EndEvent => StatusType.Pending,
+                ElementType.SequenceFlow => StatusType.Pending,
+                ElementType.ExclusiveGateway => StatusType.Pending,
+                ElementType.ServiceTask => StatusType.Pending,
+                ElementType.SendTask => StatusType.Pending,
+                ElementType.SubProcess => StatusType.Pending,
+                ElementType.ReceiveTask => StatusType.WaitingReceivedMessage,
+                ElementType.ParallelGateway => StatusType.WaitingCompletedWays,
                 _ => throw new NotImplementedException(
                     $"[FillNextNodesToPending] Not find ImplementedException {node.ElementType}")
             };
             _logger.LogDebug($"[FillNextNodesToPending] init Node: {node.IdElement} State: {state}");
-            NodeRegistryChangeState(node.IdElement, state, null);
+            NodeRegistryChangeState(node.IdElement, state);
         }
     }
 
@@ -366,35 +405,29 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         if (currentNode.ElementType == ElementType.ExclusiveGateway)
         {
             var idNode = _pathFinder.GetConditionRouteWithExclusiveGateWay(_contextBpmnProcess, currentNode);
-            NodeRegistryChangeState(idNode, ProcessingStaus.Complete, null);
-            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {idNode} State: {ProcessingStaus.Complete}");
+            NodeRegistryChangeState(idNode, StatusType.Completed);
+            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {idNode} State: {StatusType.Completed}");
             return;
         }
 
         var flowsId = GetOutgoingPath(currentNode);
         foreach (var flow in flowsId)
         {
-            NodeRegistryChangeState(flow, ProcessingStaus.Complete, null);
-            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {flow} State: {ProcessingStaus.Complete}");
+            NodeRegistryChangeState(flow, StatusType.Completed);
+            _logger.LogDebug($"[FillFlowNodesToCompleted] init Node: {flow} State: {StatusType.Completed}");
         }
     }
 
     private string[] GetOutgoingPath(IElement currentNode)
     {
-        if (currentNode is IOutgoingPath outgoingPath)
-        {
-            return outgoingPath.Outgoing;
-        }
+        if (currentNode is IOutgoingPath outgoingPath) return outgoingPath.Outgoing;
 
         return [];
     }
 
     private string[] GetIncomingPath(IElement currentNode)
     {
-        if (currentNode is IIncomingPath incomingPath)
-        {
-            return incomingPath.Incoming;
-        }
+        if (currentNode is IIncomingPath incomingPath) return incomingPath.Incoming;
 
         return [];
     }
@@ -406,10 +439,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
             if (resGet && nodeJobStatus is not null &&
-                nodeJobStatus.ProcessingStaus == ProcessingStaus.Works) //случай когда параллельный шлюз уже запущен
-            {
+                nodeJobStatus.StatusType == StatusType.Works) //случай когда параллельный шлюз уже запущен
                 continue;
-            }
 
             result.Add(node);
         }
@@ -432,5 +463,4 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _logger.LogDebug("[MoqHandler] Calling handler");
         return Task.CompletedTask;
     }
-
 }

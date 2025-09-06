@@ -1,4 +1,5 @@
-using BpmnDotNet.Interfaces.Elements;
+using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Common.Models;
 
 namespace BpmnDotNet.Elements.BpmnNatation;
 

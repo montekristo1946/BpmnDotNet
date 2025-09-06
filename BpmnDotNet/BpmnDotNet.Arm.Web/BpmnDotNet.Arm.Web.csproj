@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <RootNamespace>BpmnDotNet.Arm.Web</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="$(SerilogVersion)"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCoreVersion)"/>
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="$(SerilogEnrichersEnvironmentVersion)"/>
+        <PackageReference Include="Serilog.Enrichers.Process" Version="$(SerilogEnrichersProcessVersion)"/>
+        <PackageReference Include="Serilog.Exceptions" Version="$(SerilogExceptionsVersion)"/>
+        <PackageReference Include="Serilog.Sinks.RollingFileSizeLimit" Version="$(SerilogSinksRollingFileSizeLimitVersion)"/>
+
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftAspNetCoreComponentsWebVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BpmnDotNet.Arm.Core\BpmnDotNet.Arm.Core.csproj"/>
+        <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
+    </ItemGroup>
+
+
+</Project>

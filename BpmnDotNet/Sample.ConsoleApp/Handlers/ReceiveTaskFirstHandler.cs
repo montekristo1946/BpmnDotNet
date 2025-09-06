@@ -1,16 +1,12 @@
 using System.Globalization;
-using BpmnDotNet.Interfaces.Elements;
-using BpmnDotNet.Interfaces.Handlers;
+using BpmnDotNet.Common.Abstractions;
 using Microsoft.Extensions.Logging;
-using Sample.ConsoleApp.Context;
 using Sample.ConsoleApp.Messages;
 
 namespace Sample.ConsoleApp.Handlers;
 
 public class ReceiveTaskFirstHandle : IBpmnHandler
 {
-    public string TaskDefinitionId { get; init; } = nameof(ReceiveTaskFirstHandle);
-
     private readonly ILogger<ReceiveTaskFirstHandle> _logger;
 
     public ReceiveTaskFirstHandle(ILoggerFactory loggerFactory)
@@ -19,12 +15,14 @@ public class ReceiveTaskFirstHandle : IBpmnHandler
         _logger = loggerFactory.CreateLogger<ReceiveTaskFirstHandle>();
     }
 
+    public string TaskDefinitionId { get; init; } = nameof(ReceiveTaskFirstHandle);
+
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         var cont = context as IMessageReceiveTask;
         if (cont is null)
         {
-            _logger.LogError($"[ServiceTaskFirstHandler:AsyncJobHandler] context is null ");
+            _logger.LogError("[ServiceTaskFirstHandler:AsyncJobHandler] context is null ");
             return;
         }
 
@@ -40,6 +38,4 @@ public class ReceiveTaskFirstHandle : IBpmnHandler
 
         await Task.Delay(1, ctsToken);
     }
-
-
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-
-namespace Sample.ConsoleApp;
+﻿namespace Sample.ConsoleApp;
 
 public class Producer
 {
@@ -17,12 +12,10 @@ public class Producer
     public void Produce()
     {
         var keepRunning = true;
-
-        // _sampleService.StartNewProcess();
-
+        
         while (keepRunning)
         {
-            Console.WriteLine(@"a) Send 1 start \n q) Quit");
+            Console.WriteLine(@"a) start process s) send received message q) Quit");
             var key = char.ToLower(Console.ReadKey(true).KeyChar);
 
             switch (key)
@@ -44,6 +37,4 @@ public class Producer
         Console.WriteLine("Consumer listening - press ENTER to quit");
         Console.ReadLine();
     }
-
-
 }
