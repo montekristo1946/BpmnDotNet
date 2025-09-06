@@ -15,7 +15,10 @@ builder.Host.InitCulture();
 
 builder.Services
     .AddScoped<ISvgConstructor, SvgConstructor>()
-    .AddScoped<ElasticClientConfig>()
+    .AddScoped<ElasticClientConfig>(serviceProvider => new ElasticClientConfig()
+    {
+        ConnectionString = SystemConfigure.AppSetting["ElasticConnectionUrl"] ?? throw new NullReferenceException("ElasticConnectionUrl empty"),
+    })
     .AddScoped<IElasticClient, ElasticClient>()
     .AddTransient<IPlanePanelHandler, PlanePanelHandler>()
     .AddTransient<IFilterPanelHandler, FilterPanelHandler>()
