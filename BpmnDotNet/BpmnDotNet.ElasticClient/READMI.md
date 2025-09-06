@@ -1,7 +1,9 @@
 # BpmnDotNet.ElasticClient
 
-## Запустить эластику.
+## Назначение:
+Биллиотека для работы с elastic. Реализует интерфей IElasticClient.
 
+## Запустить эластику.
 ~~~
 docker run --rm  \
   --name elasticsearch \
@@ -16,5 +18,11 @@ docker run --rm  \
 ~~~
 
 ## Сотояние эластики можно смотреть
+Утилита администрирования: [elasticvue_1.8.0_amd64.AppImage](https://github.com/cars10/elasticvue)
 
-1. elasticvue_1.8.0_amd64.AppImage
+
+## Регистрация в продуктовом сервисе:
+~~~
+services.AddScoped<ElasticClientConfig>();
+services.AddSingleton<IElasticClient, ElasticClient>();
+~~~

@@ -1,18 +1,14 @@
 # Визуальная часть.
 
 ## Настройка
+Запустить сервисы
+1. [BpmnDotNet.ElasticClient](../BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
+2. [BpmnDotNet.Arm.Web](../BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
 
-1. Поднять ElasticSearch <br>
-   ~~~docker run --rm  \
-   --name elasticsearch \
-   -p 9200:9200 \
-   -p 9300:9300 \
-   -e "discovery.type=single-node" \
-   -e "xpack.security.enabled=false" \
-   -e "cluster.routing.allocation.disk.threshold_enabled=false" \
-   -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
-   -v /mnt/Disk_D/TMP/16.08.2025/ElasticDb/:/usr/share/elasticsearch/data \
-   docker.elastic.co/elasticsearch/elasticsearch:9.1.2
+## Визуализация выбранной схемы
+![plot](./Images/all_web_interfacejpg.jpg)<br>
 
-2. Проинициализировать инстанс в контейнере
-   ... ще работаем над этим
+## Визуализация выбранного процесса
+![plot](./Images/all_web_interfacejpg_erorr.jpg)<br>
+
+Веб интерфейс протестирован на chromium browser.

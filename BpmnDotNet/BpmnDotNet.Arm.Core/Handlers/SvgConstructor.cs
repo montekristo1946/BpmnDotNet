@@ -85,7 +85,7 @@ public class SvgConstructor : ISvgConstructor
         var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.StatusType ?? StatusType.None;
         var defaultColor = "#22242a";
         var running = "#19aee8";
-        var completed = "#00ae5e";
+        var completed = "#00ab5d";
         var error = "#f34848";
 
 
