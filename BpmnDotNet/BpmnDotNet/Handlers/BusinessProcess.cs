@@ -307,7 +307,6 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                     isCompleted,
                     _dateFromInitInstance
                 );
-                _logger.LogDebug($"Test {nodeId}");
                 CheckFinalProcessing(nodeId);
                 _eventsHolder.Set();
             }
