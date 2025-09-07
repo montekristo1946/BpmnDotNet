@@ -1,0 +1,9 @@
+   [*.cs]
+   dotnet_diagnostic.SA1309.severity = none
+   dotnet_diagnostic.SA1101.severity = none 
+   dotnet_diagnostic.SA1633.severity = none
+   dotnet_diagnostic.SA1642.severity = none
+   dotnet_diagnostic.SA1010.severity = none
+   dotnet_diagnostic.SA1011.severity = none
+   dotnet_diagnostic.SA1401.severity = none
+
