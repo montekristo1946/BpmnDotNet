@@ -1,8 +1,11 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using BpmnDotNet.Arm.Core.Abstractions;
 
-namespace BpmnDotNet.Arm.Core.DiagramBuilder;
+[assembly: InternalsVisibleTo("BpmnDotNet.Arm.Core.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
+namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 public class TspanBuilder : IBpmnBuild<TspanBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
@@ -29,10 +32,11 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
             _svgStorage.Append(body);
             _svgStorage.Append(footer);
         }
+
         return _svgStorage.ToString();
     }
 
-    private string[] SplitLinesFromLongLine(string[] allLines)
+    internal string[] SplitLinesFromLongLine(string[] allLines)
     {
         var retArr = new List<string>();
         foreach (var line in allLines)
@@ -53,7 +57,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
         return retArr.ToArray();
     }
 
-    private string[] SplitLinesFromWhiteSpace(string input)
+    internal string[] SplitLinesFromWhiteSpace(string input)
     {
         var arrWord = input.Split(' ');
         var segments = arrWord.Aggregate(new List<StringBuilder> { new() },
@@ -68,12 +72,14 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
                     {
                         list.Add(new StringBuilder($"{str} "));
                     }
+
                     return list;
                 })
             .Select(sb => sb.ToString())
+            .Where(s => !string.IsNullOrEmpty(s))
             .ToArray();
-
-        return segments.ToArray();
+        
+        return segments;
     }
 
     public TspanBuilder AddChild(string childElement)
@@ -87,6 +93,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
         _symbolInOneLine = len;
         return this;
     }
+
     public TspanBuilder AddPaddingY(int value)
     {
         _paddingY = value;

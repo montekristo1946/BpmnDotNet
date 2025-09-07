@@ -185,7 +185,7 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
-            .AddPaddingY(15)
+            .AddPaddingY(25)
             .AddPaddingX(10)
             .Build();
 
@@ -243,7 +243,7 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
-            .AddPaddingY(20)
+            .AddPaddingY(25)
             .AddPaddingX(10)
             .Build();
 
@@ -273,7 +273,7 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
-            .AddPaddingY(20)
+            .AddPaddingY(25)
             .AddPaddingX(10)
             .Build();
 
@@ -303,7 +303,7 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
-            .AddPaddingY(20)
+            .AddPaddingY(25)
             .AddPaddingX(10)
             .Build();
 
