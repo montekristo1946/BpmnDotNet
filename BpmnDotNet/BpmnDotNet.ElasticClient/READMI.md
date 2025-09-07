@@ -17,7 +17,7 @@ docker run --rm  \
   docker.elastic.co/elasticsearch/elasticsearch:9.1.2
 ~~~
 
-## Сотояние эластики можно смотреть
+## Состояние эластики можно смотреть
 Утилита администрирования: [elasticvue_1.8.0_amd64.AppImage](https://github.com/cars10/elasticvue)
 
 
