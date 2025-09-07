@@ -50,8 +50,8 @@ public class SampleService
         var tasks = new List<Task>();
         var startID = 1;
 
-        var totalCount = 1;
-        var batchSize = 1;
+        var totalCount = 10;
+        var batchSize = 2;
         var sw = new Stopwatch();
         sw.Restart();
         for (int i = 0; i < totalCount; i += batchSize)
@@ -61,7 +61,7 @@ public class SampleService
             // Обработка текущей партии
             for (int j = i; j < i + currentBatchSize; j++)
             {
-                Console.WriteLine($"  Элемент {j}: значение = {j}");
+               
                 var tokenId = startID + j;
                 var timeout = TimeSpan.FromMinutes(10);
                 var contextData = CreateContextData(tokenId);
@@ -69,7 +69,7 @@ public class SampleService
                 tasks.Add(taskNode.ProcessTask);
             }
             Task.WaitAll(tasks.ToArray());
-            Console.WriteLine($"Run Part {currentBatchSize}");
+            Console.WriteLine($"  Элемент {i}");
         }
         sw.Stop();
         Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");

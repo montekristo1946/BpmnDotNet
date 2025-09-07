@@ -124,7 +124,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         try
         {
             AddStartEvent();
-            var forcedRepetition = TimeSpan.FromMilliseconds(1000);
+            var forcedRepetition = TimeSpan.FromMilliseconds(1);
 
             while (!ctsToken.IsCancellationRequested)
             {
@@ -136,8 +136,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                     if (!isPending)
                         continue;
 
-                    var taskNode = ExecutionNodes(nodeState.Key, ctsToken);
-                    NodeRegistryChangeState(nodeState.Key, StatusType.Works, taskNode);
+                    NodeRegistryChangeState(nodeState.Key, StatusType.Works);
+                    await ExecutionNodes(nodeState.Key, ctsToken);
                 }
 
                 _eventsHolder.WaitOne(forcedRepetition);
@@ -152,6 +152,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
+            
             await _historyNodeStateWriter.SetStateProcess(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
@@ -228,7 +229,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             NodeRegistryChangeState(nodeIdElement, StatusType.Failed);
             var textMessage = $"[GetTypeMessage] Fail Get context IMessageReceiveTask Dictionary, " +
                               $"From node {nodeIdElement} {context.IdBpmnProcess} {context.TokenProcess}";
-            ErrorsRegistryUpdate(nodeIdElement,textMessage);
+            ErrorsRegistryUpdate(nodeIdElement, textMessage);
             throw new InvalidOperationException(textMessage);
         }
 
@@ -239,11 +240,10 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         if (!resGet || typeName is null)
         {
             NodeRegistryChangeState(nodeIdElement, StatusType.Failed);
-            var textMessage =$"[GetTypeMessage] For node {nodeIdElement} no message  registered; " +
-                             $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}";
-            ErrorsRegistryUpdate(nodeIdElement,textMessage);
+            var textMessage = $"[GetTypeMessage] For node {nodeIdElement} no message  registered; " +
+                              $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}";
+            ErrorsRegistryUpdate(nodeIdElement, textMessage);
             throw new InvalidOperationException(textMessage);
-
         }
 
         return typeName;
@@ -268,7 +268,10 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
             });
 
-            if (checkCalls) NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
+            if (checkCalls)
+            {
+                NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
+            }
         }
     }
 
@@ -284,55 +287,43 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         }
     }
 
-    private Task ExecutionNodes(string nodeId, CancellationToken ctsToken)
+    private async Task ExecutionNodes(string nodeId, CancellationToken ctsToken)
     {
-        var retTask = Task.Run((async Task () =>
+        var isForcedTermination = false;
+        try
         {
-            var isForcedTermination = false;
-            try
-            {
-                var handler = GetHandler(nodeId);
-                await handler(_contextBpmnProcess, ctsToken);
+            var handler = GetHandler(nodeId);
+            await handler(_contextBpmnProcess, ctsToken);
 
-                NodeRegistryChangeState(nodeId, StatusType.Completed);
-                FillFlowNodesToCompleted(nodeId);
-                FillNextNodesToPending(nodeId);
+            NodeRegistryChangeState(nodeId, StatusType.Completed);
+            FillFlowNodesToCompleted(nodeId);
+            FillNextNodesToPending(nodeId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
+            NodeRegistryChangeState(nodeId, StatusType.Failed);
 
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogDebug(
-                    "Command Stop. Node: {NodeId}. IdBpmnProcess: {IdBpmnProcess} TokenProcess:{TokenProcess}",
-                    nodeId, _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
-                NodeRegistryChangeState(nodeId, StatusType.Failed);
-
-                ErrorsRegistryUpdate(nodeId, ex.Message);
-                isForcedTermination =  true;
-            }
-            finally
-            {
-                var currentNode = GetIElement(nodeId);
-                var isCompleted = currentNode.ElementType == ElementType.EndEvent;
-                //Запишем состояние процесса в бд.
-                await _historyNodeStateWriter.SetStateProcess(
-                    _contextBpmnProcess.IdBpmnProcess,
-                    _contextBpmnProcess.TokenProcess,
-                    _nodeStateRegistry.Values.ToArray(),
-                    _errorsRegistry.Values.ToArray(),
-                    isCompleted,
-                    _dateFromInitInstance
-                );
-                CheckFinalProcessing(nodeId,isForcedTermination);
-                _eventsHolder.Set();
-            }
-        })!, ctsToken);
-
-        return retTask;
+            ErrorsRegistryUpdate(nodeId, ex.Message);
+            isForcedTermination = true;
+        }
+        finally
+        {
+            var currentNode = GetIElement(nodeId);
+            var isCompleted = currentNode.ElementType == ElementType.EndEvent;
+            //Запишем состояние процесса в бд.
+            await _historyNodeStateWriter.SetStateProcess(
+                _contextBpmnProcess.IdBpmnProcess,
+                _contextBpmnProcess.TokenProcess,
+                _nodeStateRegistry.Values.ToArray(),
+                _errorsRegistry.Values.ToArray(),
+                isCompleted,
+                _dateFromInitInstance
+            );
+            CheckFinalProcessing(nodeId, isForcedTermination);
+            _eventsHolder.Set();
+        }
     }
 
     private void ErrorsRegistryUpdate(string nodeId, string message)
@@ -345,13 +336,12 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         );
     }
 
-    private void NodeRegistryChangeState(string nodeId, StatusType staus, Task? taskRunNode = null)
+    private void NodeRegistryChangeState(string nodeId, StatusType staus)
     {
         var stateNew = new NodeTaskStatus
         {
             StatusType = staus,
             IdNode = nodeId,
-            TaskRunNode = taskRunNode
         };
 
         _nodeStateRegistry.AddOrUpdate(
@@ -362,7 +352,6 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 {
                     StatusType = staus,
                     IdNode = keyOld,
-                    TaskRunNode = taskRunNode ?? oldMessage.TaskRunNode
                 }
         );
     }
