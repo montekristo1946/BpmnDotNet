@@ -286,7 +286,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private Task ExecutionNodes(string nodeId, CancellationToken ctsToken)
     {
-        var retTask = Task.Run(async void () =>
+        var retTask = Task.Run((async Task () =>
         {
             var isForcedTermination = false;
             try
@@ -330,7 +330,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 CheckFinalProcessing(nodeId,isForcedTermination);
                 _eventsHolder.Set();
             }
-        }, ctsToken);
+        })!, ctsToken);
 
         return retTask;
     }
