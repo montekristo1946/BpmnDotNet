@@ -36,7 +36,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <summary>
     ///     Очередь для вызовов.
     /// </summary>
-    private readonly ConcurrentDictionary<string, NodeTaskStatus> _nodeStateRegistry = new();
+    private readonly ConcurrentDictionary<string, NodeJobStatus> _nodeStateRegistry = new();
 
     /// <summary>
     ///     Сообщения с ошибками выполнения.
@@ -338,7 +338,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private void NodeRegistryChangeState(string nodeId, StatusType staus)
     {
-        var stateNew = new NodeTaskStatus
+        var stateNew = new NodeJobStatus
         {
             StatusType = staus,
             IdNode = nodeId,
@@ -348,7 +348,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             nodeId,
             _ => stateNew,
             (keyOld, oldMessage) =>
-                new NodeTaskStatus
+                new NodeJobStatus
                 {
                     StatusType = staus,
                     IdNode = keyOld,

@@ -19,7 +19,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 
     public async Task SetStateProcess(string idBpmnProcess,
         string tokenProcess,
-        NodeTaskStatus[] nodeStateRegistry,
+        NodeJobStatus[] nodeStateRegistry,
         string[] arrayMessageErrors,
         bool isCompleted,
         long dateFromInitInstance)
@@ -63,7 +63,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
         }
     }
 
-    private ProcessStatus CalculateProcessingStaus(NodeTaskStatus[] nodeStateRegistry, bool isCompleted)
+    private ProcessStatus CalculateProcessingStaus(NodeJobStatus[] nodeStateRegistry, bool isCompleted)
     {
         var errors = nodeStateRegistry.FirstOrDefault(p => p.StatusType == StatusType.Failed);
         if (errors is not null)
