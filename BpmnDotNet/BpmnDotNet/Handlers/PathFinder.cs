@@ -74,7 +74,7 @@ public class PathFinder : IPathFinder
         if (outgoingNode.Outgoing.Length == 1)
             return outgoingNode.Outgoing.First();
 
-        if (context is not IExclusiveGateWay exclusiveGateWay)
+        if (context is not IExclusiveGateWayRoute exclusiveGateWay)
             throw new InvalidDataException($"[GetConditionRouteWithExclusiveGateWay] " +
                                            $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
 

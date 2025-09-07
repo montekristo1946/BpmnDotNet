@@ -21,7 +21,7 @@ public class GatewayFirstHandler : IBpmnHandler
         _logger.LogDebug($"[GatewayFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} ");
 
-        var conditionRoute = context as IExclusiveGateWay;
+        var conditionRoute = context as IExclusiveGateWayRoute;
 
         if (conditionRoute is null)
             throw new OperationCanceledException("Fail try Add key ConditionRoute");

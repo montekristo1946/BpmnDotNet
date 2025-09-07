@@ -4,7 +4,7 @@ using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;
 
-public class ContextData : IContextBpmnProcess, IExclusiveGateWay, IMessageReceiveTask
+public class ContextData : IContextBpmnProcess, IExclusiveGateWayRoute, IMessageReceiveTask
 {
     public int TestValue { get; set; } = 0;
 

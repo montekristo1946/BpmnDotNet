@@ -1,7 +1,7 @@
+namespace BpmnDotNet.Common.Abstractions;
+
 using System.Threading;
 using System.Threading.Tasks;
-
-namespace BpmnDotNet.Common.Abstractions;
 
 /// <summary>
 ///     Интерфейс обработчиков блоков Bpmn.
@@ -9,14 +9,15 @@ namespace BpmnDotNet.Common.Abstractions;
 public interface IBpmnHandler
 {
     /// <summary>
-    ///     ID блочка в Bpmn нотации.
+    ///     Gets Id блочка в Bpmn нотации.
     /// </summary>
     string TaskDefinitionId { get; init; }
 
     /// <summary>
     ///     Метод, который вызовет Broker.
     /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
+    /// <param name="context">IContextBpmnProcess.</param>
+    /// <param name="ctsToken">CancellationToken.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken = default);
 }

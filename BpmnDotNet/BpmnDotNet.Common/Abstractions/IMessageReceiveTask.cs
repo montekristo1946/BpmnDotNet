@@ -1,7 +1,7 @@
+namespace BpmnDotNet.Common.Abstractions;
+
 using System;
 using System.Collections.Concurrent;
-
-namespace BpmnDotNet.Common.Abstractions;
 
 /// <summary>
 ///     Хранилище зарегистрированных сообщений.
@@ -9,13 +9,13 @@ namespace BpmnDotNet.Common.Abstractions;
 public interface IMessageReceiveTask
 {
     /// <summary>
-    ///     Хранилище соответствий ReceiveTask -> сообщений. Где: string - id node ReceiveTask, второй string typeName
+    ///     Gets хранилище соответствий ReceiveTask -> сообщений. Где: string - id node ReceiveTask, второй Type
     ///     сообщения.
     /// </summary>
     public ConcurrentDictionary<string, Type> RegistrationMessagesType { get; init; }
 
     /// <summary>
-    ///     Полученные сообщения. Где string - typeName, object - само Dto сообщения
+    ///     Gets полученные сообщения. Где string - typeName, object - само Dto сообщения.
     /// </summary>
     public ConcurrentDictionary<Type, object> ReceivedMessage { get; init; }
 }

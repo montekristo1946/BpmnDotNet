@@ -69,7 +69,8 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
 
     public async Task<string[]> GetErrors(string idUpdateNodeJobStatus)
     {
-        var historyNodeState = await _elasticClient.GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus,
+        var historyNodeState = await _elasticClient
+            .GetDataFromIdAsync<HistoryNodeState>(idUpdateNodeJobStatus,
             [nameof(HistoryNodeState.NodeStaus)]) ?? new HistoryNodeState();
 
         return historyNodeState?.ArrayMessageErrors ?? [];

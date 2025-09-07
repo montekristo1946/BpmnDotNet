@@ -1,14 +1,17 @@
 namespace BpmnDotNet.Common.Abstractions;
 
+/// <summary>
+/// Интерфейс контекста процесса.
+/// </summary>
 public interface IContextBpmnProcess
 {
     /// <summary>
-    ///     ID Bpmn процесса из схемы bpmn.
+    ///     Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; init; }
 
     /// <summary>
-    ///     Текущий Token процесса.
+    ///     Gets текущий Token процесса.
     /// </summary>
     public string TokenProcess { get; init; }
 }

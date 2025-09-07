@@ -1,14 +1,14 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.Common.Abstractions;
+
+using System.Collections.Concurrent;
 
 /// <summary>
 ///     Маршруты для эксклюзивных шлюзов.
 /// </summary>
-public interface IExclusiveGateWay
+public interface IExclusiveGateWayRoute
 {
     /// <summary>
-    ///     Маршруты для эксклюзивных шлюзов, где: (IdGateWay, idFlowRoute).
+    ///     Gets маршруты для эксклюзивных шлюзов, где: (IdGateWay, idFlowRoute).
     /// </summary>
     public ConcurrentDictionary<string, string> ConditionRoute { get; init; }
 }

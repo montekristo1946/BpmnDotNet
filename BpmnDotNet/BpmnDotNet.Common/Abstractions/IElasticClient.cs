@@ -1,56 +1,60 @@
+namespace BpmnDotNet.Common.Abstractions;
+
 using System;
 using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 using BpmnDotNet.Common.Dto;
 
-namespace BpmnDotNet.Common.Abstractions;
-
 /// <summary>
-///     Клиент для записи в Elastic
+///     Клиент для записи в Elastic.
 /// </summary>
-public interface IElasticClient:IElasticClientSetDataAsync
+public interface IElasticClient : IElasticClientSetDataAsync
 {
     /// <summary>
     ///     Получить данные по ID.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="sourceExcludes"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <param name="id">ID объекта в базе данных.</param>
+    /// <param name="sourceExcludes">Source которые запросим.</param>
+    /// <typeparam name="T">Тип индекса в базе данных.</typeparam>
+    /// <returns>ДТО которую запросили со всеми заполненными полями.</returns>
     public Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes = null);
 
+    /// <summary>
+    /// Получить все записи по полю TField из TIndex.
+    /// </summary>
+    /// <param name="nameField">Название поля.</param>
+    /// <param name="maxCountElements">Масимальное количество возращаемых обьектов.</param>
+    /// <typeparam name="TIndex">Тип индекса.</typeparam>
+    /// <typeparam name="TField">Тип таблицы.</typeparam>
+    /// <returns>Массив полей.</returns>
+    public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements)
+        where TIndex : class;
 
     /// <summary>
-    /// Получить все записи по полю TField из TIndex. 
+    /// Общее количество полей, с фильтром ProcessStatus.
     /// </summary>
-    /// <typeparam name="TIndex"></typeparam>
-    /// <typeparam name="TField"></typeparam>
-    /// <returns></returns>
-    public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements) where TIndex : class;
-    
-    /// <summary>
-    /// Общее количество полей.
-    /// </summary>
-    /// <param name="idBpmnProcess"></param>
-    /// <param name="processStatus"></param>
-    /// <param name="sizeSample"></param>
-    /// <returns></returns>
-    public Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus = null, int sizeSample = 10000);
+    /// <param name="idBpmnProcess">ID BpmnProcess.</param>
+    /// <param name="processStatus">Массив ProcessStatus.</param>
+    /// <param name="sizeSample">Количество, которое будем анализировать.</param>
+    /// <returns>Найденное количество.</returns>
+    public Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus, int sizeSample = 10000);
 
     /// <summary>
-    /// Выдача результатов пагинация
+    /// Выдача результатов пагинация, с фильтром ProcessStatus.
     /// </summary>
-    /// <param name="idBpmnProcess"></param>
-    /// <param name="from">С какого элемента</param>
+    /// <param name="idBpmnProcess">ID BpmnProcess.</param>
+    /// <param name="from">С какого элемента.</param>
     /// <param name="size">Сколько элементов.</param>
-    /// <returns></returns>
-    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus = null);
+    /// <param name="processStatus">Массив ProcessStatus.</param>
+    /// <returns>Массив HistoryNodeState.</returns>
+    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus);
 
     /// <summary>
-    /// Поиск HistoryNodeState по маске в поле Token
+    /// Поиск HistoryNodeState по маске в поле Token.
     /// </summary>
-    /// <param name="idBpmnProcess"></param>
-    /// <param name="mask"></param>
-    /// <returns></returns>
+    /// <param name="idBpmnProcess">ID BpmnProcess.</param>
+    /// <param name="mask">Маска поиска формата elastic.</param>
+    /// <param name="sizeSample">Количество выдаваемого результата.</param>
+    /// <returns>Массив HistoryNodeState.</returns>
     public Task<HistoryNodeState[]> GetHistoryNodeFromTokenMaskAsync(string idBpmnProcess, string mask, int sizeSample = 100);
 }

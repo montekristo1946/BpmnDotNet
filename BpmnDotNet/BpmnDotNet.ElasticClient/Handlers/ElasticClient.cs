@@ -69,8 +69,7 @@ public class ElasticClient : IElasticClient
             {
                 excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
             }
-
-
+            
             var client = await GetClient();
             var index = StringUtils.CreateIndexName(typeof(T));
             var response = client

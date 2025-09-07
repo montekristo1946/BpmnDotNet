@@ -133,7 +133,6 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ParallelGateway => CreateParallelGateway(shape, color),
                 ElementType.SubProcess => CreateSubProcess(shape, color),
                 _ => string.Empty
-                // _ => throw new ArgumentOutOfRangeException()
             };
 
             viewportBuilder.AddChild(stringShape);
