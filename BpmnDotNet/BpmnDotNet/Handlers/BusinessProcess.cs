@@ -270,6 +270,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     {
         var retTask = Task.Run(async void () =>
         {
+            var isForcedTermination = false;
             try
             {
                 var handler = GetHandler(nodeId);
@@ -293,6 +294,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 NodeRegistryChangeState(nodeId, StatusType.Failed);
 
                 ErrorsRegistryUpdate(nodeId, ex.Message);
+                isForcedTermination =  true;
             }
             finally
             {
@@ -307,7 +309,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                     isCompleted,
                     _dateFromInitInstance
                 );
-                CheckFinalProcessing(nodeId);
+                CheckFinalProcessing(nodeId,isForcedTermination);
                 _eventsHolder.Set();
             }
         }, ctsToken);
@@ -355,10 +357,10 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         return currentNode;
     }
 
-    private void CheckFinalProcessing(string currentNodeId)
+    private void CheckFinalProcessing(string currentNodeId, bool isForcedTermination)
     {
         var currentNode = GetIElement(currentNodeId);
-        if (currentNode.ElementType != ElementType.EndEvent)
+        if (currentNode.ElementType != ElementType.EndEvent && !isForcedTermination)
         {
             return;
         }
