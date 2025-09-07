@@ -14,7 +14,7 @@ internal static class BpmnClientBuilder
     public static IBpmnClient Build(string pathDiagram,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
-        IElasticClient elasticClient,
+        IElasticClientSetDataAsync elasticClient,
         IHistoryNodeStateWriter historyNodeStateWriter)
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
@@ -23,7 +23,7 @@ internal static class BpmnClientBuilder
         return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder, historyNodeStateWriter);
     }
 
-    private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClient elasticClient)
+    private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClientSetDataAsync elasticClient)
     {
         var xmlBpmnLoader = new XmlSerializationBpmnDiagramSection();
         foreach (var allBpmnFile in allBpmnFiles)

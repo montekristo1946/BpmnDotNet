@@ -8,10 +8,10 @@ namespace BpmnDotNet.Handlers;
 
 internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 {
-    private readonly IElasticClient _elasticClient;
+    private readonly IElasticClientSetDataAsync _elasticClient;
     private readonly ILogger<HistoryNodeStateWriter> _logger;
 
-    public HistoryNodeStateWriter(IElasticClient elasticClient, ILogger<HistoryNodeStateWriter> logger)
+    public HistoryNodeStateWriter(IElasticClientSetDataAsync elasticClient, ILogger<HistoryNodeStateWriter> logger)
     {
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

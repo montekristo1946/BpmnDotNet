@@ -135,7 +135,7 @@ public class BackgroundWorkerService : BackgroundService
     private void GetCountHistoryNodeState()
     {
         var processStatus = "Completed";
-        var count = _elasticClient.GetCountHistoryNodeState("IdBpmnProcessingMain", ["Completed", "None", "Works", "Error"]).Result;
+        var count = _elasticClient.GetCountHistoryNodeStateAsync("IdBpmnProcessingMain", ["Completed", "None", "Works", "Error"]).Result;
 
         if (count == 0)
             throw new Exception("Failed to set history node state");

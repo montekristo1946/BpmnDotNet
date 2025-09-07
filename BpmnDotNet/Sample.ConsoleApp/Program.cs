@@ -26,7 +26,7 @@ services.AddSingleton<ILoggerFactory>(option =>
 });
 
 services.AddScoped<ElasticClientConfig>();
-services.AddSingleton<IElasticClient, ElasticClient>();
+services.AddSingleton<IElasticClientSetDataAsync, ElasticClient>();
 
 //Создадим IBpmnClient, загрузим схемы
 services.AddBusinessProcess("./BpmnDiagram");

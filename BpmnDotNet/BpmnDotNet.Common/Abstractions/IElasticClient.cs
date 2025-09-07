@@ -8,14 +8,8 @@ namespace BpmnDotNet.Common.Abstractions;
 /// <summary>
 ///     Клиент для записи в Elastic
 /// </summary>
-public interface IElasticClient
+public interface IElasticClient:IElasticClientSetDataAsync
 {
-    /// <summary>
-    ///     Сохраняет модели истории проходов по блокам.
-    /// </summary>
-    /// <param name="document"></param>
-    public Task<bool> SetDataAsync<T>(T document);
-
     /// <summary>
     ///     Получить данные по ID.
     /// </summary>
@@ -41,7 +35,7 @@ public interface IElasticClient
     /// <param name="processStatus"></param>
     /// <param name="sizeSample"></param>
     /// <returns></returns>
-    public Task<int> GetCountHistoryNodeState(string idBpmnProcess, string[] processStatus = null, int sizeSample = 10000);
+    public Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus = null, int sizeSample = 10000);
 
     /// <summary>
     /// Выдача результатов пагинация

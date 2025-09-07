@@ -24,7 +24,7 @@ public class ListProcessPanelHandler : IListProcessPanelHandler
             return 0;
         }
 
-        var res = await _elasticClient.GetCountHistoryNodeState(idActiveProcess, processStatus);
+        var res = await _elasticClient.GetCountHistoryNodeStateAsync(idActiveProcess, processStatus);
 
         return res;
     }

@@ -196,7 +196,7 @@ public class ElasticClient : IElasticClient
         throw new InvalidOperationException($"Failed to reconnect to Elasticsearch after {_maxRetryCount} attempts");
     }
 
-    public async Task<int> GetCountHistoryNodeState(string idBpmnProcess, string[] processStatus = null,
+    public async Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus = null,
         int sizeSample = 10000)
     {
         var fieldsValue = GetFields(processStatus);
