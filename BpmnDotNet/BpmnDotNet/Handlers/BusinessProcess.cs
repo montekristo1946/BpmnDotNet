@@ -225,8 +225,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         var resGet = dic.TryGetValue(nodeIdElement, out var typeName);
 
         if (!resGet || typeName is null)
-            throw new InvalidOperationException($"[GetTypeMessage] Fail Get Message Name, " +
-                                                $"From node {nodeIdElement} {context.IdBpmnProcess} {context.TokenProcess}");
+            throw new InvalidOperationException($"[GetTypeMessage] For node {nodeIdElement} no message  registered; " +
+                                                $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}");
 
         return typeName;
     }
