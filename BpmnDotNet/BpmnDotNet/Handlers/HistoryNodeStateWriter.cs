@@ -65,6 +65,12 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 
     private ProcessStatus CalculateProcessingStaus(NodeTaskStatus[] nodeStateRegistry, bool isCompleted)
     {
+        var errors = nodeStateRegistry.FirstOrDefault(p => p.StatusType == StatusType.Failed);
+        if (errors is not null)
+        {
+            return ProcessStatus.Error;
+        }
+        
         if (isCompleted)
         {
             return ProcessStatus.Completed;
@@ -75,12 +81,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
             return ProcessStatus.None;
         }
 
-        var errors = nodeStateRegistry.FirstOrDefault(p => p.StatusType == StatusType.Failed);
-        if (errors is not null)
-        {
-            return ProcessStatus.Error;
-        }
-
+        
         return ProcessStatus.Works;
     }
 }

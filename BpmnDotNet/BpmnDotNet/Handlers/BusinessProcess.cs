@@ -116,7 +116,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// </summary>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
-    private Task ThreadBackground(CancellationToken ctsToken)
+    private async Task ThreadBackground(CancellationToken ctsToken)
     {
         _logger.LogDebug("[ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
@@ -152,13 +152,20 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
+            await _historyNodeStateWriter.SetStateProcess(
+                _contextBpmnProcess.IdBpmnProcess,
+                _contextBpmnProcess.TokenProcess,
+                _nodeStateRegistry.Values.ToArray(),
+                _errorsRegistry.Values.ToArray(),
+                true,
+                _dateFromInitInstance
+            );
         }
 
         _logger.LogDebug("[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
 
         JobStatus.StatusType = StatusType.Completed;
-        return Task.CompletedTask;
     }
 
     private void CheckMessagesStore()
@@ -217,16 +224,27 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         var messageReceiveTask = context as IMessageReceiveTask;
 
         if (messageReceiveTask is null)
-            throw new InvalidOperationException($"[GetTypeMessage] Fail Get context IMessageReceiveTask Dictionary, " +
-                                                $"From node {nodeIdElement} {context.IdBpmnProcess} {context.TokenProcess}");
+        {
+            NodeRegistryChangeState(nodeIdElement, StatusType.Failed);
+            var textMessage = $"[GetTypeMessage] Fail Get context IMessageReceiveTask Dictionary, " +
+                              $"From node {nodeIdElement} {context.IdBpmnProcess} {context.TokenProcess}";
+            ErrorsRegistryUpdate(nodeIdElement,textMessage);
+            throw new InvalidOperationException(textMessage);
+        }
 
         var dic = messageReceiveTask.RegistrationMessagesType;
 
         var resGet = dic.TryGetValue(nodeIdElement, out var typeName);
 
         if (!resGet || typeName is null)
-            throw new InvalidOperationException($"[GetTypeMessage] For node {nodeIdElement} no message  registered; " +
-                                                $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}");
+        {
+            NodeRegistryChangeState(nodeIdElement, StatusType.Failed);
+            var textMessage =$"[GetTypeMessage] For node {nodeIdElement} no message  registered; " +
+                             $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}";
+            ErrorsRegistryUpdate(nodeIdElement,textMessage);
+            throw new InvalidOperationException(textMessage);
+
+        }
 
         return typeName;
     }
