@@ -1,3 +1,6 @@
+namespace BpmnDotNet.Config;
+
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
@@ -6,10 +9,22 @@ using BpmnDotNet.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.Config;
-
+/// <summary>
+/// Extensions BpmnDotNet.
+/// </summary>
+[UnconditionalSuppressMessage("Trimming", "IL2072:AssemblyGetTypesTrimming")]
+[UnconditionalSuppressMessage("Trimming", "IL2026:AssemblyGetTypesTrimming")]
+[UnconditionalSuppressMessage("Trimming", "IL2098:AssemblyGetTypesTrimming")]
+[UnconditionalSuppressMessage("Trimming", "IL2067:AssemblyGetTypesTrimming")]
+[UnconditionalSuppressMessage("Trimming", "IL2070:AssemblyGetTypesTrimming")]
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Зарегистрирует IBpmnClient.
+    /// </summary>
+    /// <param name="services">IServiceCollection.</param>
+    /// <param name="pathDiagram">Путь до диаграмм.</param>
+    /// <returns>Коллекцию сервисов.</returns>
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
         services.AddScoped<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
@@ -28,9 +43,13 @@ public static class ServiceCollectionExtensions
             var elasticClient = options.GetRequiredService<IElasticClientSetDataAsync>();
             var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
 
-            return BpmnClientBuilder.Build(pathDiagram, loggerFactory, pathFinder, elasticClient, historyNodeStateWriter);
+            return BpmnClientBuilder.Build(
+                pathDiagram,
+                loggerFactory,
+                pathFinder,
+                elasticClient,
+                historyNodeStateWriter);
         });
-
 
         return services;
     }
@@ -38,14 +57,16 @@ public static class ServiceCollectionExtensions
     /// <summary>
     ///     Регистрация по пространству имен.
     /// </summary>
-    /// <param name="services"></param>
-    /// <typeparam name="THandler"></typeparam>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static IServiceCollection AutoRegisterHandlersFromAssemblyOf<THandler>
-        (this IServiceCollection services)
+    /// <param name="services">Коллекция сервисов.</param>
+    /// <typeparam name="THandler">Тип регистрируемых сервисов.</typeparam>
+    /// <returns>IServiceCollection.</returns>
+    public static IServiceCollection AutoRegisterHandlersFromAssemblyOf<THandler>(
+        this IServiceCollection services)
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
 
         var assemblyToRegister = GetAssembly<THandler>();
 
@@ -53,7 +74,6 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
 
     private static IEnumerable<Type> GetImplementedHandlerInterfaces(Type type)
     {
@@ -63,7 +83,6 @@ public static class ServiceCollectionExtensions
 
         return sort;
     }
-
 
     private static Assembly GetAssembly<THandler>()
     {
@@ -88,17 +107,22 @@ public static class ServiceCollectionExtensions
             .Select(type => new
             {
                 Type = type,
-                ImplementedHandlerInterfaces = GetImplementedHandlerInterfaces(type).ToList()
+                ImplementedHandlerInterfaces = GetImplementedHandlerInterfaces(type).ToList(),
             });
 
         var typesToAutoRegister = emplementeds
             .Where(a => a.ImplementedHandlerInterfaces.Any());
 
         if (!string.IsNullOrEmpty(namespaceFilter))
+        {
             typesToAutoRegister = typesToAutoRegister.Where(a =>
                 a.Type.Namespace != null && a.Type.Namespace.StartsWith(namespaceFilter));
+        }
 
-        foreach (var type in typesToAutoRegister) RegisterType(services, type.Type);
+        foreach (var type in typesToAutoRegister)
+        {
+            RegisterType(services, type.Type);
+        }
     }
 
     private static void RegisterType(IServiceCollection services, Type typeToRegister)
@@ -106,6 +130,8 @@ public static class ServiceCollectionExtensions
         var implementedHandlerInterfaces = GetImplementedHandlerInterfaces(typeToRegister).ToArray();
 
         foreach (var handlerInterface in implementedHandlerInterfaces)
+        {
             services.AddScoped(handlerInterface, typeToRegister);
+        }
     }
 }
