@@ -184,14 +184,16 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 _errorsRegistry.Values.ToArray(),
                 true,
                 _dateFromInitInstance);
+
+            JobStatus.StatusType = StatusType.Failed;
         }
+
+        JobStatus.StatusType = JobStatus.StatusType != StatusType.Failed ? StatusType.Completed : StatusType.Failed;
 
         _logger.LogDebug(
             "[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
             _contextBpmnProcess.TokenProcess);
-
-        JobStatus.StatusType = StatusType.Completed;
     }
 
     private void CheckMessagesStore()
@@ -340,6 +342,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
             ErrorsRegistryUpdate(nodeId, ex.Message);
             isForcedTermination = true;
+            JobStatus.StatusType = StatusType.Failed;
         }
         finally
         {
@@ -417,7 +420,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         if (_contextBpmnProcess is not IExclusiveGateWayRoute exclusiveGateWay)
         {
             throw new InvalidDataException($"[FillNextNodesToPending] " +
-                                        $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
+                                           $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
         }
 
         var nextNodes = _pathFinder.GetNextNode(allElements, [currentNode], exclusiveGateWay);
