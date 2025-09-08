@@ -1,6 +1,6 @@
-using System;
-
 namespace BpmnDotNet.Common.Dto;
+
+using System;
 
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.
@@ -8,32 +8,32 @@ namespace BpmnDotNet.Common.Dto;
 public class HistoryNodeStateBase
 {
     /// <summary>
-    ///     ID, IdBpmnProcess+TokenProcess
+    ///     Gets iD, IdBpmnProcess+TokenProcess.
     /// </summary>
     public string Id => $"{IdBpmnProcess}_{TokenProcess}";
 
     /// <summary>
-    ///     ID Bpmn процесса из схемы bpmn.
+    ///     Gets or sets iD Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Текущий Token процесса.
+    ///     Gets or sets текущий Token процесса.
     /// </summary>
     public string TokenProcess { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Время создания документа.
+    ///     Gets or sets время создания документа.
     /// </summary>
     public long DateCreated { get; set; } = DateTime.Now.Ticks;
 
     /// <summary>
-    ///     Время последнего изменения
+    ///     Gets or sets время последнего изменения.
     /// </summary>
     public long DateLastModified { get; set; } = DateTime.MaxValue.Ticks;
 
     /// <summary>
-    ///     Состояние процесса.
+    ///     Gets or sets состояние процесса.
     /// </summary>
     public ProcessStatus ProcessStatus { get; set; } = ProcessStatus.None;
 }

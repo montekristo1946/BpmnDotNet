@@ -6,12 +6,12 @@ namespace BpmnDotNet.Common.Dto;
 public class NodeJobStatus
 {
     /// <summary>
-    ///     Id узла на bpmn схемы.
+    ///     Gets id узла на bpmn схемы.
     /// </summary>
     public string IdNode { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Состояние ноды на Bpmn схеме.
+    ///     Gets or sets состояние ноды на Bpmn схеме.
     /// </summary>
     public StatusType StatusType { get; set; } = StatusType.None;
 }

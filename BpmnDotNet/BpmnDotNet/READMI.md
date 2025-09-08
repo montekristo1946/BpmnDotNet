@@ -9,5 +9,5 @@
  dotnet pack BpmnDotNet/ \
   --configuration Release \
   -o ./nupkgs \
-  -p:Version=1.0.17
+  -p:Version=1.0.18
 ~~~

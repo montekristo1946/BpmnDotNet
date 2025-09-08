@@ -36,7 +36,7 @@ public enum StatusType
     WaitingCompletedWays = 5,
 
     /// <summary>
-    ///     Ожидает получения сообщения (для ReceivedTask)
+    ///     Ожидает получения сообщения (для ReceivedTask).
     /// </summary>
-    WaitingReceivedMessage = 6
+    WaitingReceivedMessage = 6,
 }

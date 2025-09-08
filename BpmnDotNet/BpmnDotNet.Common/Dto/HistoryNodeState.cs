@@ -1,5 +1,3 @@
-using System;
-
 namespace BpmnDotNet.Common.Dto;
 
 /// <summary>
@@ -8,12 +6,12 @@ namespace BpmnDotNet.Common.Dto;
 public class HistoryNodeState : HistoryNodeStateBase
 {
     /// <summary>
-    ///     Текущее состояние нод.
+    ///     Gets or sets текущее состояние нод.
     /// </summary>
     public NodeJobStatus[] NodeStaus { get; set; } = [];
 
     /// <summary>
-    ///     Сообщения об ошибках.
+    ///     Gets or sets сообщения об ошибках.
     /// </summary>
     public string[] ArrayMessageErrors { get; set; } = [];
 }

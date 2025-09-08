@@ -24,5 +24,4 @@ public enum ProcessStatus
     ///     Не удачно завершен.
     /// </summary>
     Error = 3,
-
 }
