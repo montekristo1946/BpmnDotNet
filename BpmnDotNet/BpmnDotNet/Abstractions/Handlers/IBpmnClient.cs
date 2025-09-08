@@ -14,14 +14,14 @@ public interface IBpmnClient : IDisposable
     /// <param name="context">Контекст операции.</param>
     /// <param name="timeout">Выделенное время на весь процесс.</param>
     /// <returns>BusinessProcessJobStatus.</returns>
-    BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
+    public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
 
     /// <summary>
     ///     Регистрация handler.
     /// </summary>
     /// <param name="handlerBpmn">Хэндлер.</param>
     /// <typeparam name="THandler">Тип хэндлера.</typeparam>
-    void RegisterHandlers<THandler>(THandler handlerBpmn)
+    public void RegisterHandlers<THandler>(THandler handlerBpmn)
         where THandler : IBpmnHandler;
 
     /// <summary>
@@ -31,5 +31,5 @@ public interface IBpmnClient : IDisposable
     /// <param name="tokenProcess">tokenProcess.</param>
     /// <param name="messageType">Тип сообщения.</param>
     /// <param name="message">Сообщение.</param>
-    void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message);
+    public void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message);
 }

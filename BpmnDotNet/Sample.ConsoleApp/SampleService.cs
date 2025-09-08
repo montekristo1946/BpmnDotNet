@@ -66,6 +66,7 @@ public class SampleService
                 var timeout = TimeSpan.FromMinutes(10);
                 var contextData = CreateContextData(tokenId);
                 var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
+                
                 tasks.Add(taskNode.ProcessTask);
             }
             Task.WaitAll(tasks.ToArray());

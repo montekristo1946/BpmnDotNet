@@ -1,32 +1,35 @@
+namespace BpmnDotNet.Dto;
+
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Handlers;
 
-namespace BpmnDotNet.Dto;
-
+/// <summary>
+/// Экземпляр описывающий запущенный процесс.
+/// </summary>
 public class BusinessProcessJobStatus
 {
     /// <summary>
-    ///     Текущее состояние.
+    ///     Gets or sets текущее состояние.
     /// </summary>
     public StatusType StatusType { get; set; } = StatusType.None;
 
     /// <summary>
-    ///     ID Bpmn процесса из схемы bpmn.
+    ///     Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Текущий Token процесса.
+    ///     Gets текущий Token процесса.
     /// </summary>
     public string TokenProcess { get; init; } = string.Empty;
 
-    // /// <summary>
-    // /// Task основного потока.
-    // /// </summary>
+    /// <summary>
+    /// Gets task основного потока.
+    /// </summary>
     public Task ProcessTask { get; init; } = Task.CompletedTask;
 
     /// <summary>
-    ///     Инстанс процесса.
+    ///     Gets инстанс процесса.
     /// </summary>
     internal BusinessProcess Process { get; init; } = null!;
 }
