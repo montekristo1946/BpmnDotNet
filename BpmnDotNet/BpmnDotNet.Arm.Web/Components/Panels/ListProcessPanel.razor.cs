@@ -59,8 +59,6 @@ public partial class ListProcessPanel : ComponentBase
 
                 _listProcessPanel = currentList;
                 _countAllPage = (int)Math.Ceiling((double)allprocessLine / _countLineOnePage);
-
-                return;
             });
         }
         catch (Exception e)

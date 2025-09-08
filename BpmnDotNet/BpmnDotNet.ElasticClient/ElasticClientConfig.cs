@@ -6,7 +6,7 @@ namespace BpmnDotNet.ElasticClient;
 public class ElasticClientConfig
 {
     /// <summary>
-    ///     Url до базы данных.
+    ///     Gets or sets url до базы данных.
     /// </summary>
     public string ConnectionString { get; set; } = "http://localhost:9200";
 }
