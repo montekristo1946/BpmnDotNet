@@ -1,3 +1,5 @@
+namespace BpmnDotNet.Handlers;
+
 using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
@@ -5,14 +7,16 @@ using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Models;
 using BpmnDotNet.Utils;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSection
 {
+    /// <inheritdoc />
     public BpmnPlane LoadXmlBpmnDiagram(string pathDiagram)
     {
         if (string.IsNullOrWhiteSpace(pathDiagram))
+        {
             throw new ArgumentNullException(nameof(pathDiagram));
+        }
 
         var ret = new XmlDocument();
         ret.Load(pathDiagram);
@@ -27,21 +31,28 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
 
         XmlNode? root = xmlDoc.DocumentElement;
         if (root == null || root.Name != Constants.BpmnRootName)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnRootName}");
-
+        }
 
         var bpmnDiagram = root.ChildNodes.Cast<XmlNode>().FirstOrDefault(p => p.Name == Constants.BpmnDiagramName);
         if (bpmnDiagram is null)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnDiagramName}");
+        }
 
         var bpmnPlane = bpmnDiagram.ChildNodes.Cast<XmlNode>()
             .FirstOrDefault(p => p.Name == Constants.BpmnBpmnPlaneName);
         if (bpmnPlane is null)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnBpmnPlaneName}");
+        }
 
         var processBlock = root.ChildNodes.Cast<XmlNode>().FirstOrDefault(p => p.Name == Constants.BpmnProcessName);
         if (processBlock is null)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnProcessName}");
+        }
 
         var idBpmnPlane = GetId(bpmnPlane);
         var bpmnElementPlane = GetBpmnElement(bpmnPlane);
@@ -49,11 +60,10 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var shapes = GetShapesFromPlane(bpmnPlane, idBpmnPlane);
         shapes = FillTypeAndName(shapes, processBlock);
 
-
         return new BpmnPlane
         {
             IdBpmnProcess = bpmnElementPlane,
-            Shapes = shapes
+            Shapes = shapes,
         };
     }
 
@@ -92,7 +102,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
             Constants.BpmnReceiveTaskName => ElementType.ReceiveTask,
             Constants.BpmnServiceTaskName => ElementType.ServiceTask,
             Constants.BpmnSubProcess => ElementType.SubProcess,
-            _ => throw new ArgumentOutOfRangeException($"[GetTypeNode] fail get: {shapeName}")
+            _ => throw new ArgumentOutOfRangeException($"[GetTypeNode] fail get: {shapeName}"),
         };
     }
 
@@ -107,14 +117,16 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                 Constants.BpmnShapeName => CreateBpmnShape(xmlNode),
                 Constants.BpmnEdgeName => CreateBpmnEdgeName(xmlNode),
 
-                _ => throw new ArgumentOutOfRangeException($"{idBpmnPlane} {xmlNode.Name}")
+                _ => throw new ArgumentOutOfRangeException($"{idBpmnPlane} {xmlNode.Name}"),
             };
             elements.Add(element);
         }
 
         if (elements.Any() is false)
+        {
             throw new InvalidOperationException(
                 $"[GetShapesFromPlane] Not find BpmnShape:{idBpmnPlane} {bpmnPlane.Name}");
+        }
 
         return elements.ToArray();
     }
@@ -131,7 +143,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
             Id = id,
             BpmnElement = bpmnElement,
             Bounds = waypoint,
-            BpmnLabel = labelBounds
+            BpmnLabel = labelBounds,
         };
     }
 
@@ -149,12 +161,14 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
                     Height = int.MinValue,
-                    Width = int.MinValue
+                    Width = int.MinValue,
                 };
             }).ToArray();
 
         if (bounds.Any() is false)
+        {
             throw new InvalidDataException($"Not Find GetBounds from:{node.Name}");
+        }
 
         return bounds;
     }
@@ -172,7 +186,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
             Id = id,
             Bounds = bounds,
             BpmnElement = bpmnElement,
-            BpmnLabel = labelBounds
+            BpmnLabel = labelBounds,
         };
     }
 
@@ -193,7 +207,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
                     Width = Mappers.Map(width),
-                    Height = Mappers.Map(height)
+                    Height = Mappers.Map(height),
                 };
             }).ToArray();
 
@@ -216,12 +230,14 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
                     Width = Mappers.Map(width),
-                    Height = Mappers.Map(height)
+                    Height = Mappers.Map(height),
                 };
             }).ToArray();
 
         if (bounds.Any() is false)
+        {
             throw new InvalidDataException($"Not Find GetBounds from:{node.Name}");
+        }
 
         return bounds;
     }
@@ -231,7 +247,9 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var bpmnElement = node.Attributes?[Constants.BpmnElementName]?.Value
                           ?? throw new InvalidOperationException($"Not Find BpmnElement from:{node.Name}");
         if (string.IsNullOrWhiteSpace(bpmnElement))
+        {
             throw new InvalidDataException($"Not Find BpmnElement from:{node.Name}");
+        }
 
         return bpmnElement;
     }
@@ -241,7 +259,9 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var id = elements.Attributes?[Constants.BpmnIdName]?.Value
                  ?? throw new InvalidOperationException($"Not Find ID from:{elements.Name}");
         if (string.IsNullOrWhiteSpace(id))
+        {
             throw new InvalidDataException($"Not Find ID from:{elements.Name}");
+        }
 
         return id;
     }

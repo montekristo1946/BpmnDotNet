@@ -1,11 +1,13 @@
+namespace BpmnDotNet.Handlers;
+
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Models;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
 {
+    /// <inheritdoc/>
     public void Check(BpmnProcessDto bpmnProcess)
     {
         ArgumentNullException.ThrowIfNull(bpmnProcess);
@@ -14,8 +16,9 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         var elements = bpmnProcess.ElementsFromBody;
 
         if (elements.Any() is false)
+        {
             throw new ArgumentNullException(nameof(elements));
-
+        }
 
         CheckAvailabilityOutgoings(elements, bpmnProcess.IdBpmnProcess);
         CheckAvailabilityIncomingPath(elements, bpmnProcess.IdBpmnProcess);
@@ -27,27 +30,36 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
     {
         var exclusiveGateway = elements.Where(p => p.ElementType == ElementType.ExclusiveGateway).ToArray();
         if (exclusiveGateway.Length % 2 != 0)
+        {
             throw new InvalidDataException($"{bpmnProcessIdBpmnProcess} Invalid count of elements ExclusiveGateway");
+        }
 
         var parallelGateway = elements.Where(p => p.ElementType == ElementType.ParallelGateway).ToArray();
         if (parallelGateway.Length % 2 != 0)
+        {
             throw new InvalidDataException($"{bpmnProcessIdBpmnProcess} Invalid count of elements ParallelGateway");
+        }
     }
 
     private void CheckBeginningAndEnd(IElement[] elements, string bpmnProcessIdBpmnProcess)
     {
         var startEvent = elements.Where(p => p.ElementType == ElementType.StartEvent).ToArray();
         if (startEvent.Length != 1)
+        {
             throw new InvalidDataException($"{bpmnProcessIdBpmnProcess} Invalid count of elements start event");
+        }
 
         var endEvent = elements.Where(p => p.ElementType == ElementType.EndEvent).ToArray();
         if (endEvent.Length != 1)
+        {
             throw new InvalidDataException($"{bpmnProcessIdBpmnProcess} Invalid count of elements end event");
+        }
     }
 
     private void CheckAvailabilityIncomingPath(IElement[] elements, string bpmnProcessIdBpmnProcess)
     {
         foreach (var element in elements)
+        {
             switch (element.ElementType)
             {
                 case ElementType.EndEvent:
@@ -64,23 +76,26 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
                 case ElementType.ParallelGateway:
                     break;
 
-
                 default:
                     throw new ArgumentOutOfRangeException(element.ElementType.ToString());
             }
+        }
     }
 
     private void CheckIncomingPathOneWay(IElement element, string bpmnProcessIdBpmnProcess)
     {
         var res = ElementOperator.GetIncomingPath(element);
         if (res.Incoming.Length != 1)
+        {
             throw new InvalidDataException(
                 $"{bpmnProcessIdBpmnProcess} Outgoing elements must have exactly one incoming element. {element.IdElement}");
+        }
     }
 
     private void CheckAvailabilityOutgoings(IElement[] elements, string bpmnProcessIdBpmnProcess)
     {
         foreach (var element in elements)
+        {
             switch (element.ElementType)
             {
                 case ElementType.StartEvent:
@@ -97,17 +112,19 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
                 case ElementType.ParallelGateway:
                     break;
 
-
                 default:
                     throw new ArgumentOutOfRangeException(element.ElementType.ToString());
             }
+        }
     }
 
     private void CheckOutgoingsOneWay(IElement element, string bpmnProcessIdBpmnProcess)
     {
         var res = ElementOperator.GetOutgoingPath(element);
         if (res.Outgoing.Length != 1)
+        {
             throw new InvalidDataException(
                 $"{bpmnProcessIdBpmnProcess} Outgoing elements must have exactly one outgoing element. {element.IdElement}");
+        }
     }
 }

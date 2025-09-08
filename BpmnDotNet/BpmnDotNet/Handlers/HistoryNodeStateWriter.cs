@@ -1,23 +1,31 @@
+namespace BpmnDotNet.Handlers;
+
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 {
     private readonly IElasticClientSetDataAsync _elasticClient;
     private readonly ILogger<HistoryNodeStateWriter> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HistoryNodeStateWriter"/> class.
+    /// </summary>
+    /// <param name="elasticClient">elasticClient.</param>
+    /// <param name="logger">logger.</param>
     public HistoryNodeStateWriter(IElasticClientSetDataAsync elasticClient, ILogger<HistoryNodeStateWriter> logger)
     {
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task SetStateProcess(string idBpmnProcess,
+    /// <inheritdoc/>
+    public async Task SetStateProcess(
+        string idBpmnProcess,
         string tokenProcess,
         NodeJobStatus[] nodeStateRegistry,
         string[] arrayMessageErrors,
@@ -28,6 +36,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
         {
             throw new ArgumentNullException(nameof(idBpmnProcess));
         }
+
         if (string.IsNullOrWhiteSpace(tokenProcess))
         {
             throw new ArgumentNullException(nameof(tokenProcess));
@@ -70,7 +79,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
         {
             return ProcessStatus.Error;
         }
-        
+
         if (isCompleted)
         {
             return ProcessStatus.Completed;
@@ -81,7 +90,6 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
             return ProcessStatus.None;
         }
 
-        
         return ProcessStatus.Works;
     }
 }

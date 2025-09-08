@@ -1,3 +1,5 @@
+namespace BpmnDotNet.Handlers;
+
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
@@ -7,8 +9,7 @@ using BpmnDotNet.Common.Models;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 internal class BusinessProcess : IBusinessProcess, IDisposable
 {
     private readonly BpmnProcessDto _bpmnShema;
@@ -29,7 +30,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers;
 
     /// <summary>
-    ///     Хранилище сообщений
+    ///     Хранилище сообщений.
     /// </summary>
     private readonly ConcurrentDictionary<Type, object> _messagesStore = new();
 
@@ -47,10 +48,21 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private bool _idDispose;
     private long _dateFromInitInstance;
 
-
-    public BusinessProcess(IContextBpmnProcess contextBpmnProcess,
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BusinessProcess"/> class.
+    /// </summary>
+    /// <param name="contextBpmnProcess">IContextBpmnProcess.</param>
+    /// <param name="logger">ILogger.</param>
+    /// <param name="bpmnShema">BpmnProcessDto.</param>
+    /// <param name="pathFinder">IPathFinder.</param>
+    /// <param name="handlers">Зарегестрированные handlers.</param>
+    /// <param name="timeout">timeout.</param>
+    /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
+    public BusinessProcess(
+        IContextBpmnProcess contextBpmnProcess,
         ILogger<IBusinessProcess> logger,
-        BpmnProcessDto bpmnShema, IPathFinder pathFinder,
+        BpmnProcessDto bpmnShema,
+        IPathFinder pathFinder,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
         TimeSpan timeout,
         IHistoryNodeStateWriter historyNodeStateWriter)
@@ -72,12 +84,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
             TokenProcess = contextBpmnProcess.TokenProcess,
             ProcessTask = task,
-            Process = this
+            Process = this,
         };
     }
 
+    /// <inheritdoc/>
     public BusinessProcessJobStatus JobStatus { get; }
 
+    /// <inheritdoc/>
     public bool AddMessageToQueue(Type messageType, object message)
     {
         try
@@ -96,16 +110,21 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         return false;
     }
 
-
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (_idDispose)
+        {
             return;
+        }
 
         _cts.Dispose();
         _idDispose = true;
     }
 
+    /// <summary>
+    /// Завершить работу.
+    /// </summary>
     public void ForceCancel()
     {
         _cts.Cancel();
@@ -114,12 +133,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <summary>
     ///     Главный поток процесса.
     /// </summary>
-    /// <param name="ctsToken"></param>
-    /// <returns></returns>
+    /// <param name="ctsToken">ctsToken.</param>
+    /// <returns><see cref="Task"/> representing the asynchronous operation.</returns>
     private async Task ThreadBackground(CancellationToken ctsToken)
     {
-        _logger.LogDebug("[ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
-            _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
+        _logger.LogDebug(
+            "[ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
+            _contextBpmnProcess.IdBpmnProcess,
+            _contextBpmnProcess.TokenProcess);
 
         try
         {
@@ -134,7 +155,9 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 {
                     var isPending = nodeState.Value.StatusType == StatusType.Pending;
                     if (!isPending)
+                    {
                         continue;
+                    }
 
                     NodeRegistryChangeState(nodeState.Key, StatusType.Works);
                     await ExecutionNodes(nodeState.Key, ctsToken);
@@ -147,24 +170,26 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             _logger.LogDebug(
                 "Command Stop. Business process is stopped. IdBpmnProcess: {IdBpmnProcess} TokenProcess:{TokenProcess}",
-                _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
+                _contextBpmnProcess.IdBpmnProcess,
+                _contextBpmnProcess.TokenProcess);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            
+
             await _historyNodeStateWriter.SetStateProcess(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
                 _nodeStateRegistry.Values.ToArray(),
                 _errorsRegistry.Values.ToArray(),
                 true,
-                _dateFromInitInstance
-            );
+                _dateFromInitInstance);
         }
 
-        _logger.LogDebug("[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
-            _contextBpmnProcess.IdBpmnProcess, _contextBpmnProcess.TokenProcess);
+        _logger.LogDebug(
+            "[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
+            _contextBpmnProcess.IdBpmnProcess,
+            _contextBpmnProcess.TokenProcess);
 
         JobStatus.StatusType = StatusType.Completed;
     }
@@ -199,23 +224,28 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             _logger.LogWarning(
                 "[AddMessageInContext] received null message, IdBpmnProcess:{IdBpmnProcess}, TokenProcess:{TokenProcess}",
-                context.IdBpmnProcess, context.TokenProcess);
+                context.IdBpmnProcess,
+                context.TokenProcess);
             return false;
         }
 
         var messageReceiveTask = context as IMessageReceiveTask;
 
         if (messageReceiveTask is null)
+        {
             throw new InvalidOperationException(
                 $"[AddMessageInContext] Fail Get context IMessageReceiveTask Dictionary, " +
                 $"From node {typeMessage} {context.IdBpmnProcess} {context.TokenProcess}");
+        }
 
         var dic = messageReceiveTask.ReceivedMessage;
         var resSet = dic.TryAdd(typeMessage, message);
 
         if (!resSet)
+        {
             throw new InvalidOperationException(
                 $"[AddMessageInContext] Fail Set {typeMessage}, From {context.IdBpmnProcess} {context.TokenProcess}");
+        }
 
         return true;
     }
@@ -257,7 +287,9 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         foreach (var nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
+            {
                 continue;
+            }
 
             var currentNode = GetIElement(nodeState.Key);
             var incomingPath = GetIncomingPath(currentNode);
@@ -301,7 +333,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
+            _logger.LogError(
+                ex,
                 $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
             NodeRegistryChangeState(nodeId, StatusType.Failed);
 
@@ -312,15 +345,16 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             var currentNode = GetIElement(nodeId);
             var isCompleted = currentNode.ElementType == ElementType.EndEvent;
-            //Запишем состояние процесса в бд.
+
+            // Запишем состояние процесса в бд.
             await _historyNodeStateWriter.SetStateProcess(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
                 _nodeStateRegistry.Values.ToArray(),
                 _errorsRegistry.Values.ToArray(),
                 isCompleted,
-                _dateFromInitInstance
-            );
+                _dateFromInitInstance);
+
             CheckFinalProcessing(nodeId, isForcedTermination);
             _eventsHolder.Set();
         }
@@ -332,8 +366,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             nodeId,
             _ => message,
             (keyOld, oldMessage) =>
-                message
-        );
+                message);
     }
 
     private void NodeRegistryChangeState(string nodeId, StatusType staus)
@@ -352,8 +385,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 {
                     StatusType = staus,
                     IdNode = keyOld,
-                }
-        );
+                });
     }
 
     private IElement GetIElement(string nodeId)
@@ -388,7 +420,6 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                                         $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
         }
 
-        
         var nextNodes = _pathFinder.GetNextNode(allElements, [currentNode], exclusiveGateWay);
 
         var sortedNoes = EliminateDuplicates(nextNodes);
@@ -435,14 +466,20 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
 
     private string[] GetOutgoingPath(IElement currentNode)
     {
-        if (currentNode is IOutgoingPath outgoingPath) return outgoingPath.Outgoing;
+        if (currentNode is IOutgoingPath outgoingPath)
+        {
+            return outgoingPath.Outgoing;
+        }
 
         return [];
     }
 
     private string[] GetIncomingPath(IElement currentNode)
     {
-        if (currentNode is IIncomingPath incomingPath) return incomingPath.Incoming;
+        if (currentNode is IIncomingPath incomingPath)
+        {
+            return incomingPath.Incoming;
+        }
 
         return [];
     }
@@ -453,9 +490,13 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         foreach (var node in nodes)
         {
             var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
+
+            // случай когда параллельный шлюз уже запущен
             if (resGet && nodeJobStatus is not null &&
-                nodeJobStatus.StatusType == StatusType.Works) //случай когда параллельный шлюз уже запущен
+                nodeJobStatus.StatusType == StatusType.Works)
+            {
                 continue;
+            }
 
             result.Add(node);
         }
@@ -468,7 +509,9 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         var resGet = _handlers.TryGetValue(nodeIdElement, out var value);
 
         if (!resGet || value is null)
+        {
             return MoqHandler;
+        }
 
         return value;
     }

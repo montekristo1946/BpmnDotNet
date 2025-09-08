@@ -1,3 +1,5 @@
+namespace BpmnDotNet.Handlers;
+
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
@@ -6,8 +8,7 @@ using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 internal class BpmnClient : IBpmnClient
 {
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
@@ -25,14 +26,23 @@ internal class BpmnClient : IBpmnClient
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private volatile bool _disposed;
 
-    public BpmnClient(BpmnProcessDto[] businessProcessDtos,
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BpmnClient"/> class.
+    /// </summary>
+    /// <param name="businessProcessDtos">BpmnProcessDtos.</param>
+    /// <param name="loggerFactory">ILoggerFactory.</param>
+    /// <param name="pathFinder">IPathFinder.</param>
+    /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
+    public BpmnClient(
+        BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
-        _historyNodeStateWriter = historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
+        _historyNodeStateWriter =
+            historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
         _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
@@ -42,25 +52,35 @@ internal class BpmnClient : IBpmnClient
         _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token), _cts.Token);
     }
 
-
+    /// <inheritdoc/>
     public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout)
     {
         ArgumentNullException.ThrowIfNull(context);
         var logger = _loggerFactory.CreateLogger<BusinessProcess>();
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
 
-        var process = new BusinessProcess(context, logger, bpmnShema, _pathFinder, _handlers, timeout, _historyNodeStateWriter);
+        var process = new BusinessProcess(
+            context,
+            logger,
+            bpmnShema,
+            _pathFinder,
+            _handlers,
+            timeout,
+            _historyNodeStateWriter);
 
         var resAdd = _bpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
         if (resAdd is false)
+        {
             throw new InvalidOperationException(
                 $"[StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
-
+        }
 
         return process.JobStatus;
     }
 
-    public void RegisterHandlers<THandler>(THandler handlerBpmn) where THandler : IBpmnHandler
+    /// <inheritdoc />
+    public void RegisterHandlers<THandler>(THandler handlerBpmn)
+        where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlerBpmn);
 
@@ -70,27 +90,37 @@ internal class BpmnClient : IBpmnClient
         var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
 
         if (resAdd is false)
+        {
             throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+        }
     }
 
+    /// <inheritdoc />
     public void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message)
     {
         var resGet = _bpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
+        {
             throw new InvalidOperationException(
                 $"[SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
+        }
 
         var resAdd = bpmn.Process.AddMessageToQueue(messageType, message);
         if (!resAdd)
+        {
             throw new InvalidOperationException(
                 $"[SendMessage] Not Add message : {idBpmnProcess} {tokenProcess} {messageType}");
+        }
     }
 
-
+    /// <inheritdoc />
     public void Dispose()
     {
         if (_disposed)
+        {
             return;
+        }
+
         _disposed = true;
         ClearBpmnProcessesDictionary(true);
 
@@ -127,19 +157,25 @@ internal class BpmnClient : IBpmnClient
         foreach (var status in _bpmnProcesses.Values)
         {
             if (status.StatusType != StatusType.Completed && !isForce)
+            {
                 continue;
+            }
 
             var resRemote = _bpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);
             if (!resRemote)
             {
-                _logger.LogWarning("Could not delete the process {IdBpmnProcess} {TokenProcess}",
-                    status.IdBpmnProcess, status.TokenProcess);
+                _logger.LogWarning(
+                    "Could not delete the process {IdBpmnProcess} {TokenProcess}",
+                    status.IdBpmnProcess,
+                    status.TokenProcess);
             }
             else
             {
                 processJob?.Process?.ForceCancel();
                 processJob?.Process?.Dispose();
-                _logger.LogDebug("Delete the process {IdBpmnProcess} {TokenProcess}", status.IdBpmnProcess,
+                _logger.LogDebug(
+                    "Delete the process {IdBpmnProcess} {TokenProcess}",
+                    status.IdBpmnProcess,
                     status.TokenProcess);
             }
         }
@@ -151,16 +187,20 @@ internal class BpmnClient : IBpmnClient
         {
             var resAdd = _bpmnProcessDtos.TryAdd(businessProcessDto.IdBpmnProcess, businessProcessDto);
             if (resAdd is false)
+            {
                 throw new InvalidOperationException($"Fail load {businessProcessDto.IdBpmnProcess}");
+            }
         }
     }
 
-
-    private BpmnProcessDto GetBpmnShema(ConcurrentDictionary<string, BpmnProcessDto> bpmnProcessDtos,
+    private BpmnProcessDto GetBpmnShema(
+        ConcurrentDictionary<string, BpmnProcessDto> bpmnProcessDtos,
         string idBpmnProcess)
     {
         if (!bpmnProcessDtos.TryGetValue(idBpmnProcess, out var bpmn))
+        {
             throw new InvalidOperationException($"Not find BpmnProcessDto: {idBpmnProcess}");
+        }
 
         return bpmn;
     }

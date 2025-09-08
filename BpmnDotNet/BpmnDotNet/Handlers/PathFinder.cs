@@ -1,44 +1,61 @@
+namespace BpmnDotNet.Handlers;
+
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.Models;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 public class PathFinder : IPathFinder
 {
     private readonly ILogger<PathFinder> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PathFinder"/> class.
+    /// </summary>
+    /// <param name="logger">logger.</param>
     public PathFinder(ILogger<PathFinder> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public IElement[] GetStartEvent(IElement[]? elementsSrc)
     {
         ArgumentNullException.ThrowIfNull(elementsSrc);
 
-        if (elementsSrc.Length == 0) throw new InvalidDataException(nameof(BpmnProcessDto));
+        if (elementsSrc.Length == 0)
+        {
+            throw new InvalidDataException(nameof(BpmnProcessDto));
+        }
 
         var res = elementsSrc.Where(p => p.ElementType == ElementType.StartEvent).ToArray();
 
         if (res.Length == 0)
+        {
             throw new InvalidDataException("[GetStartEvent] not find StartEvent");
+        }
 
         return res;
     }
 
+    /// <inheritdoc />
     public IElement[] GetNextNode(IElement[]? elementsSrc, IElement[]? currentNodes, IExclusiveGateWayRoute context)
     {
         ArgumentNullException.ThrowIfNull(elementsSrc);
         ArgumentNullException.ThrowIfNull(currentNodes);
         ArgumentNullException.ThrowIfNull(context);
 
-        if (elementsSrc.Length == 0) throw new InvalidDataException(nameof(elementsSrc));
+        if (elementsSrc.Length == 0)
+        {
+            throw new InvalidDataException(nameof(elementsSrc));
+        }
 
-        if (currentNodes.Length == 0) throw new InvalidDataException(nameof(currentNodes));
-
+        if (currentNodes.Length == 0)
+        {
+            throw new InvalidDataException(nameof(currentNodes));
+        }
 
         var elementsNode = new List<IElement>();
 
@@ -55,7 +72,7 @@ public class PathFinder : IPathFinder
                 ElementType.ReceiveTask => OnPathGetNextNode(currentNode, elementsSrc),
                 ElementType.SubProcess => OnPathGetNextNode(currentNode, elementsSrc),
 
-                _ => throw new NotImplementedException($"Not find ImplementedException {currentNode.ElementType}")
+                _ => throw new NotImplementedException($"Not find ImplementedException {currentNode.ElementType}"),
             };
 
             elementsNode.AddRange(elements);
@@ -66,26 +83,32 @@ public class PathFinder : IPathFinder
         return retArr;
     }
 
-    
+    /// <inheritdoc />
     public string GetConditionRouteWithExclusiveGateWay(IExclusiveGateWayRoute context, IElement currentNode)
     {
         var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNode.Outgoing.Length == 1)
+        {
             return outgoingNode.Outgoing.First();
+        }
 
         var dict = context.ConditionRoute;
 
         if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
             || string.IsNullOrWhiteSpace(conditionName))
+        {
             throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
-                                           $"Couldn't find the condition from gateway:{currentNode.IdElement}");
+                                        $"Couldn't find the condition from gateway:{currentNode.IdElement}");
+        }
 
         var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p => p == conditionName) ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(checkPatch))
+        {
             throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
-                                           $"There is no such way from gateway:{currentNode.IdElement}");
+                                        $"There is no such way from gateway:{currentNode.IdElement}");
+        }
 
         return checkPatch;
     }
@@ -139,14 +162,15 @@ public class PathFinder : IPathFinder
         return [elementNext];
     }
 
-
     private IElement[] OnPathGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
         var outgoingNodes = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNodes.Outgoing.Length != 1)
+        {
             throw new InvalidOperationException(
                 $"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
+        }
 
         var outgoingIdStartEvent = outgoingNodes.Outgoing.First();
 
@@ -164,8 +188,10 @@ public class PathFinder : IPathFinder
         var outgoingFlow = ElementOperator.GetOutgoingPath(elementFlow);
 
         if (outgoingFlow.Outgoing.Length != 1)
+        {
             throw new InvalidOperationException(
                 $"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");
+        }
 
         var outgoingIdFlow = outgoingFlow.Outgoing.First();
 

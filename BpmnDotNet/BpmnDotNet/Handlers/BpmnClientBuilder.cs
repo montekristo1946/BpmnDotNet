@@ -9,9 +9,22 @@ using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Handlers;
 
+/// <summary>
+/// BpmnClientBuilder.
+/// </summary>
 internal static class BpmnClientBuilder
 {
-    public static IBpmnClient Build(string pathDiagram,
+    /// <summary>
+    /// Build IBpmnClient.
+    /// </summary>
+    /// <param name="pathDiagram">Путь до диаграмм.</param>
+    /// <param name="loggerFactory">ILoggerFactory.</param>
+    /// <param name="pathFinder">IPathFinder.</param>
+    /// <param name="elasticClient">IElasticClientSetDataAsync.</param>
+    /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
+    /// <returns>IBpmnClient.</returns>
+    public static IBpmnClient Build(
+        string pathDiagram,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IElasticClientSetDataAsync elasticClient,

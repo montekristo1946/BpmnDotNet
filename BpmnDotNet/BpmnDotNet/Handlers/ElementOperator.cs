@@ -1,27 +1,44 @@
-using BpmnDotNet.Abstractions.Elements;
-
 namespace BpmnDotNet.Handlers;
 
+using BpmnDotNet.Abstractions.Elements;
+
+/// <summary>
+/// Класс расширение функционала IElement.
+/// </summary>
 internal static class ElementOperator
 {
+    /// <summary>
+    /// Получить выходные ноды.
+    /// </summary>
+    /// <param name="currentNode">Текущая нода.</param>
+    /// <returns>Выходные Flow.</returns>
     public static IOutgoingPath GetOutgoingPath(IElement currentNode)
     {
         var outgoingPath = (IOutgoingPath)currentNode;
 
         if (outgoingPath.Outgoing is null || outgoingPath.Outgoing.Length == 0)
+        {
             throw new InvalidDataException(
                 $"{currentNode.ElementType} does not contain Outgoing: {currentNode.IdElement}");
+        }
 
         return outgoingPath;
     }
 
+    /// <summary>
+    /// Получить Входные ноды.
+    /// </summary>
+    /// <param name="currentNode">Текущая нода.</param>
+    /// <returns>Входные Flow.</returns>
     public static IIncomingPath GetIncomingPath(IElement currentNode)
     {
         var outgoingPath = (IIncomingPath)currentNode;
 
         if (outgoingPath.Incoming is null || outgoingPath.Incoming.Length == 0)
+        {
             throw new InvalidDataException(
                 $"{currentNode.ElementType} does not contain IncomingPath: {currentNode.IdElement}");
+        }
 
         return outgoingPath;
     }

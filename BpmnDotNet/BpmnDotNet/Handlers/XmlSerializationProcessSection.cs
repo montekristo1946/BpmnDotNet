@@ -1,16 +1,20 @@
+namespace BpmnDotNet.Handlers;
+
 using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Elements.BpmnNatation;
 
-namespace BpmnDotNet.Handlers;
-
+/// <inheritdoc />
 internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
 {
+    /// <inheritdoc/>
     public BpmnProcessDto LoadXmlProcessSection(string pathDiagram)
     {
         if (string.IsNullOrWhiteSpace(pathDiagram))
+        {
             throw new ArgumentNullException(nameof(pathDiagram));
+        }
 
         var ret = new XmlDocument();
         ret.Load(pathDiagram);
@@ -25,13 +29,15 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
 
         XmlNode? root = xmlDoc.DocumentElement;
         if (root == null || root.Name != Constants.BpmnRootName)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnRootName}");
-
+        }
 
         var processBlock = root.ChildNodes.Cast<XmlNode>().FirstOrDefault(p => p.Name == Constants.BpmnProcessName);
         if (processBlock is null)
+        {
             throw new InvalidOperationException($"Not find {Constants.BpmnProcessName}");
-
+        }
 
         var elements = new List<IElement>();
         var idProcess = GetId(processBlock);
@@ -49,13 +55,16 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
                 Constants.BpmnReceiveTaskName => CreateReceiveTask(xmlNode),
                 Constants.BpmnServiceTaskName => CreateServiceTask(xmlNode),
                 Constants.BpmnSubProcess => CreateSubProcess(xmlNode),
-                _ => throw new ArgumentOutOfRangeException($"{idProcess} {xmlNode.Name}")
+                _ => throw new ArgumentOutOfRangeException($"{idProcess} {xmlNode.Name}"),
+
             };
             elements.Add(element);
         }
 
         if (elements.Any() is false)
+        {
             throw new InvalidOperationException($"Not find elements in {processBlock.Name}");
+        }
 
         return new BpmnProcessDto(idProcess, elements.ToArray());
     }
@@ -114,7 +123,6 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
         return new ExclusiveGatewayComponent(id, incoming, outgoing);
     }
 
-
     private SequenceFlowComponent CreateSequenceFlow(XmlNode elements)
     {
         var id = GetId(elements);
@@ -154,7 +162,9 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
             .ToArray();
 
         if (outgoing.Any() is false)
+        {
             throw new InvalidDataException($"{idNode} Not Find Incoming from:{elements.Name}");
+        }
 
         return outgoing;
     }
@@ -167,7 +177,9 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
             .ToArray();
 
         if (outgoing.Any() is false)
+        {
             throw new InvalidDataException($"{idNode} Not Find outgoing from:{elements.Name}");
+        }
 
         return outgoing;
     }
@@ -177,7 +189,9 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
         var id = elements.Attributes?[Constants.BpmnIdName]?.Value
                  ?? throw new InvalidOperationException($"Not Find ID from:{elements.Name}");
         if (string.IsNullOrWhiteSpace(id))
+        {
             throw new InvalidDataException($"Not Find ID from:{elements.Name}");
+        }
 
         return id;
     }
