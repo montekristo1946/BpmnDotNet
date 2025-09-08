@@ -29,7 +29,7 @@ public class PathFinder : IPathFinder
         return res;
     }
 
-    public IElement[] GetNextNode(IElement[]? elementsSrc, IElement[]? currentNodes, IContextBpmnProcess context)
+    public IElement[] GetNextNode(IElement[]? elementsSrc, IElement[]? currentNodes, IExclusiveGateWayRoute context)
     {
         ArgumentNullException.ThrowIfNull(elementsSrc);
         ArgumentNullException.ThrowIfNull(currentNodes);
@@ -66,19 +66,15 @@ public class PathFinder : IPathFinder
         return retArr;
     }
 
-    //TODO: ошибка.
-    public string GetConditionRouteWithExclusiveGateWay(IContextBpmnProcess context, IElement currentNode)
+    
+    public string GetConditionRouteWithExclusiveGateWay(IExclusiveGateWayRoute context, IElement currentNode)
     {
         var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
 
         if (outgoingNode.Outgoing.Length == 1)
             return outgoingNode.Outgoing.First();
 
-        if (context is not IExclusiveGateWayRoute exclusiveGateWay)
-            throw new InvalidDataException($"[GetConditionRouteWithExclusiveGateWay] " +
-                                           $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
-
-        var dict = exclusiveGateWay.ConditionRoute;
+        var dict = context.ConditionRoute;
 
         if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
             || string.IsNullOrWhiteSpace(conditionName))
@@ -126,8 +122,10 @@ public class PathFinder : IPathFinder
         return retArr;
     }
 
-    private IElement[] ExclusiveGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc,
-        IContextBpmnProcess context)
+    private IElement[] ExclusiveGatewayGetNextNode(
+        IElement currentNode,
+        IElement[] elementsSrc,
+        IExclusiveGateWayRoute context)
     {
         var conditionName = GetConditionRouteWithExclusiveGateWay(context, currentNode);
 

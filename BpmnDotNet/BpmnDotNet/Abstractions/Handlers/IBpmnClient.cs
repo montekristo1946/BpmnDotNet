@@ -1,30 +1,35 @@
+namespace BpmnDotNet.Abstractions.Handlers;
+
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Dto;
 
-namespace BpmnDotNet.Abstractions.Handlers;
-
+/// <summary>
+/// Реализация клиента.
+/// </summary>
 public interface IBpmnClient : IDisposable
 {
     /// <summary>
     ///     Запуск процесса.
     /// </summary>
     /// <param name="context">Контекст операции.</param>
-    /// <param name="timeout">Выделенное время на весь процесс</param>
+    /// <param name="timeout">Выделенное время на весь процесс.</param>
+    /// <returns>BusinessProcessJobStatus.</returns>
     BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
 
     /// <summary>
     ///     Регистрация handler.
     /// </summary>
-    /// <param name="handlerBpmn"></param>
-    /// <typeparam name="THandler"></typeparam>
-    void RegisterHandlers<THandler>(THandler handlerBpmn) where THandler : IBpmnHandler;
+    /// <param name="handlerBpmn">Хэндлер.</param>
+    /// <typeparam name="THandler">Тип хэндлера.</typeparam>
+    void RegisterHandlers<THandler>(THandler handlerBpmn)
+        where THandler : IBpmnHandler;
 
     /// <summary>
-    ///     Отправка сообщения для блоков received Task
+    ///     Отправка сообщения для блоков received Task.
     /// </summary>
-    /// <param name="idBpmnProcess"></param>
-    /// <param name="tokenProcess"></param>
-    /// <param name="messageType"></param>
-    /// <param name="message"></param>
+    /// <param name="idBpmnProcess">idBpmnProcess.</param>
+    /// <param name="tokenProcess">tokenProcess.</param>
+    /// <param name="messageType">Тип сообщения.</param>
+    /// <param name="message">Сообщение.</param>
     void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message);
 }

@@ -1,6 +1,6 @@
-using BpmnDotNet.Common.Models;
-
 namespace BpmnDotNet.Abstractions.Elements;
+
+using BpmnDotNet.Common.Models;
 
 /// <summary>
 ///     Базовый тип элемента.
@@ -8,12 +8,12 @@ namespace BpmnDotNet.Abstractions.Elements;
 public interface IElement
 {
     /// <summary>
-    ///     Id.
+    ///     Gets id.
     /// </summary>
     string IdElement { get; }
 
     /// <summary>
-    ///     Тип Элемента.
+    ///     Gets тип Элемента.
     /// </summary>
     ElementType ElementType { get; }
 }

@@ -1,8 +1,15 @@
-using BpmnDotNet.Abstractions.Elements;
-
 namespace BpmnDotNet.Abstractions.Handlers;
 
-public interface ICheckBpmnProcessDto
+using BpmnDotNet.Abstractions.Elements;
+
+/// <summary>
+/// Проверка Bpmn в объектном виде.
+/// </summary>
+internal interface ICheckBpmnProcessDto
 {
-    void Check(BpmnProcessDto bpmnProcess);
+    /// <summary>
+    /// Запустить проверку.
+    /// </summary>
+    /// <param name="bpmnProcess">BpmnProcessDto.</param>
+    public void Check(BpmnProcessDto bpmnProcess);
 }

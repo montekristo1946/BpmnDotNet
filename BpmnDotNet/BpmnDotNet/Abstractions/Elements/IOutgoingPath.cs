@@ -5,5 +5,8 @@ namespace BpmnDotNet.Abstractions.Elements;
 /// </summary>
 public interface IOutgoingPath
 {
+    /// <summary>
+    /// Gets перечисление выходных flow.
+    /// </summary>
     string[] Outgoing { get; }
 }

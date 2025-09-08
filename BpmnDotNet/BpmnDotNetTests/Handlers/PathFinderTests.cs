@@ -7,7 +7,7 @@ using NSubstitute;
 
 namespace BpmnDotNetTests.Handlers;
 
-public class ContextDatTest : IContextBpmnProcess, IExclusiveGateWayRoute, IMessageReceiveTask
+public class ContextDatTest : IContextBpmnProcess
 {
     public string IdBpmnProcess { get; init; }
     public string TokenProcess { get; init; }

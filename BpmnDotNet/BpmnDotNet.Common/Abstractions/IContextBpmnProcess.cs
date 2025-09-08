@@ -3,7 +3,7 @@ namespace BpmnDotNet.Common.Abstractions;
 /// <summary>
 /// Интерфейс контекста процесса.
 /// </summary>
-public interface IContextBpmnProcess
+public interface IContextBpmnProcess : IExclusiveGateWayRoute, IMessageReceiveTask
 {
     /// <summary>
     ///     Gets iD Bpmn процесса из схемы bpmn.

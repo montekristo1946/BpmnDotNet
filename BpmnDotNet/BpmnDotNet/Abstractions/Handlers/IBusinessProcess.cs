@@ -1,24 +1,22 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.Abstractions.Handlers;
 
+using BpmnDotNet.Dto;
+
+/// <summary>
+/// BusinessProcess. Для внутреннего тестирования.
+/// </summary>
 internal interface IBusinessProcess
 {
     /// <summary>
-    ///     Получить статус процесса.
+    ///     Gets получить статус процесса.
     /// </summary>
     public BusinessProcessJobStatus JobStatus { get; }
-    // /// <summary>
-    // /// Запустить процесс
-    // /// </summary>
-    // /// <param name="ctsToken"></param>
-    // /// <returns></returns>
-    // Task<BusinessProcessJobStatus> StartBusinessProcess(CancellationToken ctsToken);
 
     /// <summary>
     ///     Добавить сообщение в очередь.
     /// </summary>
-    /// <param name="messageType"></param>
-    /// <param name="message"></param>
-    bool AddMessageToQueue(Type messageType, object message);
+    /// <param name="messageType">Тип сообщения.</param>
+    /// <param name="message">Сообщение.</param>
+    /// <returns>Результат.</returns>
+    public bool AddMessageToQueue(Type messageType, object message);
 }

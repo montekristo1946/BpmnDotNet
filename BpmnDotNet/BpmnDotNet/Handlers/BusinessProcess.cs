@@ -382,7 +382,14 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         var allElements = _bpmnShema.ElementsFromBody;
         var currentNode = GetIElement(currentNodeId);
 
-        var nextNodes = _pathFinder.GetNextNode(allElements, [currentNode], _contextBpmnProcess);
+        if (_contextBpmnProcess is not IExclusiveGateWayRoute exclusiveGateWay)
+        {
+            throw new InvalidDataException($"[FillNextNodesToPending] " +
+                                        $"The context does not implement IExclusiveGateWay but uses an exclusive gateway:{currentNode.IdElement}");
+        }
+
+        
+        var nextNodes = _pathFinder.GetNextNode(allElements, [currentNode], exclusiveGateWay);
 
         var sortedNoes = EliminateDuplicates(nextNodes);
         foreach (var node in sortedNoes)
@@ -399,7 +406,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                 ElementType.ReceiveTask => StatusType.WaitingReceivedMessage,
                 ElementType.ParallelGateway => StatusType.WaitingCompletedWays,
                 _ => throw new NotImplementedException(
-                    $"[FillNextNodesToPending] Not find ImplementedException {node.ElementType}")
+                    $"[FillNextNodesToPending] Not find ImplementedException {node.ElementType}"),
             };
             _logger.LogDebug($"[FillNextNodesToPending] init Node: {node.IdElement} State: {state}");
             NodeRegistryChangeState(node.IdElement, state);
