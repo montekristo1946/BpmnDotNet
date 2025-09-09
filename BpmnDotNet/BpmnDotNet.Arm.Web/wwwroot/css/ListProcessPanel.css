@@ -40,7 +40,9 @@ tfoot td {
 
 .check-tr{
     border-radius: 5px;
-    box-shadow:
-            inset 0 0 0 4px #261d1d;
+    /*box-shadow: inset 0 0 0 4px #261d1d;*/
+    /*border: 2px solid #261d1d;*/
+    font-weight: bold;
+    font-size: 0.9rem;
 }
 
