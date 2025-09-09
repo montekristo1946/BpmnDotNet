@@ -4,10 +4,10 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class MenuPanel : ComponentBase
 {
-    [Parameter] public Action? IsUpdatePanel { get; set; }
+    [Parameter] public Func<Task> IsUpdatePanel { get; set; } = null!;
 
-    private void OnClickUpdate()
+    private async Task OnClickUpdate()
     {
-        IsUpdatePanel?.Invoke();
+        await IsUpdatePanel();
     }
 }

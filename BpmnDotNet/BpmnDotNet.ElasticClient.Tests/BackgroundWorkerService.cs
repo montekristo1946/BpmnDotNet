@@ -33,7 +33,7 @@ public class BackgroundWorkerService : BackgroundService
     private Task Produce()
     {
         var keepRunning = true;
-        
+
         while (keepRunning)
         {
             _logger.LogDebug(@"a) Send 1 start \n q) Quit");
@@ -66,7 +66,7 @@ public class BackgroundWorkerService : BackgroundService
         return Task.CompletedTask;
     }
 
-    
+
     private void GetDataIndex()
     {
         var document = _elasticClient
@@ -98,9 +98,9 @@ public class BackgroundWorkerService : BackgroundService
                 NodeStaus = _fixture.Build<NodeJobStatus>().CreateMany(15).ToArray()
             };
             var reshistoryNodeState = _elasticClient.SetDataAsync(historyNodeState).Result;
-            if (!reshistoryNodeState) 
+            if (!reshistoryNodeState)
                 throw new Exception("Failed to set history node state");
-            
+
             if (i > 0 && i % 100 == 0) _logger.LogDebug($"processed:{i}");
         }
 
@@ -149,7 +149,7 @@ public class BackgroundWorkerService : BackgroundService
         if (res.Any() is false)
             throw new Exception("Failed to set history node state");
     }
-    
+
     private void GetHistoryNodeFromTokenMask()
     {
         var res = _elasticClient.GetHistoryNodeFromTokenMaskAsync("IdBpmnProcessingMain", "*_395*").Result;

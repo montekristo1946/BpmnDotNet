@@ -7,10 +7,9 @@ namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class ListProcessPanel : ComponentBase
 {
-    [Parameter] public Action<string> IsColorUpdateNodeJobStatus { get; set; } = null!;
+    [Parameter] public Func<string, Task> IsColorUpdateNodeJobStatus { get; set; } = null!;
 
-    [Parameter] public Action<string> IsBaseUpdateNodeJobStatus { get; set; } = null!;
-
+    [Parameter] public Func<string, Task> IsBaseUpdateNodeJobStatus { get; set; } = null!;
     [Inject] private ILogger<ListProcessPanel> Logger { get; set; } = null!;
 
     [Inject] private IListProcessPanelHandler ListProcessPanelHandler { get; set; } = null!;
@@ -77,7 +76,7 @@ public partial class ListProcessPanel : ComponentBase
         _acitveTable = new ListProcessPanelDto();
     }
 
-    public void SetIdProcess(string value)
+    public async Task SetIdProcess(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -87,14 +86,14 @@ public partial class ListProcessPanel : ComponentBase
 
         _activeIdBpmnProcess = value;
         ClearValue();
-        UpdatePanel();
+        await UpdatePanel();
     }
 
 
     private async Task ButtonClickObjectAsync(ListProcessPanelDto table)
     {
         _acitveTable = table;
-        IsColorUpdateNodeJobStatus?.Invoke(table.IdStorageHistoryNodeState);
+        await IsColorUpdateNodeJobStatus(table.IdStorageHistoryNodeState);
 
         _arrErrors = await ListProcessPanelHandler.GetErrors(table.IdStorageHistoryNodeState);
     }
@@ -113,21 +112,21 @@ public partial class ListProcessPanel : ComponentBase
     }
 
 
-    private void Forward()
+    private async Task Forward()
     {
-        if (_currentPage >= _countAllPage-1)
+        if (_currentPage >= _countAllPage - 1)
         {
             return;
         }
 
         ClearValue();
         _currentPage += 1;
-        IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
+        await IsBaseUpdateNodeJobStatus(_activeIdBpmnProcess);
 
-        UpdatePanel();
+        await UpdatePanel();
     }
 
-    private void Backward()
+    private async Task Backward()
     {
         if (_currentPage <= 0)
         {
@@ -135,49 +134,44 @@ public partial class ListProcessPanel : ComponentBase
         }
 
         _currentPage -= 1;
-        IsBaseUpdateNodeJobStatus?.Invoke(_activeIdBpmnProcess);
+        await IsBaseUpdateNodeJobStatus(_activeIdBpmnProcess);
         ClearValue();
-        UpdatePanel();
+        await UpdatePanel();
     }
 
-    public void SetStatusFilter(string[] filters)
+    public async Task SetStatusFilter(string[] filters)
     {
         _filtersProcessStatus = filters;
         ClearValue();
-        UpdatePanel();
+        await UpdatePanel();
     }
 
-    public void SetFilterToken(string filterToken)
+    public async Task SetFilterToken(string filterToken)
     {
         _filterToken = filterToken;
-        UpdateFilterToken();
+        await UpdateFilterToken();
     }
 
     public async Task UpdateFilterToken()
     {
         try
         {
-            await InvokeAsync(async () =>
+            _listProcessPanel = [];
+            _countAllPage = 0;
+            _currentPage = 0;
+            ClearValue();
+
+
+            var sizeSample = 100;
+            var currentList = await ListProcessPanelHandler
+                .GetHistoryNodeFromTokenMaskAsync(_activeIdBpmnProcess, _filterToken, sizeSample);
+
+            if (currentList.Any() is false)
             {
-                _listProcessPanel = [];
-                _countAllPage = 0;
-                _currentPage = 0;
-                ClearValue();
-
-
-                var sizeSample = 100;
-                var currentList = await ListProcessPanelHandler
-                    .GetHistoryNodeFromTokenMaskAsync(_activeIdBpmnProcess, _filterToken, sizeSample);
-
-                if (currentList.Any() is false)
-                {
-                    return;
-                }
-
-                _listProcessPanel = currentList;
-
                 return;
-            });
+            }
+
+            _listProcessPanel = currentList;
         }
         catch (Exception e)
         {

@@ -100,12 +100,7 @@ public partial class DrawingPlanePanel : ComponentBase
             }
 
             _svgToString = await PlaneHandler.GetColorPlane(idUpdateNodeJobStatus, SizeWindows);
-
-            await InvokeAsync(() =>
-            {
-                StateHasChanged();
-                return Task.CompletedTask;
-            });
+            StateHasChanged();
         }
         catch (Exception e)
         {

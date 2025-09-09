@@ -57,16 +57,16 @@ public class SampleService
         for (int i = 0; i < totalCount; i += batchSize)
         {
             var currentBatchSize = Math.Min(batchSize, totalCount - i);
-            
+
             // Обработка текущей партии
             for (int j = i; j < i + currentBatchSize; j++)
             {
-               
+
                 var tokenId = startID + j;
                 var timeout = TimeSpan.FromMinutes(10);
                 var contextData = CreateContextData(tokenId);
                 var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
-                
+
                 tasks.Add(taskNode.ProcessTask);
             }
             Task.WaitAll(tasks.ToArray());

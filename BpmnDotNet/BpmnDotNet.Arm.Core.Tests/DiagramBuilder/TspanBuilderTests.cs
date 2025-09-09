@@ -8,7 +8,7 @@ public class TspanBuilderTests
 
     public TspanBuilderTests()
     {
-        _builder =  new TspanBuilder();
+        _builder = new TspanBuilder();
     }
 
     [Fact]
@@ -16,17 +16,17 @@ public class TspanBuilderTests
     {
         var name = "SplitLinesFromWhiteSpace_ChekLargeName_splitName";
         var split = _builder.SplitLinesFromWhiteSpace(name);
-        
+
         Assert.Single(split);
     }
-    
+
     [Fact]
     public void SplitLinesFromLongLine_ChekLargeName_splitName()
     {
         var name = "SplitLinesFromLongLine_ChekLargeName_splitName";
         var split = _builder.SplitLinesFromLongLine([name]);
-        
+
         Assert.Equal(4, split.Length);
     }
-    
+
 }

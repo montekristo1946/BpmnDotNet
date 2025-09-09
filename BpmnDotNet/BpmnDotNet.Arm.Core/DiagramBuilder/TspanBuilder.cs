@@ -78,7 +78,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
             .Select(sb => sb.ToString())
             .Where(s => !string.IsNullOrEmpty(s))
             .ToArray();
-        
+
         return segments;
     }
 

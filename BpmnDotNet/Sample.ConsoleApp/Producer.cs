@@ -12,7 +12,7 @@ public class Producer
     public void Produce()
     {
         var keepRunning = true;
-        
+
         while (keepRunning)
         {
             Console.WriteLine(@"a) start process s) send received message q) Quit");

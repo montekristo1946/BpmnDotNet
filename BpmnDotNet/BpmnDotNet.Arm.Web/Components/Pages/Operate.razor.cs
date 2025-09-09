@@ -6,13 +6,13 @@ namespace BpmnDotNet.Arm.Web.Components.Pages;
 public partial class Operate : ComponentBase
 {
     private RenderFragment BpmnPlanePanelTemplate { get; set; }
-    private DrawingPlanePanel? _drawingPlanePanel;
+    private DrawingPlanePanel _drawingPlanePanel;
     private RenderFragment MenuPanelTemplate { get; set; }
-    private MenuPanel? _menuPanel;
+    private MenuPanel _menuPanel;
     private RenderFragment FilterPanelTemplate { get; set; }
-    private FilterPanel? _filterPanel;
+    private FilterPanel _filterPanel;
     public RenderFragment ListProcessPanelTemplate { get; set; }
-    private ListProcessPanel? _listProcessPanel;
+    private ListProcessPanel _listProcessPanel;
 
 
     protected override Task OnInitializedAsync()
@@ -24,33 +24,33 @@ public partial class Operate : ComponentBase
         return Task.CompletedTask;
     }
 
-    private void ChoseIdProcess(string value)
+    private async Task ChoseIdProcess(string value)
     {
-        _drawingPlanePanel?.BaseUpdatePanel(value);
-        _listProcessPanel?.SetIdProcess(value);
+        await _drawingPlanePanel.BaseUpdatePanel(value);
+        await _listProcessPanel.SetIdProcess(value);
     }
 
-    private void SetStatusFilter(string[] filters)
+    private async Task SetStatusFilter(string[] filters)
     {
-        _listProcessPanel?.SetStatusFilter(filters);
-    }
-    
-    private void SetFilterToken(string filterToken)
-    {
-        _listProcessPanel?.SetFilterToken(filterToken);
-        
+        await _listProcessPanel.SetStatusFilter(filters);
     }
 
-  
-    
-    private void IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
+    private async Task SetFilterToken(string filterToken)
     {
-        _drawingPlanePanel?.ColorUpdatePanel(idUpdateNodeJobStatus);
+        await _listProcessPanel.SetFilterToken(filterToken);
+
     }
 
-    private void UpdateUpdatePanel()
+
+
+    private async Task IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
     {
-        _filterPanel?.UpdatePanel();
+        await _drawingPlanePanel.ColorUpdatePanel(idUpdateNodeJobStatus);
+    }
+
+    private async Task UpdateUpdatePanel()
+    {
+        await _filterPanel.UpdatePanel();
         _drawingPlanePanel?.BaseUpdatePanel();
         _listProcessPanel?.UpdatePanel();
 
@@ -73,7 +73,7 @@ public partial class Operate : ComponentBase
             builder.CloseComponent();
         };
     }
-    
+
     private RenderFragment CreateFilterPanelTemplate()
     {
         return builder =>
@@ -92,7 +92,7 @@ public partial class Operate : ComponentBase
             builder.CloseComponent();
         };
     }
-    
+
 
     private RenderFragment CreateBpmnPlanePanelTemplate()
     {

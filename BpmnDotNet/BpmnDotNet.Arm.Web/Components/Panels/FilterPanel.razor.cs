@@ -10,35 +10,30 @@ public partial class FilterPanel : ComponentBase
 
     [Inject] private ILogger<FilterPanel> Logger { get; set; } = null!;
 
-    [Parameter] public Action<string> ChoseIdProcess { get; set; } = null!;
+    [Parameter] public Func<string, Task> ChoseIdProcess { get; set; } = null!;
 
-    [Parameter] public Action<string[]> SetStatusFilter { get; set; } = null!;
+    [Parameter] public Func<string[], Task> SetStatusFilter { get; set; } = null!;
 
-    [Parameter] public Action<string> SetFilterToken { get; set; } = null!;
+    [Parameter] public Func<string, Task> SetFilterToken { get; set; } = null!;
 
     private string[] _arrayProcessId = [];
-    private bool _isCheckFilterNone { get; set; } = true;
-    private bool _isCheckFilterWorks { get; set; } = true;
-    private bool _isCheckFilterCompleted { get; set; } = true;
-    private bool _isCheckFilterError { get; set; } = true;
+    private bool IsCheckFilterNone { get; set; } = true;
+    private bool IsCheckFilterWorks { get; set; } = true;
+    private bool IsCheckFilterCompleted { get; set; } = true;
+    private bool IsCheckFilterError { get; set; } = true;
     private string _filterToken = "*value*";
 
-    private Task ButtonClickObjectAsync(string process)
+    private async Task ButtonClickObjectAsync(string process)
     {
-        ChoseIdProcess?.Invoke(process);
-        return Task.CompletedTask;
+        await ChoseIdProcess(process);
     }
 
     public async Task UpdatePanel()
     {
         try
         {
-            await InvokeAsync(async () =>
-            {
-                _arrayProcessId = await FilterPanelHandler.GetAllProcessId();
-                StateHasChanged();
-              
-            });
+            _arrayProcessId = await FilterPanelHandler.GetAllProcessId();
+            StateHasChanged();
         }
         catch (Exception e)
         {
@@ -49,22 +44,22 @@ public partial class FilterPanel : ComponentBase
     private string[] CreateFilterStatus()
     {
         var retArr = new List<string>();
-        if (_isCheckFilterNone)
+        if (IsCheckFilterNone)
         {
             retArr.Add(nameof(ProcessStatus.None));
         }
 
-        if (_isCheckFilterError)
+        if (IsCheckFilterError)
         {
             retArr.Add(nameof(ProcessStatus.Error));
         }
 
-        if (_isCheckFilterCompleted)
+        if (IsCheckFilterCompleted)
         {
             retArr.Add(nameof(ProcessStatus.Completed));
         }
 
-        if (_isCheckFilterWorks)
+        if (IsCheckFilterWorks)
         {
             retArr.Add(nameof(ProcessStatus.Works));
         }
@@ -72,58 +67,60 @@ public partial class FilterPanel : ComponentBase
         return [.. retArr];
     }
 
-    private void ChangeNone(ChangeEventArgs obj)
+    private async Task ChangeNone(ChangeEventArgs obj)
     {
         if (obj?.Value is bool newValue)
         {
-            _isCheckFilterNone = newValue;
+            IsCheckFilterNone = newValue;
         }
+
         var processStatus = CreateFilterStatus();
-        SetStatusFilter?.Invoke(processStatus);
+        await SetStatusFilter(processStatus);
     }
 
-    private void ChangeWorks(ChangeEventArgs obj)
+    private async Task ChangeWorks(ChangeEventArgs obj)
     {
         if (obj?.Value is bool newValue)
         {
-            _isCheckFilterWorks = newValue;
+            IsCheckFilterWorks = newValue;
         }
 
         var processStatus = CreateFilterStatus();
-        SetStatusFilter?.Invoke(processStatus);
+        await SetStatusFilter(processStatus);
     }
 
-    private void ChangeCompleted(ChangeEventArgs obj)
+    private async Task ChangeCompleted(ChangeEventArgs obj)
     {
         if (obj?.Value is bool newValue)
         {
-            _isCheckFilterCompleted = newValue;
+            IsCheckFilterCompleted = newValue;
         }
+
         var processStatus = CreateFilterStatus();
-        SetStatusFilter?.Invoke(processStatus);
+        await SetStatusFilter(processStatus);
     }
 
-    private void ChangeError(ChangeEventArgs obj)
+    private async Task ChangeError(ChangeEventArgs obj)
     {
         if (obj?.Value is bool newValue)
         {
-            _isCheckFilterError = newValue;
+            IsCheckFilterError = newValue;
         }
+
         var processStatus = CreateFilterStatus();
-        SetStatusFilter?.Invoke(processStatus);
+        await SetStatusFilter(processStatus);
     }
 
     private void OnChangeFilterToken(ChangeEventArgs changeEventArgs)
     {
-        if (changeEventArgs?.Value == null )
+        if (changeEventArgs?.Value == null)
             return;
 
         _filterToken = changeEventArgs.Value.ToString() ?? string.Empty;
-        
     }
 
-    private void OnclickButtonSearch()
+    private async Task OnclickButtonSearch()
     {
-        SetFilterToken?.Invoke(_filterToken);
+        await SetFilterToken(_filterToken);
     }
 }
