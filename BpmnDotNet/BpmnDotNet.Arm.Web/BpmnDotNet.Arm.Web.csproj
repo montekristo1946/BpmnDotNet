@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <RazorLangVersion>Latest</RazorLangVersion>
         <RootNamespace>BpmnDotNet.Arm.Web</RootNamespace>
     </PropertyGroup>
 

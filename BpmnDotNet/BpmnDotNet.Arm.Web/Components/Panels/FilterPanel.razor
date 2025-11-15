@@ -19,7 +19,8 @@
                 <div class="m-0 padding-1px">
                     <div class="row m-0  border-enveloping-custom bottom-shadow"
                          style="background-color: #ffffff; padding: 0 3px 0 3px"
-                         @onclick="@(() => ButtonClickObjectAsync(process.IdBpmnProcess))">
+                         @onclick="@(() => ButtonClickObjectAsync(process.IdBpmnProcess))"
+                         title="@process.IdBpmnProcess">
                         @process.NameBpmnProcess
                     </div>
                 </div>
