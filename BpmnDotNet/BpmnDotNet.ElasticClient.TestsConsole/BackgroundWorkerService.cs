@@ -122,16 +122,7 @@ public class BackgroundWorkerService : BackgroundService
             _elasticClient.GetDataFromIdAsync<BpmnPlane>("IdBpmnProcessingMain_638914914391324271").Result;
         if (reshistoryNodeState is null) throw new Exception("Failed to set history node state");
     }
-
-    private void GetAllIdBpmnPlan()
-    {
-        var idBpmnProcesss = _elasticClient.GetAllFieldsAsync<BpmnPlane, string>(
-            nameof(BpmnPlane.IdBpmnProcess), 1000)
-            .Result;
-        if (idBpmnProcesss?.Any() != true)
-            throw new Exception("Failed to set history node state");
-    }
-
+    
     private void GetCountHistoryNodeState()
     {
         var processStatus = "Completed";

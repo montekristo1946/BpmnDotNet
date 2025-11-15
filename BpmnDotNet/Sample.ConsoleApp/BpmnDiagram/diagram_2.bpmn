@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0inwert" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
-  <bpmn:process id="IdBpmnProcessing_2" isExecutable="true">
+  <bpmn:process id="IdBpmnProcessing_2" name="Процесс тестовый" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_in_GatewayThirdHandler</bpmn:outgoing>
     </bpmn:startEvent>
@@ -60,17 +60,17 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessing_2">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="132" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0k7arcx_di" bpmnElement="GatewayThirdHandler">
         <dc:Bounds x="275" y="245" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="202" y="206.5" width="89" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="132" y="252" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1gke426_di" bpmnElement="ServiceTaskThirdHandler">
-        <dc:Bounds x="640" y="160" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_01c0426_di" bpmnElement="SendTaskFirstHandler">
+        <dc:Bounds x="400" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
@@ -83,22 +83,22 @@
         <dc:Bounds x="400" y="390" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01c0426_di" bpmnElement="SendTaskFirstHandler">
-        <dc:Bounds x="400" y="80" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1gke426_di" bpmnElement="ServiceTaskThirdHandler">
+        <dc:Bounds x="640" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k2itzl_di" bpmnElement="SubProcessFirstHandler" isExpanded="false">
+        <dc:Bounds x="640" y="300" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1urnnj5_di" bpmnElement="Event_End">
         <dc:Bounds x="1162" y="252" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1doh30z_di" bpmnElement="GatewaySecondExlusive" isMarkerVisible="true">
-        <dc:Bounds x="785" y="245" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1b04v3w_di" bpmnElement="Gateway_Second">
         <dc:Bounds x="925" y="245" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1k2itzl_di" bpmnElement="SubProcessFirstHandler" isExpanded="false">
-        <dc:Bounds x="640" y="300" width="100" height="80" />
-        <bpmndi:BPMNLabel />
+      <bpmndi:BPMNShape id="Gateway_1doh30z_di" bpmnElement="GatewaySecondExlusive" isMarkerVisible="true">
+        <dc:Bounds x="785" y="245" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1wnyavv_di" bpmnElement="Flow_in_GatewayThirdHandler">
         <di:waypoint x="168" y="270" />

@@ -1,4 +1,5 @@
 using BpmnDotNet.Arm.Core.Abstractions;
+using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.Dto;
 using Microsoft.AspNetCore.Components;
 
@@ -16,7 +17,7 @@ public partial class FilterPanel : ComponentBase
 
     [Parameter] public Func<string, Task> SetFilterToken { get; set; } = null!;
 
-    private string[] _arrayProcessId = [];
+    private ProcessDataFilterPanel[] _arrayProcessData = [];
     private bool IsCheckFilterNone { get; set; } = true;
     private bool IsCheckFilterWorks { get; set; } = true;
     private bool IsCheckFilterCompleted { get; set; } = true;
@@ -32,7 +33,7 @@ public partial class FilterPanel : ComponentBase
     {
         try
         {
-            _arrayProcessId = await FilterPanelHandler.GetAllProcessId();
+            _arrayProcessData = await FilterPanelHandler.GetAllProcessIdAsync();
             StateHasChanged();
         }
         catch (Exception e)

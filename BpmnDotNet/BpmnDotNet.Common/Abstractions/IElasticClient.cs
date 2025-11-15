@@ -22,12 +22,11 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// <summary>
     /// Получить все записи по полю TField из TIndex.
     /// </summary>
-    /// <param name="nameField">Название поля.</param>
+    /// <param name="searchFields">Поля которые нужно выбрать.</param>
     /// <param name="maxCountElements">Масимальное количество возращаемых обьектов.</param>
     /// <typeparam name="TIndex">Тип индекса.</typeparam>
-    /// <typeparam name="TField">Тип таблицы.</typeparam>
     /// <returns>Массив полей.</returns>
-    public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements)
+    public Task<TIndex[]> GetAllFieldsAsync<TIndex>(string [] searchFields, int maxCountElements)
         where TIndex : class;
 
     /// <summary>

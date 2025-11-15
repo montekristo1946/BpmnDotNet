@@ -14,13 +14,13 @@
         </div>
         
         @{
-            foreach (var process in _arrayProcessId)
+            foreach (var process in _arrayProcessData)
             {
                 <div class="m-0 padding-1px">
                     <div class="row m-0  border-enveloping-custom bottom-shadow"
                          style="background-color: #ffffff; padding: 0 3px 0 3px"
-                         @onclick="@(() => ButtonClickObjectAsync(process))">
-                        @process
+                         @onclick="@(() => ButtonClickObjectAsync(process.IdBpmnProcess))">
+                        @process.NameBpmnProcess
                     </div>
                 </div>
             }

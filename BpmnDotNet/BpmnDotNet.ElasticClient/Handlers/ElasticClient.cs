@@ -102,8 +102,8 @@ public class ElasticClient : IElasticClient
     }
 
     /// <inheritdoc />
-    public async Task<TField[]> GetAllFieldsAsync<TIndex, TField>(
-        string nameField,
+    public async Task<TIndex[]> GetAllFieldsAsync<TIndex>(
+        string[] searchFields,
         int maxCountElements)
         where TIndex : class
     {
@@ -111,39 +111,24 @@ public class ElasticClient : IElasticClient
         {
             var client = await GetClient();
             var index = StringUtils.CreateIndexName(typeof(TIndex));
-            var field = nameField.ToElasticsearchFieldName();
+            var fieldList = searchFields.Select(f => new Field(f.ToElasticsearchFieldName())).ToArray();
 
             var response = await client.SearchAsync<TIndex>(s => s
-                    .Indices(index)
-                    .Size(maxCountElements)
-                    .Source(src => src.Filter(f => f.Includes(new Field(field))))
-                    .Query(q => q.MatchAll()));
+                .Indices(index)
+                .Size(maxCountElements)
+                .Source(src => src.Filter(f => f.Includes(fieldList)))
+                .Query(q => q.MatchAll()));
 
             if (!response.IsValidResponse)
             {
                 return [];
             }
 
-            var fieldValues = new List<TField>();
-            var property = typeof(TIndex).GetProperty(
-                nameField,
-                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var retArr = response.IsValidResponse
+                ? response.Hits.Select(h => h.Source).OfType<TIndex>().ToArray()
+                : [];
 
-            foreach (var document in response.Documents)
-            {
-                if (property == null)
-                {
-                    continue;
-                }
-
-                var value = property.GetValue(document);
-                if (value is TField typedValue)
-                {
-                    fieldValues.Add(typedValue);
-                }
-            }
-
-            return fieldValues.ToArray();
+            return retArr;
         }
         catch (Exception ex)
         {
