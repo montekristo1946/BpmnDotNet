@@ -18,6 +18,7 @@
 3. [BpmnDotNet.ElasticClient](./BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
 4. [BpmnDotNet.Arm.Web](./BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
 5. [BpmnDotNet](./BpmnDotNet/BpmnDotNet/READMI.md)
+6. [Sample.ConsoleApp](./BpmnDotNet/Sample.ConsoleApp/README.MD)
 
 ## Кому это подойдет:
 1. Небольшой проект в котором не требуются распределенные вызовы обработчиков.

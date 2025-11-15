@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
-        <TargetFrameworkVersion>net9.0</TargetFrameworkVersion>
+        <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+        <TargetFrameworkVersionUI>net9.0</TargetFrameworkVersionUI>
 
         <SerilogVersion>4.3.0</SerilogVersion>
         <SerilogAspNetCoreVersion>[8.0.0,9.0.0)</SerilogAspNetCoreVersion>

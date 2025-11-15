@@ -9,13 +9,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_SolutionItems", "_SolutionItems", "{192541F7-ADDD-458E-8FE6-E01232392E9B}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{062CAF72-15CF-47C4-8C38-432967E4C218}"
 	ProjectSection(SolutionItems) = preProject
 		..\Documents\BpmnNanation.md = ..\Documents\BpmnNanation.md
 		..\Documents\Developer.md = ..\Documents\Developer.md
-		..\README.md = ..\README.md
 		..\Documents\UiMonitoring.md = ..\Documents\UiMonitoring.md
 	EndProjectSection
 EndProject

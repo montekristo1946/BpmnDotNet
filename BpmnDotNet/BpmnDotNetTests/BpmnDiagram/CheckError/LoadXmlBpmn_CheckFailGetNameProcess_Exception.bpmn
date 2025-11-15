@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_191qv1h" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.41.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
-  <bpmn:process id="IdBpmnProcessingMain" name="Сканирования лидаров" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1" name="Начало процесса">
+  <bpmn:process id="IdBpmnProcessingMain" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start Event">
       <bpmn:outgoing>Flow_to_BlockFirstHandler</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_to_BlockFirstHandler" sourceRef="StartEvent_1" targetRef="ServiceTaskFirstHandler" />
-    <bpmn:endEvent id="End_event" name="Процесс завершен">
+    <bpmn:endEvent id="End_event" name="End event">
       <bpmn:incoming>Flow_out_GatewayFourthHandler</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="Выбор типа вагона">
+    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
       <bpmn:incoming>Flow_out_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
       <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_in_ReceiveTaskFirstHandle" name="Да&#10;" sourceRef="GatewayFirstHandler" targetRef="ReceiveTaskFirstHandle" />
-    <bpmn:exclusiveGateway id="Gateway_Second" name="Обьединение результатов по типу вагона">
+    <bpmn:exclusiveGateway id="Gateway_Second" name="Gateway_Second">
       <bpmn:incoming>Flow_out_SendTaskFirstHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_ReceiveTaskFirstHandle</bpmn:incoming>
       <bpmn:outgoing>Flow_out_Gateway_Second</bpmn:outgoing>
@@ -23,20 +23,20 @@
     <bpmn:sequenceFlow id="Flow_out_ReceiveTaskFirstHandle" sourceRef="ReceiveTaskFirstHandle" targetRef="Gateway_Second" />
     <bpmn:sequenceFlow id="Flow_out_BlockFirstHandler" sourceRef="ServiceTaskFirstHandler" targetRef="GatewayFirstHandler" />
     <bpmn:sequenceFlow id="Flow_in_SendTaskFirstHandler" name="Нет" sourceRef="GatewayFirstHandler" targetRef="SendTaskFirstHandler" />
-    <bpmn:serviceTask id="ServiceTaskFirstHandler" name="Деленеие облаков на вагоны">
+    <bpmn:serviceTask id="ServiceTaskFirstHandler" name="ServiceTaskFirstHandler">
       <bpmn:incoming>Flow_to_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_BlockFirstHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sendTask id="SendTaskFirstHandler" name="Тип вагона Хоппер">
+    <bpmn:sendTask id="SendTaskFirstHandler" name="SendTaskFirstHandler">
       <bpmn:incoming>Flow_in_SendTaskFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_SendTaskFirstHandler</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:receiveTask id="ReceiveTaskFirstHandle" name="Тип вагона цистерна">
+    <bpmn:receiveTask id="ReceiveTaskFirstHandle" name="ReceiveTaskFirstHandle">
       <bpmn:incoming>Flow_in_ReceiveTaskFirstHandle</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ReceiveTaskFirstHandle</bpmn:outgoing>
     </bpmn:receiveTask>
     <bpmn:sequenceFlow id="Flow_out_Gateway_Second" sourceRef="Gateway_Second" targetRef="GatewayThirdHandler" />
-    <bpmn:parallelGateway id="GatewayThirdHandler" name="Формирования репортов подсистем">
+    <bpmn:parallelGateway id="GatewayThirdHandler" name="GatewayThirdHandler">
       <bpmn:incoming>Flow_out_Gateway_Second</bpmn:incoming>
       <bpmn:outgoing>Flow_in_ServiceTaskSecondHandler</bpmn:outgoing>
       <bpmn:outgoing>Flow_in_ServiceTaskThirdHandler</bpmn:outgoing>
@@ -44,7 +44,7 @@
     </bpmn:parallelGateway>
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskSecondHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskSecondHandler" />
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskSecondHandler" sourceRef="ServiceTaskSecondHandler" targetRef="GatewayFourthHandler" />
-    <bpmn:parallelGateway id="GatewayFourthHandler" name="Отправка репоротов">
+    <bpmn:parallelGateway id="GatewayFourthHandler" name="GatewayFourthHandler">
       <bpmn:incoming>Flow_out_ServiceTaskSecondHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_ServiceTaskThirdHandler</bpmn:incoming>
       <bpmn:incoming>Flow_out_SubProcessFirstHandler</bpmn:incoming>
@@ -52,21 +52,21 @@
     </bpmn:parallelGateway>
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskThirdHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskThirdHandler" />
     <bpmn:sequenceFlow id="Flow_out_ServiceTaskThirdHandler" sourceRef="ServiceTaskThirdHandler" targetRef="GatewayFourthHandler" />
-    <bpmn:sequenceFlow id="Flow_out_GatewayFourthHandler" sourceRef="GatewayFourthHandler" targetRef="End_event" />
+    <bpmn:sequenceFlow id="Flow_out_GatewayFourthHandler" name="to end" sourceRef="GatewayFourthHandler" targetRef="End_event" />
     <bpmn:sequenceFlow id="Flow_in_ServiceTaskFourthHandler" sourceRef="GatewayThirdHandler" targetRef="ServiceTaskFourthHandler" />
-    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="Система габаритные ворота">
+    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="ServiceTaskSecondHandler">
       <bpmn:incoming>Flow_in_ServiceTaskSecondHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ServiceTaskSecondHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTaskThirdHandler" name="Система Дифекты кузова вагона">
+    <bpmn:serviceTask id="ServiceTaskThirdHandler" name="ServiceTaskThirdHandler">
       <bpmn:incoming>Flow_in_ServiceTaskThirdHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_ServiceTaskThirdHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTaskFourthHandler" name="Отрицательная динамика">
+    <bpmn:serviceTask id="ServiceTaskFourthHandler" name="ServiceTaskFourthHandler">
       <bpmn:incoming>Flow_in_ServiceTaskFourthHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_SubProcessFirstHandler</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:subProcess id="SubProcessFirstHandler" name="Уточнения показателей">
+    <bpmn:subProcess id="SubProcessFirstHandler" name="SubProcessFirst">
       <bpmn:extensionElements />
       <bpmn:incoming>Flow_in_SubProcessFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_out_SubProcessFirstHandler</bpmn:outgoing>
@@ -79,25 +79,25 @@
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="157" y="73" width="89" height="14" />
+          <dc:Bounds x="173" y="73" width="55" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1tak4tf_di" bpmnElement="End_event">
-        <dc:Bounds x="1462" y="102" width="36" height="36" />
+        <dc:Bounds x="1502" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1455" y="56" width="51" height="27" />
+          <dc:Bounds x="1495" y="56" width="50" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
         <dc:Bounds x="475" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="469" y="56" width="61" height="27" />
+          <dc:Bounds x="469" y="56" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0oqklk1_di" bpmnElement="Gateway_Second" isMarkerVisible="true">
         <dc:Bounds x="765" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="752" y="56" width="77" height="40" />
+          <dc:Bounds x="746" y="56" width="87" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_11bw6xs_di" bpmnElement="ServiceTaskFirstHandler">
@@ -115,13 +115,13 @@
       <bpmndi:BPMNShape id="Gateway_0k7arcx_di" bpmnElement="GatewayThirdHandler">
         <dc:Bounds x="875" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="861" y="50" width="77" height="40" />
+          <dc:Bounds x="856" y="56" width="89" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">
         <dc:Bounds x="1375" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1374" y="56" width="54" height="27" />
+          <dc:Bounds x="1355" y="56" width="90" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1004tiz_di" bpmnElement="ServiceTaskSecondHandler">
@@ -196,7 +196,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06gqg94_di" bpmnElement="Flow_out_GatewayFourthHandler">
         <di:waypoint x="1425" y="120" />
-        <di:waypoint x="1462" y="120" />
+        <di:waypoint x="1502" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1449" y="102" width="31" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1pwgzjc_di" bpmnElement="Flow_in_ServiceTaskFourthHandler">
         <di:waypoint x="900" y="145" />
