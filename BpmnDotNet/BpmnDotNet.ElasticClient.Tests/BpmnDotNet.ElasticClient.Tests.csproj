@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>BpmnDotNetElasticClientTests</RootNamespace>
+        <RootNamespace>BpmnDotNet.ElasticClient.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
