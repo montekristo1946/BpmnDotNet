@@ -23,6 +23,7 @@ public class ServiceTaskThirdHandler : IBpmnHandler
             _logger.LogDebug($"[ServiceTaskThirdHandler:AsyncJobHandler]  " +
                              $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {cont.TestValue2}");
 
+    
         await Task.Delay(1, ctsToken);
     }
 }
