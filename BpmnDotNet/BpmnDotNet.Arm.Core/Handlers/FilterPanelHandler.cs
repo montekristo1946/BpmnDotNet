@@ -2,6 +2,7 @@ using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Arm.Core.Handlers;

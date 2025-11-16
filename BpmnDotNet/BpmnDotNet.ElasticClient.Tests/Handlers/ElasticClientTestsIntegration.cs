@@ -3,6 +3,7 @@ using AutoFixture;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.ElasticClient.Tests.Handlers;

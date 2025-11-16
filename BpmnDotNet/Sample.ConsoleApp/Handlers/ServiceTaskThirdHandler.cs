@@ -16,7 +16,7 @@ public class ServiceTaskThirdHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskThirdHandler);
-    public string Description { get; init; } =   "Service task third";
+    public string Description { get; init; } =   "Вагон по рельсам скользит, не сворачивай —\nбезопасность пассажиров всегда впереди маяк.";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

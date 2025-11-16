@@ -22,18 +22,25 @@ internal static class BpmnClientBuilder
     /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="elasticClient">IElasticClientSetDataAsync.</param>
     /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
+    /// <param name="descriptionWriteService">IDescriptionWriteService.</param>
     /// <returns>IBpmnClient.</returns>
     public static IBpmnClient Build(
         string pathDiagram,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IElasticClientSetDataAsync elasticClient,
-        IHistoryNodeStateWriter historyNodeStateWriter)
+        IHistoryNodeStateWriter historyNodeStateWriter,
+        IDescriptionWriteService descriptionWriteService)
     {
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = CreateBusinessProcessDtos(allBpmnFiles);
         LoadBpmnInElastic(allBpmnFiles, elasticClient);
-        return new BpmnClient(businessProcessDtos, loggerFactory, pathFinder, historyNodeStateWriter);
+        return new BpmnClient(
+            businessProcessDtos,
+            loggerFactory,
+            pathFinder,
+            historyNodeStateWriter,
+            descriptionWriteService);
     }
 
     private static void LoadBpmnInElastic(string[] allBpmnFiles, IElasticClientSetDataAsync elasticClient)

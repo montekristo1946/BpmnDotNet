@@ -4,6 +4,7 @@ using System.Reflection;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Entities;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,11 @@ public class ElasticClient : IElasticClient
                 .IdProperty(d => d.Id))
             .DefaultMappingFor<BpmnPlane>(m => m
                 .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
-                .IdProperty(d => d.Id));
+                .IdProperty(d => d.Id))
+            .DefaultMappingFor<DescriptionData>(m => m
+                .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
+                .IdProperty(d => d.Id))
+            ;
     }
 
     /// <inheritdoc />

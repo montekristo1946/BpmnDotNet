@@ -1,6 +1,7 @@
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Entities;
 
 namespace BpmnDotNet.Arm.Core.Abstractions;
 

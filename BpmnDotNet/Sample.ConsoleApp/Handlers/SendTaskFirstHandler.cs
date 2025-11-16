@@ -15,7 +15,12 @@ public class SendTaskFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(SendTaskFirstHandler);
-    public string Description { get; init; } =   "Send task first handler";
+
+    public string Description { get; init; } =
+        "Отцепка вагонов производится только при наличии технической неисправности или нарушении условий перевозки.\n" +
+        "Перед отцепкой необходимо оформить соответствующую документацию и уведомить ответственные службы для оперативного устранения причин.\n" +
+        "Отцепленные вагоны подлежат направлению в вагонное депо для диагностики, ремонта или таможенных процедур в установленном порядке.";
+
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

@@ -4,6 +4,7 @@ using BpmnDotNet.Arm.Core.DiagramBuilder;
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Common.Models;
 
 namespace BpmnDotNet.Arm.Core.Handlers;

@@ -16,7 +16,7 @@ public class ServiceTaskSecondHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskSecondHandler);
-    public string Description { get; init; } =   "Service task second handler";
+    public string Description { get; init; } =   "Вагон следует букве «А» держаться строго в пути,\nчтобы к пункту назначения вовремя прийти.";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

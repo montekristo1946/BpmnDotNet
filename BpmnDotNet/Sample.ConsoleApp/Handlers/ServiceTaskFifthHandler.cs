@@ -16,7 +16,7 @@ public class ServiceTaskFifthHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFifthHandler);
-    public string Description { get; init; } =  "Service task first handler";
+    public string Description { get; init; } =  "Осмоторщик вагонов обязан тщательно проверять целостность всех узлов и деталей.\nПри выявлении повреждений или неисправностей немедленно информировать начальство.\nСледить за правильностью крепления тормозных систем и состояние ходовой части.\nОбеспечивать своевременное оформление актов осмотра и проверок.\nБезопасность и исправность вагонов — главная забота осмоторщика.";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
