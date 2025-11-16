@@ -9,22 +9,15 @@ using BpmnDotNet.Common.Models;
 
 namespace BpmnDotNet.Arm.Core.Handlers;
 
+/// <inheritdoc />
 public class SvgConstructor : ISvgConstructor
 {
-    public Task<string> CreatePlane(BpmnPlane plane, SizeWindows sizeWindows)
-    {
-        var widthWindows = (int)sizeWindows.Width;
-        var heightWindows = (int)sizeWindows.Height;
-        if (plane.Shapes.Any() is false)
-        {
-            return Task.FromResult(string.Empty);
-        }
-        var shapes = CreateShapes(plane.Shapes, widthWindows, heightWindows);
-
-        return Task.FromResult(shapes);
-    }
-
-    public Task<string> CreatePlane(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows)
+    /// <inheritdoc />
+    public Task<string> CreatePlane(
+        BpmnPlane plane,
+        NodeJobStatus[] nodeJobStatus,
+        SizeWindows sizeWindows,
+        DescriptionData[] descriptions)
     {
         var widthWindows = (int)sizeWindows.Width;
         var heightWindows = (int)sizeWindows.Height;
@@ -33,11 +26,15 @@ public class SvgConstructor : ISvgConstructor
             return Task.FromResult(string.Empty);
         }
 
-        var shapes = CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows);
+        var shapes = nodeJobStatus.Any()
+            ? CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows, descriptions)
+            : CreateShapes(plane.Shapes, widthWindows, heightWindows,descriptions);
+
         return Task.FromResult(shapes);
     }
 
-    private string CreateColorShapes(BpmnShape[] shapes, NodeJobStatus[] nodeJobStatus, int widthWindows, int heightWindows)
+    private string CreateColorShapes(BpmnShape[] shapes, NodeJobStatus[] nodeJobStatus, int widthWindows,
+        int heightWindows, DescriptionData[] descriptions)
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
@@ -55,13 +52,14 @@ public class SvgConstructor : ISvgConstructor
 
         foreach (var shape in shapes)
         {
+            var title = GetTitle(shape.BpmnElement, descriptions);
             var color = GetColor(shape.BpmnElement, nodeJobStatus);
             var stringShape = shape.Type switch
             {
                 ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
                 ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd),
                 ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
-                ElementType.ServiceTask => CreateServiceTask(shape, color),
+                ElementType.ServiceTask => CreateServiceTask(shape, color, title),
                 ElementType.SendTask => CreateSendTask(shape, color),
                 ElementType.ReceiveTask => CreateReceiveTask(shape, color),
                 ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
@@ -79,6 +77,13 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.Build();
         return retStringSvg;
+    }
+
+    private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
+    {
+        var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shapeBpmnElement)?.Description ??
+                    string.Empty;
+        return title;
     }
 
     private string GetColor(string shapeId, NodeJobStatus[] nodeJobStatus)
@@ -104,7 +109,7 @@ public class SvgConstructor : ISvgConstructor
     }
 
 
-    private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows)
+    private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows,DescriptionData[] descriptions)
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
@@ -122,12 +127,13 @@ public class SvgConstructor : ISvgConstructor
         var color = "#22242a";
         foreach (var shape in shapes)
         {
+            var title = GetTitle(shape.BpmnElement, descriptions);
             var stringShape = shape.Type switch
             {
                 ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
                 ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd),
                 ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
-                ElementType.ServiceTask => CreateServiceTask(shape, color),
+                ElementType.ServiceTask => CreateServiceTask(shape, color,title),
                 ElementType.SendTask => CreateSendTask(shape, color),
                 ElementType.ReceiveTask => CreateReceiveTask(shape, color),
                 ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
@@ -294,7 +300,7 @@ public class SvgConstructor : ISvgConstructor
         return task;
     }
 
-    private string CreateServiceTask(BpmnShape shape, string color)
+    private string CreateServiceTask(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -320,6 +326,7 @@ public class SvgConstructor : ISvgConstructor
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return task;
     }
@@ -386,14 +393,13 @@ public class SvgConstructor : ISvgConstructor
             .Build();
 
 
-        var startEvent = IBpmnBuild<StartEventBuilder>.Create();
-        var retStringSvg = startEvent
+        var startEvent = IBpmnBuild<StartEventBuilder>
+            .Create()
             .AddId(id)
             .AddPosition(xStart, yStart)
             .AddChild(circle)
             .Build();
 
-
-        return retStringSvg;
+        return startEvent;
     }
 }

@@ -23,12 +23,27 @@ public class PlanePanelHandler : IPlanePanelHandler
         _svgConstructor = svgConstructor ?? throw new ArgumentNullException(nameof(svgConstructor));
     }
 
-    public async Task<string> GetPlane(string IdBpmnProcess, SizeWindows sizeWindows)
+    public async Task<string> GetPlane(string idBpmnProcess, SizeWindows sizeWindows)
     {
-        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(IdBpmnProcess) ?? new BpmnPlane();
-        var svg = await _svgConstructor.CreatePlane(plane, sizeWindows);
+        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(idBpmnProcess) ?? new BpmnPlane();
+        var descriptors = await GetDescriptor(plane);
+        var svg = await _svgConstructor.CreatePlane(plane, [], sizeWindows,descriptors);
 
         return svg;
+    }
+
+    private async Task<DescriptionData[]> GetDescriptor(BpmnPlane plane)
+    {
+        var result = new List<DescriptionData>(); 
+        foreach (var planeShape in plane.Shapes)
+        {
+            var data = await _elasticClient.GetDataFromIdAsync<DescriptionData>(planeShape.BpmnElement);
+            if (data != null)
+            {
+                result.Add(data);
+            }
+        }
+        return result.ToArray();
     }
 
     public async Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows)
@@ -37,8 +52,8 @@ public class PlanePanelHandler : IPlanePanelHandler
             [nameof(HistoryNodeState.ArrayMessageErrors)]) ?? new HistoryNodeState();
 
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(historyNodeState.IdBpmnProcess) ?? new BpmnPlane();
-
-        var svg = await _svgConstructor.CreatePlane(plane, historyNodeState.NodeStaus, sizeWindows);
+        var descriptors = await GetDescriptor(plane);
+        var svg = await _svgConstructor.CreatePlane(plane, historyNodeState.NodeStaus, sizeWindows,descriptors);
 
         return svg;
     }
