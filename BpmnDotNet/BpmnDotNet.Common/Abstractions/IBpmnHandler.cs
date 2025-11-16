@@ -14,6 +14,11 @@ public interface IBpmnHandler
     string TaskDefinitionId { get; init; }
 
     /// <summary>
+    ///     Gets описания блока. Например, детали правила реализуемые блоком.
+    /// </summary>
+    string Description { get; init; }
+
+    /// <summary>
     ///     Метод, который вызовет Broker.
     /// </summary>
     /// <param name="context">IContextBpmnProcess.</param>

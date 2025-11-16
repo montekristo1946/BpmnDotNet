@@ -15,6 +15,7 @@ public class SendTaskFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(SendTaskFirstHandler);
+    public string Description { get; init; } =   "Send task first handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

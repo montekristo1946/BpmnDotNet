@@ -79,7 +79,7 @@ internal class BpmnClient : IBpmnClient
     }
 
     /// <inheritdoc />
-    public void RegisterHandlers<THandler>(THandler handlerBpmn)
+    public void RegisterHandler<THandler>(THandler handlerBpmn)
         where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlerBpmn);
@@ -92,6 +92,18 @@ internal class BpmnClient : IBpmnClient
         if (resAdd is false)
         {
             throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+        }
+    }
+
+    /// <inheritdoc/>
+    public void RegisterHandlers<THandler>(THandler[] handlersBpmn)
+        where THandler : IBpmnHandler
+    {
+        ArgumentNullException.ThrowIfNull(handlersBpmn);
+
+        foreach (var handler in handlersBpmn)
+        {
+            RegisterHandler<IBpmnHandler>(handler);
         }
     }
 

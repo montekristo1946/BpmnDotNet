@@ -15,6 +15,7 @@ public class GatewayThirdHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(GatewayThirdHandler);
+    public string Description { get; init; } =   "Gateway third handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

@@ -21,7 +21,15 @@ public interface IBpmnClient : IDisposable
     /// </summary>
     /// <param name="handlerBpmn">Хэндлер.</param>
     /// <typeparam name="THandler">Тип хэндлера.</typeparam>
-    public void RegisterHandlers<THandler>(THandler handlerBpmn)
+    public void RegisterHandler<THandler>(THandler handlerBpmn)
+        where THandler : IBpmnHandler;
+
+    /// <summary>
+    ///     Регистрация handlers.
+    /// </summary>
+    /// <param name="handlerBpmn">Хэндлер.</param>
+    /// <typeparam name="THandler">Тип хэндлера.</typeparam>
+    public void RegisterHandlers<THandler>(THandler[] handlerBpmn)
         where THandler : IBpmnHandler;
 
     /// <summary>

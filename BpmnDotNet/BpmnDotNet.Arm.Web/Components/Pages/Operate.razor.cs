@@ -40,9 +40,7 @@ public partial class Operate : ComponentBase
         await _listProcessPanel.SetFilterToken(filterToken);
 
     }
-
-
-
+    
     private async Task IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
     {
         await _drawingPlanePanel.ColorUpdatePanel(idUpdateNodeJobStatus);

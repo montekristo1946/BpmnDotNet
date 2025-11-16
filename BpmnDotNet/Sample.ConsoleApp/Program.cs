@@ -24,20 +24,20 @@ services.AddSingleton<ILoggerFactory>(option =>
     return LoggerFactory.Create(builder => { builder.AddSerilog(Log.Logger); });
 });
 
-services.AddScoped<ElasticClientConfig>();
-services.AddSingleton<IElasticClientSetDataAsync, ElasticClient>();
+//Инструменты для записи в ElasticSearch
+services.AddTransient<ElasticClientConfig>();
+services.AddTransient<IElasticClientSetDataAsync, ElasticClient>();
 
 //Создадим IBpmnClient, загрузим схемы
 services.AddBusinessProcess("./BpmnDiagram");
+
+//Зарегистрирует все Handlers реализующие интерфейс IBpmnHandler
+services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
 
 //Вспомогательные классы для тестовой консоли.
 services.AddSingleton<Producer>();
 services.AddScoped<SampleService>();
 services.AddLogging();
-
-
-//Зарегистрирует все Handlers реализующие интерфейс IBpmnHandler
-services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
 
 // Run service
 using var provider = services.BuildServiceProvider();
@@ -46,10 +46,8 @@ var handlerTypes = provider.GetServices<IBpmnHandler>().ToArray();
 var bpmnClient = provider.GetRequiredService<IBpmnClient>();
 
 //Регистрация IBpmnHandler в IBpmnClient.
-foreach (var handler in handlerTypes)
-{
-    bpmnClient.RegisterHandlers<IBpmnHandler>(handler);
-}
+bpmnClient.RegisterHandlers<IBpmnHandler>(handlerTypes);
+
 
 var producer = provider.GetRequiredService<Producer>();
 producer.Produce();

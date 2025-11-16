@@ -8,7 +8,7 @@ using System.Globalization;
 internal static class Mappers
 {
     /// <summary>
-    /// Map strint to int.
+    /// Map string to int.
     /// </summary>
     /// <param name="x">value in.</param>
     /// <returns>Int.</returns>

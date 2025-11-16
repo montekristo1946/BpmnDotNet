@@ -16,6 +16,7 @@ public class ServiceTaskFourthHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFourthHandler);
+    public string Description { get; init; } =   "Service task fourth handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

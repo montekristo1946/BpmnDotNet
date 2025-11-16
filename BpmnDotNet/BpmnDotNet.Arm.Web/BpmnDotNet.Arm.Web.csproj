@@ -25,5 +25,9 @@
         <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Components\Layout\" />
+    </ItemGroup>
+
 
 </Project>

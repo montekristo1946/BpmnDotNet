@@ -20,6 +20,7 @@ public class SubProcessFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(SubProcessFirstHandler);
+    public string Description { get; init; } =   "Sub-process first handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

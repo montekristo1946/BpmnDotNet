@@ -20,6 +20,7 @@ public class ServiceTaskBuilder : IBpmnBuild<ServiceTaskBuilder>
         var mainRect = IBpmnBuild<RectBuilder>.Create().AddColor(_color).Build();
 
         _svgStorage.AppendLine(hider);
+        // _svgStorage.AppendLine("<title>Отцепка вагонов производится только при наличии технической неисправности или нарушении условий перевозки. Перед отцепкой необходимо оформить соответствующую документацию и уведомить ответственные службы для оперативного устранения причин. Отцепленные вагоны подлежат направлению в вагонное депо для диагностики, ремонта или таможенных процедур в установленном порядке.</title>");
         _svgStorage.AppendLine(mainRect);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(CreateCircleTop());
