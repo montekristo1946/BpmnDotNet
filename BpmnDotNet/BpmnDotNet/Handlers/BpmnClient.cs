@@ -78,32 +78,22 @@ internal class BpmnClient : IBpmnClient
         return process.JobStatus;
     }
 
-    /// <inheritdoc />
-    public void RegisterHandler<THandler>(THandler handlerBpmn)
-        where THandler : IBpmnHandler
-    {
-        ArgumentNullException.ThrowIfNull(handlerBpmn);
-
-        var handler = (IBpmnHandler)handlerBpmn;
-        var taskDefinitionId = handler.TaskDefinitionId;
-
-        var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
-
-        if (resAdd is false)
-        {
-            throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
-        }
-    }
-
     /// <inheritdoc/>
     public void RegisterHandlers<THandler>(THandler[] handlersBpmn)
         where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlersBpmn);
 
-        foreach (var handler in handlersBpmn)
+        foreach (THandler handler in handlersBpmn)
         {
-            RegisterHandler<IBpmnHandler>(handler);
+            var taskDefinitionId = handler.TaskDefinitionId;
+
+            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+
+            if (resAdd is false)
+            {
+                throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+            }
         }
     }
 
@@ -140,6 +130,22 @@ internal class BpmnClient : IBpmnClient
         _cleanerTask.Wait();
         _cleanerTask.Dispose();
         _cts?.Dispose();
+    }
+
+    private void RegisterHandler<THandler>(THandler handlerBpmn)
+        where THandler : IBpmnHandler
+    {
+        ArgumentNullException.ThrowIfNull(handlerBpmn);
+
+        var handler = (IBpmnHandler)handlerBpmn;
+        var taskDefinitionId = handler.TaskDefinitionId;
+
+        var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+
+        if (resAdd is false)
+        {
+            throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+        }
     }
 
     private async Task CleaningBpmnProcesses(CancellationToken cts)

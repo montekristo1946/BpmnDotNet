@@ -17,14 +17,6 @@ public interface IBpmnClient : IDisposable
     public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
 
     /// <summary>
-    ///     Регистрация handler.
-    /// </summary>
-    /// <param name="handlerBpmn">Хэндлер.</param>
-    /// <typeparam name="THandler">Тип хэндлера.</typeparam>
-    public void RegisterHandler<THandler>(THandler handlerBpmn)
-        where THandler : IBpmnHandler;
-
-    /// <summary>
     ///     Регистрация handlers.
     /// </summary>
     /// <param name="handlerBpmn">Хэндлер.</param>
