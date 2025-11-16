@@ -22,10 +22,14 @@ public partial class FilterPanel : ComponentBase
     private bool IsCheckFilterWorks { get; set; } = true;
     private bool IsCheckFilterCompleted { get; set; } = true;
     private bool IsCheckFilterError { get; set; } = true;
+    
     private string _filterToken = "*value*";
+    
+    private string _activeIdProcessData = String.Empty;
 
     private async Task ButtonClickObjectAsync(string process)
     {
+        _activeIdProcessData = process ;
         await ChoseIdProcess(process);
     }
 
