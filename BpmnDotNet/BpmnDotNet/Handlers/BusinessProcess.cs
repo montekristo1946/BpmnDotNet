@@ -196,6 +196,9 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             _contextBpmnProcess.TokenProcess);
     }
 
+    /// <summary>
+    /// Проверим наличие сообщения в локальном хрнанилище.
+    /// </summary>
     private void CheckMessagesStore()
     {
         foreach (var nodeState in _nodeStateRegistry)
@@ -321,6 +324,11 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         }
     }
 
+    /// <summary>
+    /// Запустить код хэндлера bpmn блока.
+    /// </summary>
+    /// <param name="nodeId">nodeId.</param>
+    /// <param name="ctsToken">CancellationToken.</param>
     private async Task ExecutionNodesAsync(string nodeId, CancellationToken ctsToken)
     {
         var isForcedTermination = false;
