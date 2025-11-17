@@ -4,12 +4,13 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>
+public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>,ITitleBuilder<SequenceFlowBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private Bound[] _bounds = [];
     private string _color = string.Empty;
     private string _id = string.Empty;
+    private string _titleText  = string.Empty;
 
     public string Build()
     {
@@ -32,6 +33,7 @@ public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>
 
 
         _svgStorage.AppendLine(firstLine);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(defs);
         _svgStorage.AppendLine(path);
         _svgStorage.AppendLine(footer);
@@ -61,6 +63,15 @@ public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>
     public SequenceFlowBuilder AddColor(string color)
     {
         _color = color;
+        return this;
+    }
+    
+    public SequenceFlowBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

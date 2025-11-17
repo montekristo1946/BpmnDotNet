@@ -4,7 +4,7 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>
+public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>,ITitleBuilder<ReceiveTaskBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private string _color = string.Empty;
@@ -12,6 +12,7 @@ public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>
     private readonly List<string> _childElements = new();
     private int _xElement;
     private int _yElement;
+    private string _titleText  = string.Empty;
 
     public string Build()
     {
@@ -20,6 +21,7 @@ public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>
         var mainRect = IBpmnBuild<RectBuilder>.Create().AddColor(_color).Build();
 
         _svgStorage.AppendLine(hider);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(mainRect);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(CreateEnvelope());
@@ -60,6 +62,14 @@ public class ReceiveTaskBuilder : IBpmnBuild<ReceiveTaskBuilder>
     {
         _xElement = x;
         _yElement = y;
+        return this;
+    }
+    public ReceiveTaskBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

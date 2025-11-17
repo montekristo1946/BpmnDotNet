@@ -34,7 +34,7 @@ public class ElasticClientTestsIntegration
     {
         var name = $"Name_{DateTime.Now.ToString("MM.dd.yyyy_HH:mm:ss", CultureInfo.InvariantCulture)}";
         var plane = _fixture.Build<BpmnPlane>().With(p => p.Name, name).Create();
-
+        
         var res = await _elasticClient.SetDataAsync(plane);
 
         Assert.True(res);

@@ -4,7 +4,7 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class SubProcessBuilder : IBpmnBuild<SubProcessBuilder>
+public class SubProcessBuilder : IBpmnBuild<SubProcessBuilder>,ITitleBuilder<SubProcessBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private string _color = string.Empty;
@@ -12,6 +12,7 @@ public class SubProcessBuilder : IBpmnBuild<SubProcessBuilder>
     private readonly List<string> _childElements = new();
     private int _xElement;
     private int _yElement;
+    private string _titleText  = string.Empty;
 
     public string Build()
     {
@@ -20,6 +21,7 @@ public class SubProcessBuilder : IBpmnBuild<SubProcessBuilder>
         var mainRect = IBpmnBuild<RectBuilder>.Create().AddColor(_color).Build();
 
         _svgStorage.AppendLine(hider);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(mainRect);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(CreateInnerSquare());
@@ -66,6 +68,15 @@ public class SubProcessBuilder : IBpmnBuild<SubProcessBuilder>
     {
         _xElement = x;
         _yElement = y;
+        return this;
+    }
+    
+    public SubProcessBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

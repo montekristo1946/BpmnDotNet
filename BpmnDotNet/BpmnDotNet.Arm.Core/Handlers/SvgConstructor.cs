@@ -28,7 +28,7 @@ public class SvgConstructor : ISvgConstructor
 
         var shapes = nodeJobStatus.Any()
             ? CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows, descriptions)
-            : CreateShapes(plane.Shapes, widthWindows, heightWindows,descriptions);
+            : CreateShapes(plane.Shapes, widthWindows, heightWindows, descriptions);
 
         return Task.FromResult(shapes);
     }
@@ -56,15 +56,15 @@ public class SvgConstructor : ISvgConstructor
             var color = GetColor(shape.BpmnElement, nodeJobStatus);
             var stringShape = shape.Type switch
             {
-                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
-                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd),
-                ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
+                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
                 ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-                ElementType.SendTask => CreateSendTask(shape, color),
-                ElementType.ReceiveTask => CreateReceiveTask(shape, color),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
-                ElementType.ParallelGateway => CreateParallelGateway(shape, color),
-                ElementType.SubProcess => CreateSubProcess(shape, color),
+                ElementType.SendTask => CreateSendTask(shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
+                ElementType.SubProcess => CreateSubProcess(shape, color, title),
                 _ => string.Empty
             };
 
@@ -109,7 +109,7 @@ public class SvgConstructor : ISvgConstructor
     }
 
 
-    private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows,DescriptionData[] descriptions)
+    private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows, DescriptionData[] descriptions)
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
@@ -130,15 +130,15 @@ public class SvgConstructor : ISvgConstructor
             var title = GetTitle(shape.BpmnElement, descriptions);
             var stringShape = shape.Type switch
             {
-                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart),
-                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd),
-                ElementType.SequenceFlow => CreateSequenceFlow(shape, color),
-                ElementType.ServiceTask => CreateServiceTask(shape, color,title),
-                ElementType.SendTask => CreateSendTask(shape, color),
-                ElementType.ReceiveTask => CreateReceiveTask(shape, color),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color),
-                ElementType.ParallelGateway => CreateParallelGateway(shape, color),
-                ElementType.SubProcess => CreateSubProcess(shape, color),
+                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
+                ElementType.ServiceTask => CreateServiceTask(shape, color, title),
+                ElementType.SendTask => CreateSendTask(shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
+                ElementType.SubProcess => CreateSubProcess(shape, color, title),
                 _ => string.Empty
             };
 
@@ -182,7 +182,7 @@ public class SvgConstructor : ISvgConstructor
     }
 
 
-    private string CreateSubProcess(BpmnShape shape, string color)
+    private string CreateSubProcess(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -208,11 +208,12 @@ public class SvgConstructor : ISvgConstructor
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return task;
     }
 
-    private string CreateParallelGateway(BpmnShape shape, string color)
+    private string CreateParallelGateway(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -222,11 +223,12 @@ public class SvgConstructor : ISvgConstructor
             .AddColor(color)
             .AddId(shape.Id)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return gateway;
     }
 
-    private string CreateExclusiveGateway(BpmnShape shape, string color)
+    private string CreateExclusiveGateway(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -236,11 +238,12 @@ public class SvgConstructor : ISvgConstructor
             .AddColor(color)
             .AddId(shape.Id)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return gateway;
     }
 
-    private string CreateReceiveTask(BpmnShape shape, string color)
+    private string CreateReceiveTask(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -266,11 +269,12 @@ public class SvgConstructor : ISvgConstructor
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return task;
     }
 
-    private string CreateSendTask(BpmnShape shape, string color)
+    private string CreateSendTask(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -296,6 +300,7 @@ public class SvgConstructor : ISvgConstructor
             .AddId(shape.Id)
             .AddChild(textBuilder)
             .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
             .Build();
         return task;
     }
@@ -357,25 +362,28 @@ public class SvgConstructor : ISvgConstructor
         return label;
     }
 
-    private string CreateSequenceFlow(BpmnShape shape, string color)
+    private string CreateSequenceFlow(BpmnShape shape, string color, string title)
     {
         if (shape.Bounds.Length < 2)
+        {
             throw new ArgumentException("Shape must have at least 2 bounds");
+        }
 
         var id = shape.Id;
         var bounds = shape.Bounds;
 
-        var circle = IBpmnBuild<SequenceFlowBuilder>
+        var sequenceFlow = IBpmnBuild<SequenceFlowBuilder>
             .Create()
             .AddColor(color)
             .AddBound(bounds)
             .AddId(id)
+            .AddTitle(title)
             .Build();
-        return circle;
+        return sequenceFlow;
     }
 
 
-    private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth)
+    private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
     {
         var boundCircle = shape.Bounds.FirstOrDefault()
                           ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
@@ -398,6 +406,7 @@ public class SvgConstructor : ISvgConstructor
             .AddId(id)
             .AddPosition(xStart, yStart)
             .AddChild(circle)
+            .AddTitle(title)
             .Build();
 
         return startEvent;

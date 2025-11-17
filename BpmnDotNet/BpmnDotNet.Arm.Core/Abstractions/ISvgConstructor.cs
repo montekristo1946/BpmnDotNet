@@ -18,5 +18,6 @@ public interface ISvgConstructor
     /// <param name="sizeWindows">Размер окна под которое подогнать svg.</param>
     /// <param name="descriptions">Текст всплывающие подсказки.</param>
     /// <returns></returns>
-    Task<string> CreatePlane(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows,DescriptionData[]  descriptions);
+    Task<string> CreatePlane(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows,
+        DescriptionData[] descriptions);
 }
