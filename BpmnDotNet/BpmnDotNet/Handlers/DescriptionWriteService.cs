@@ -35,7 +35,7 @@ internal class DescriptionWriteService : IDescriptionWriteService
     }
 
     /// <inheritdoc />
-    public async Task Commit()
+    public async Task CommitAsync(CancellationToken token = default)
     {
         var saveArr = _dictionary.Select(p => new DescriptionData()
         {
@@ -45,7 +45,7 @@ internal class DescriptionWriteService : IDescriptionWriteService
 
         foreach (var item in saveArr)
         {
-            var checkSave = await _elasticClient.SetDataAsync(item);
+            var checkSave = await _elasticClient.SetDataAsync(item, token);
             if (!checkSave)
             {
                 _logger.LogError("Failed to update description, {TaskDefinitionId}", item.TaskDefinitionId);
@@ -54,7 +54,7 @@ internal class DescriptionWriteService : IDescriptionWriteService
     }
 
     /// <inheritdoc/>
-    public Task Init()
+    public Task InitAsync(CancellationToken token = default)
     {
         _dictionary = new ConcurrentDictionary<string, string>();
         return Task.CompletedTask;

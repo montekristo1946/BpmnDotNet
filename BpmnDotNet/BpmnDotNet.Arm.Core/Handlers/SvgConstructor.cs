@@ -13,7 +13,7 @@ namespace BpmnDotNet.Arm.Core.Handlers;
 public class SvgConstructor : ISvgConstructor
 {
     /// <inheritdoc />
-    public Task<string> CreatePlane(
+    public Task<string> CreatePlaneAsync(
         BpmnPlane plane,
         NodeJobStatus[] nodeJobStatus,
         SizeWindows sizeWindows,

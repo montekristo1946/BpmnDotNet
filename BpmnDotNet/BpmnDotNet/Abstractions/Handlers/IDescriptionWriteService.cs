@@ -15,12 +15,14 @@ internal interface IDescriptionWriteService
     /// <summary>
     /// Записать дескрипторы в базу данных.
     /// </summary>
+    /// <param name="token">Токен отмены.</param>
     /// <returns>Task.</returns>
-    Task Commit();
+    Task CommitAsync(CancellationToken token = default);
 
     /// <summary>
     /// Инициализировать новый инстанс.
     /// </summary>
+    /// <param name="token">Токен отмены.</param>
     /// <returns>Task.</returns>
-    Task Init();
+    Task InitAsync(CancellationToken token = default);
 }

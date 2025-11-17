@@ -38,7 +38,7 @@ public class SubProcessFirstHandler : IBpmnHandler
         var randomState = random.Next(0, 10);
         if (randomState > 5)
         {
-            throw new Exception("Test exception!");
+            // throw new Exception("Test exception!");
         }
         _logger.LogDebug($"[SubProcessFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {contextSubProcess.ContextSubProcessValue}");

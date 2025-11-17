@@ -88,7 +88,7 @@ internal class BpmnClient : IBpmnClient
         where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlersBpmn);
-        _descriptionWriteService.Init();
+        _descriptionWriteService.InitAsync();
 
         foreach (THandler handler in handlersBpmn)
         {
@@ -104,7 +104,7 @@ internal class BpmnClient : IBpmnClient
             _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
         }
 
-        _descriptionWriteService.Commit();
+        _descriptionWriteService.CommitAsync();
     }
 
     /// <inheritdoc />

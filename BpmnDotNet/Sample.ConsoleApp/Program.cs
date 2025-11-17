@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp;
 using Sample.ConsoleApp.Handlers;
+using Sample.ConsoleApp.Moq;
 using Serilog;
 
 //Логер
@@ -26,7 +27,7 @@ services.AddSingleton<ILoggerFactory>(option =>
 
 //Инструменты для записи в ElasticSearch
 services.AddTransient<ElasticClientConfig>();
-services.AddTransient<IElasticClientSetDataAsync, ElasticClient>();
+services.AddTransient<IElasticClientSetDataAsync, ElasticClientMoq>();
 
 //Создадим IBpmnClient, загрузим схемы
 services.AddBusinessProcess("./BpmnDiagram");

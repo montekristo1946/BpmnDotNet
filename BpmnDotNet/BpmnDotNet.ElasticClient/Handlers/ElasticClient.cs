@@ -36,25 +36,26 @@ public class ElasticClient : IElasticClient
         _retryDelay = retryDelay ?? TimeSpan.FromSeconds(5);
 
         _settings = new ElasticsearchClientSettings(new Uri(config.ConnectionString))
-            .DefaultMappingFor<HistoryNodeState>(m => m
-                .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
-                .IdProperty(d => d.Id))
-            .DefaultMappingFor<BpmnPlane>(m => m
-                .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
-                .IdProperty(d => d.Id))
-            .DefaultMappingFor<DescriptionData>(m => m
-                .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
-                .IdProperty(d => d.Id))
+                .DefaultMappingFor<HistoryNodeState>(m => m
+                    .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
+                    .IdProperty(d => d.Id))
+                .DefaultMappingFor<BpmnPlane>(m => m
+                    .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
+                    .IdProperty(d => d.Id))
+                .DefaultMappingFor<DescriptionData>(m => m
+                    .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
+                    .IdProperty(d => d.Id))
             ;
     }
 
     /// <inheritdoc />
-    public async Task<bool> SetDataAsync<T>(T historyNodeState)
+    public async Task<bool> SetDataAsync<T>(T historyNodeState, CancellationToken token = default)
+        where T : class
     {
         try
         {
-            var client = await GetClient();
-            var response = await client.IndexAsync(historyNodeState);
+            var client = await GetClientAsync(token);
+            var response = await client.IndexAsync(historyNodeState, token);
             if (!response.IsValidResponse)
             {
                 _logger.LogError($"[SetHistoryNodeState] Fail:{response.Result}");
@@ -72,7 +73,7 @@ public class ElasticClient : IElasticClient
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes)
+    public async Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes, CancellationToken token = default)
     {
         try
         {
@@ -82,11 +83,10 @@ public class ElasticClient : IElasticClient
                 excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
             }
 
-            var client = await GetClient();
+            var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(T));
             var response = await client
-                .GetAsync<T>(index, id, g => g
-                    .SourceExcludes(excludes));
+                .GetAsync<T>(index, id, g => g.SourceExcludes(excludes), token);
 
             if (!response.IsValidResponse || !response.Found)
             {
@@ -109,20 +109,23 @@ public class ElasticClient : IElasticClient
     /// <inheritdoc />
     public async Task<TIndex[]> GetAllFieldsAsync<TIndex>(
         string[] searchFields,
-        int maxCountElements)
+        int maxCountElements,
+        CancellationToken token = default)
         where TIndex : class
     {
         try
         {
-            var client = await GetClient();
+            var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(TIndex));
             var fieldList = searchFields.Select(f => new Field(f.ToElasticsearchFieldName())).ToArray();
 
-            var response = await client.SearchAsync<TIndex>(s => s
+            var response = await client.SearchAsync<TIndex>(
+                s => s
                 .Indices(index)
                 .Size(maxCountElements)
                 .Source(src => src.Filter(f => f.Includes(fieldList)))
-                .Query(q => q.MatchAll()));
+                .Query(q => q.MatchAll()),
+                token);
 
             if (!response.IsValidResponse)
             {
@@ -147,15 +150,17 @@ public class ElasticClient : IElasticClient
     public async Task<int> GetCountHistoryNodeStateAsync(
         string idBpmnProcess,
         string[] processStatus,
-        int sizeSample = 10000)
+        int sizeSample = 10000,
+        CancellationToken token = default)
     {
         var fieldsValue = GetFields(processStatus);
 
         try
         {
-            var client = await GetClient();
+            var client = await GetClientAsync(token);
 
-            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(
+                s => s
                 .Size(sizeSample)
                 .Query(q => q
                     .Bool(b => b
@@ -172,7 +177,8 @@ public class ElasticClient : IElasticClient
                         .Order(SortOrder.Desc)))
                 .Source(src => src
                     .Filter(f => f
-                        .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName())))));
+                        .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName())))),
+                token);
 
             var retValue = searchRequest.Hits.Count;
             return retValue;
@@ -190,15 +196,17 @@ public class ElasticClient : IElasticClient
         string idBpmnProcess,
         int from,
         int size,
-        string[] processStatus)
+        string[] processStatus,
+        CancellationToken token = default)
     {
         var fieldsValue = GetFields(processStatus);
 
         try
         {
-            var client = await GetClient();
+            var client = await GetClientAsync(token);
 
-            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(
+                s => s
                 .From(from)
                 .Size(size)
                 .Query(q => q
@@ -224,7 +232,8 @@ public class ElasticClient : IElasticClient
                             new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()),
                             new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()),
                             new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName()),
-                        }))));
+                        }))),
+                token);
 
             var retArr = searchRequest?.Hits
                 ?.Select(p => p.Source)
@@ -245,12 +254,14 @@ public class ElasticClient : IElasticClient
     public async Task<HistoryNodeState[]> GetHistoryNodeFromTokenMaskAsync(
         string idBpmnProcess,
         string mask,
-        int sizeSample = 100)
+        int sizeSample = 100,
+        CancellationToken token = default)
     {
         try
         {
-            var client = await GetClient();
-            var searchRequest = await client.SearchAsync<HistoryNodeState>(s => s
+            var client = await GetClientAsync(token);
+            var searchRequest = await client.SearchAsync<HistoryNodeState>(
+                s => s
                 .Size(sizeSample)
                 .Query(q => q
                     .Bool(b => b
@@ -276,7 +287,8 @@ public class ElasticClient : IElasticClient
                             new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()),
                             new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()),
                             new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName()),
-                        }))));
+                        }))),
+                token);
 
             var retArr = searchRequest?.Hits
                 ?.Select(p => p.Source)
@@ -293,11 +305,11 @@ public class ElasticClient : IElasticClient
         return [];
     }
 
-    private async Task<ElasticsearchClient> GetClient()
+    private async Task<ElasticsearchClient> GetClientAsync(CancellationToken token = default)
     {
         if (_client == null || !Ping())
         {
-            await Reconnect();
+            await ReconnectAsync(token);
         }
 
         return _client ?? throw new InvalidOperationException("Elasticsearch client is null");
@@ -318,7 +330,7 @@ public class ElasticClient : IElasticClient
         }
     }
 
-    private async Task Reconnect()
+    private async Task ReconnectAsync(CancellationToken token = default)
     {
         var retryCount = 0;
         while (retryCount < _maxRetryCount)
@@ -343,7 +355,7 @@ public class ElasticClient : IElasticClient
             }
 
             retryCount++;
-            await Task.Delay(_retryDelay);
+            await Task.Delay(_retryDelay, token);
         }
 
         throw new InvalidOperationException($"Failed to reconnect to Elasticsearch after {_maxRetryCount} attempts");

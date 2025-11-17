@@ -160,7 +160,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
                     }
 
                     NodeRegistryChangeState(nodeState.Key, StatusType.Works);
-                    await ExecutionNodes(nodeState.Key, ctsToken);
+                    await ExecutionNodesAsync(nodeState.Key, ctsToken);
                 }
 
                 _eventsHolder.WaitOne(forcedRepetition);
@@ -177,7 +177,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         {
             _logger.LogError(e, e.Message);
 
-            await _historyNodeStateWriter.SetStateProcess(
+            await _historyNodeStateWriter.SetStateProcessAsync(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
                 _nodeStateRegistry.Values.ToArray(),
@@ -321,7 +321,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         }
     }
 
-    private async Task ExecutionNodes(string nodeId, CancellationToken ctsToken)
+    private async Task ExecutionNodesAsync(string nodeId, CancellationToken ctsToken)
     {
         var isForcedTermination = false;
         try
@@ -350,7 +350,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
             var isCompleted = currentNode.ElementType == ElementType.EndEvent;
 
             // Запишем состояние процесса в бд.
-            await _historyNodeStateWriter.SetStateProcess(
+            await _historyNodeStateWriter.SetStateProcessAsync(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
                 _nodeStateRegistry.Values.ToArray(),

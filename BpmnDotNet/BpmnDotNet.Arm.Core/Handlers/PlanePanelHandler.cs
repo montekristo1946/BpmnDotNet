@@ -27,7 +27,7 @@ public class PlanePanelHandler : IPlanePanelHandler
     {
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(idBpmnProcess) ?? new BpmnPlane();
         var descriptors = await GetDescriptor(plane);
-        var svg = await _svgConstructor.CreatePlane(plane, [], sizeWindows,descriptors);
+        var svg = await _svgConstructor.CreatePlaneAsync(plane, [], sizeWindows,descriptors);
 
         return svg;
     }
@@ -53,7 +53,7 @@ public class PlanePanelHandler : IPlanePanelHandler
 
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(historyNodeState.IdBpmnProcess) ?? new BpmnPlane();
         var descriptors = await GetDescriptor(plane);
-        var svg = await _svgConstructor.CreatePlane(plane, historyNodeState.NodeStaus, sizeWindows,descriptors);
+        var svg = await _svgConstructor.CreatePlaneAsync(plane, historyNodeState.NodeStaus, sizeWindows,descriptors);
 
         return svg;
     }

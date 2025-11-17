@@ -51,7 +51,7 @@ public class SampleService
         var startID = 1;
 
         var totalCount = 10;
-        var batchSize = 2;
+        var batchSize = 1;
         var sw = new Stopwatch();
         sw.Restart();
         for (int i = 0; i < totalCount; i += batchSize)

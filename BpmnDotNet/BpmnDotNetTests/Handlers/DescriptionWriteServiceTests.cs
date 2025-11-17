@@ -25,7 +25,7 @@ public class DescriptionWriteServiceTests
         _descriptionWriteService.AddDescription("testId1", "test_message1");
         _descriptionWriteService.AddDescription("testId2", "test_message2");
 
-        await _descriptionWriteService.Commit();
+        await _descriptionWriteService.CommitAsync();
         
         await _elasticClient.Received(2).SetDataAsync(Arg.Any<DescriptionData>());
     }
@@ -36,8 +36,8 @@ public class DescriptionWriteServiceTests
         _descriptionWriteService.AddDescription("testId1", "test_message1");
         _descriptionWriteService.AddDescription("testId2", "test_message2");
 
-        await _descriptionWriteService.Init();
-        await _descriptionWriteService.Commit();
+        await _descriptionWriteService.InitAsync();
+        await _descriptionWriteService.CommitAsync();
         
         await _elasticClient.Received(0).SetDataAsync(Arg.Any<DescriptionData>());
     }
