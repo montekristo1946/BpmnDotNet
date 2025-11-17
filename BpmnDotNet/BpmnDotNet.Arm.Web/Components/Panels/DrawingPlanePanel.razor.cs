@@ -2,13 +2,13 @@ using BlazorBrowserInteractLabeler.Web.Common;
 using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.Dto;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace BpmnDotNet.Arm.Web.Components.Panels;
 
 public partial class DrawingPlanePanel : ComponentBase
 {
-
     [Inject] private IPlanePanelHandler PlaneHandler { get; set; } = null!;
 
     [Inject] private ILogger<DrawingPlanePanel> Logger { get; set; } = null!;
@@ -18,11 +18,18 @@ public partial class DrawingPlanePanel : ComponentBase
     private string WidthConvas => $"{100}%";
     private string HeightConvas => $"{100}%";
 
+    private double ScaleCurrent = 1.0;
+
     private string _idActiveProcess = string.Empty;
 
-    private SizeWindows SizeWindows { get; set; } = new SizeWindows();
-    private string _svgToString = string.Empty;
 
+    private SizeWindows SizeWindows { get; set; } = new ();
+    private string _svgToString = string.Empty;
+    private bool _isMoveSvg = false;
+    private const int LeftButton = 1;
+    private const int RightButton = 2;
+    private PointT _pointStartOffset = new(){X = 0,Y = 0};
+    private PointT _offset = new(){X = 0,Y = 0};
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -45,10 +52,7 @@ public partial class DrawingPlanePanel : ComponentBase
 
     private string CssScale()
     {
-        var scaleCurrent = 1.0F;
-        var offsetX = 0;
-        var offsetY = 0;
-        return $"transform: scale({scaleCurrent}) translate({offsetX}px, {offsetY}px)";
+        return $"transform: scale({ScaleCurrent}) translate({_offset.X}px, {_offset.Y}px)";
     }
 
     private RenderFragment GetRenderAnnotation()
@@ -74,7 +78,7 @@ public partial class DrawingPlanePanel : ComponentBase
             {
                 return;
             }
-
+            ResetScale();
             _idActiveProcess = idProcess;
 
             _svgToString = await PlaneHandler.GetPlane(_idActiveProcess, SizeWindows);
@@ -99,6 +103,7 @@ public partial class DrawingPlanePanel : ComponentBase
                 return;
             }
 
+            ResetScale();
             _svgToString = await PlaneHandler.GetColorPlane(idUpdateNodeJobStatus, SizeWindows);
             StateHasChanged();
         }
@@ -106,5 +111,48 @@ public partial class DrawingPlanePanel : ComponentBase
         {
             Logger.LogError("[ColorUpdatePanel] {@Exception}", e.Message);
         }
+    }
+
+    private void MouseWheelHandler(WheelEventArgs args)
+    {
+        ScaleCurrent = PlaneHandler.SetScrollValue(args?.DeltaY, ScaleCurrent);
+    }
+
+    private void MouseMoveHandler(MouseEventArgs obj)
+    {
+        if (_isMoveSvg is false)
+        {
+            return;
+        }
+
+        var currentPoint = new PointT() { X = obj.PageX, Y = obj.PageY };
+        _offset = PlaneHandler.CalculateOffset(_pointStartOffset, currentPoint,_offset,ScaleCurrent);
+        _pointStartOffset = currentPoint;
+        
+    }
+
+    private void OnmouseDownHandler(MouseEventArgs obj)
+    {
+        if (obj.Buttons == LeftButton)
+        {
+            _pointStartOffset = new PointT() { X = obj.PageX, Y = obj.PageY };
+            _isMoveSvg = true;
+        }
+
+        if (obj.Buttons == RightButton)
+        {
+            ResetScale();
+        }
+    }
+
+    private void OnmouseUpHandler(MouseEventArgs obj)
+    {
+        _isMoveSvg = false;
+    }
+
+    private void ResetScale()
+    {
+        _offset  = new PointT();
+        ScaleCurrent = 1.0;
     }
 }

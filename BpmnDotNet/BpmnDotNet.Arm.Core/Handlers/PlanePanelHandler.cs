@@ -58,4 +58,40 @@ public class PlanePanelHandler : IPlanePanelHandler
         return svg;
     }
 
+    public double SetScrollValue(double? deltaY, double scaleInput)
+    {
+        const double maxScale = 6F;
+        const double minScale = 0.5F;
+        const double stepScale = 0.2f;
+
+        var scale = scaleInput;
+
+        if (deltaY < 0)
+        {
+            scale *= 1.0f + stepScale;
+        }
+
+
+        if (deltaY > 0)
+        {
+            scale *= 1.0f - stepScale;
+        }
+
+
+        if (scale < minScale || scale > maxScale) 
+        {
+            return scaleInput;
+        }
+        
+        return scale;
+    }
+
+    public PointT CalculateOffset(PointT pointStart, PointT pointEnd, PointT currentOffset, double scaleCurrent)
+    {
+        var coefValueMoved = 1/scaleCurrent;
+        currentOffset.X += (pointStart.X - pointEnd.X)*-1*coefValueMoved;
+        currentOffset.Y += (pointStart.Y - pointEnd.Y)*-1*coefValueMoved;
+
+        return currentOffset;
+    }
 }

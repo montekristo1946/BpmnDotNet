@@ -40,12 +40,12 @@ public class SvgConstructor : ISvgConstructor
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
         var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-
+        var minScale = Math.Min(scalingX, scalingY);
 
         var viewportBuilder = IBpmnBuild<ViewportBuilder>
             .Create()
-            .AddScalingX(scalingX)
-            .AddScalingY(scalingY);
+            .AddScalingX(minScale)
+            .AddScalingY(minScale);
 
         const int stokeWidthStart = 2;
         const int stokeWidthEnd = 4;
@@ -115,12 +115,12 @@ public class SvgConstructor : ISvgConstructor
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
         var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-
+        var minScale = Math.Min(scalingX, scalingY);
 
         var viewportBuilder = IBpmnBuild<ViewportBuilder>
             .Create()
-            .AddScalingX(scalingX)
-            .AddScalingY(scalingY);
+            .AddScalingX(minScale)
+            .AddScalingY(minScale);
 
         const int stokeWidthStart = 2;
         const int stokeWidthEnd = 4;
