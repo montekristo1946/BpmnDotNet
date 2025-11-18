@@ -15,6 +15,7 @@ public class GatewayFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(GatewayFirstHandler);
+    public string Description { get; init; } = "Gateway first handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
@@ -27,7 +28,8 @@ public class GatewayFirstHandler : IBpmnHandler
             throw new OperationCanceledException("Fail try Add key ConditionRoute");
 
         conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SendTaskFirstHandler");
-
+        // conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SubProcessFirstHandler");
+        
         await Task.Delay(1, ctsToken);
     }
 }

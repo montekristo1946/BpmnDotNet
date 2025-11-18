@@ -3,13 +3,14 @@ using BpmnDotNet.Arm.Core.Abstractions;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class StartEventBuilder : IBpmnBuild<StartEventBuilder>
+public class StartEventBuilder : IBpmnBuild<StartEventBuilder>,ITitleBuilder<StartEventBuilder>
 {
     private readonly List<string> _childElements = new();
     private readonly StringBuilder _svgStorage = new();
     private string _id = string.Empty;
     private int _xElement;
     private int _yElement;
+    private string _titleText  = string.Empty;
 
     public string Build()
     {
@@ -18,6 +19,7 @@ public class StartEventBuilder : IBpmnBuild<StartEventBuilder>
 
         var footer = "\t</g>";
         _svgStorage.AppendLine(hider);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(footer);
 
@@ -41,6 +43,15 @@ public class StartEventBuilder : IBpmnBuild<StartEventBuilder>
     public StartEventBuilder AddId(string id)
     {
         _id = id;
+        return this;
+    }
+
+    public StartEventBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

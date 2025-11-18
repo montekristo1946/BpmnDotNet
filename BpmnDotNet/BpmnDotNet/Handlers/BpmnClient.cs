@@ -24,6 +24,7 @@ internal class BpmnClient : IBpmnClient
     private readonly ILoggerFactory _loggerFactory;
     private readonly IPathFinder _pathFinder;
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
+    private readonly IDescriptionWriteService _descriptionWriteService;
     private volatile bool _disposed;
 
     /// <summary>
@@ -32,17 +33,21 @@ internal class BpmnClient : IBpmnClient
     /// <param name="businessProcessDtos">BpmnProcessDtos.</param>
     /// <param name="loggerFactory">ILoggerFactory.</param>
     /// <param name="pathFinder">IPathFinder.</param>
-    /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
+    /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
+    /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполенения.</param>
     public BpmnClient(
         BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
-        IHistoryNodeStateWriter historyNodeStateWriter)
+        IHistoryNodeStateWriter historyNodeStateWriter,
+        IDescriptionWriteService descriptionWriteService)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
         _historyNodeStateWriter =
             historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
+        _descriptionWriteService =
+            descriptionWriteService ?? throw new ArgumentNullException(nameof(descriptionWriteService));
         _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
@@ -78,21 +83,28 @@ internal class BpmnClient : IBpmnClient
         return process.JobStatus;
     }
 
-    /// <inheritdoc />
-    public void RegisterHandlers<THandler>(THandler handlerBpmn)
+    /// <inheritdoc/>
+    public void RegisterHandlers<THandler>(THandler[] handlersBpmn)
         where THandler : IBpmnHandler
     {
-        ArgumentNullException.ThrowIfNull(handlerBpmn);
+        ArgumentNullException.ThrowIfNull(handlersBpmn);
+        _descriptionWriteService.InitAsync();
 
-        var handler = (IBpmnHandler)handlerBpmn;
-        var taskDefinitionId = handler.TaskDefinitionId;
-
-        var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
-
-        if (resAdd is false)
+        foreach (THandler handler in handlersBpmn)
         {
-            throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+            var taskDefinitionId = handler.TaskDefinitionId;
+
+            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+
+            if (resAdd is false)
+            {
+                throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+            }
+
+            _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
         }
+
+        _descriptionWriteService.CommitAsync();
     }
 
     /// <inheritdoc />
@@ -128,6 +140,22 @@ internal class BpmnClient : IBpmnClient
         _cleanerTask.Wait();
         _cleanerTask.Dispose();
         _cts?.Dispose();
+    }
+
+    private void RegisterHandler<THandler>(THandler handlerBpmn)
+        where THandler : IBpmnHandler
+    {
+        ArgumentNullException.ThrowIfNull(handlerBpmn);
+
+        var handler = (IBpmnHandler)handlerBpmn;
+        var taskDefinitionId = handler.TaskDefinitionId;
+
+        var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+
+        if (resAdd is false)
+        {
+            throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+        }
     }
 
     private async Task CleaningBpmnProcesses(CancellationToken cts)

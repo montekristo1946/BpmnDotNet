@@ -17,11 +17,11 @@ public interface IBpmnClient : IDisposable
     public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
 
     /// <summary>
-    ///     Регистрация handler.
+    ///     Регистрация handlers.
     /// </summary>
     /// <param name="handlerBpmn">Хэндлер.</param>
     /// <typeparam name="THandler">Тип хэндлера.</typeparam>
-    public void RegisterHandlers<THandler>(THandler handlerBpmn)
+    public void RegisterHandlers<THandler>(THandler[] handlerBpmn)
         where THandler : IBpmnHandler;
 
     /// <summary>

@@ -20,12 +20,11 @@ public class SubProcessFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(SubProcessFirstHandler);
+    public string Description { get; init; } =   "Sub-process first handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug("[SubProcessFirstHandler:AsyncJobHandler] SubProcessFirstHandler run ");
-        var cont = context as ContextData;
-
 
         var timeout = TimeSpan.FromMinutes(10);
         var contextSubProcess = CreateContextSubProcess();
@@ -35,6 +34,12 @@ public class SubProcessFirstHandler : IBpmnHandler
 
         await Task.Delay(1, ctsToken);
 
+        var random = new Random();
+        var randomState = random.Next(0, 10);
+        if (randomState > 5)
+        {
+            // throw new Exception("Test exception!");
+        }
         _logger.LogDebug($"[SubProcessFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {contextSubProcess.ContextSubProcessValue}");
     }

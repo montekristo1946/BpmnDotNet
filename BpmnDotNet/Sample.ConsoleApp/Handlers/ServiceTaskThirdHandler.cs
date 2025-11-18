@@ -16,6 +16,7 @@ public class ServiceTaskThirdHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskThirdHandler);
+    public string Description { get; init; } =   "Вагон по рельсам скользит, не сворачивай —\nбезопасность пассажиров всегда впереди маяк.";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {
@@ -23,6 +24,7 @@ public class ServiceTaskThirdHandler : IBpmnHandler
             _logger.LogDebug($"[ServiceTaskThirdHandler:AsyncJobHandler]  " +
                              $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {cont.TestValue2}");
 
+    
         await Task.Delay(1, ctsToken);
     }
 }

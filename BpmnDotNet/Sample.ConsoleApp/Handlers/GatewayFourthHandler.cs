@@ -15,6 +15,7 @@ public class GatewayFourthHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(GatewayFourthHandler);
+    public string Description { get; init; } =  "Gateway fourth handler";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

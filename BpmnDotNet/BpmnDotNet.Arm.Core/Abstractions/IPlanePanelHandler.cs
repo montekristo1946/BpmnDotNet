@@ -25,7 +25,23 @@ internal interface IPlanePanelHandler
     /// <param name="idUpdateNodeJobStatus"></param>
     /// <param name="sizeWindows"></param>
     /// <returns></returns>
-    Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows);
+    public Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows);
 
+    /// <summary>
+    /// Установить масштаб.
+    /// </summary>
+    /// <param name="deltaY">The vertical scroll amount.</param>
+    /// <param name="scaleCurrent"></param>
+    /// <returns></returns>
+    public double SetScrollValue(double? deltaY, double scaleCurrent);
 
+    /// <summary>
+    /// Рассчитает точку смещения svg.
+    /// </summary>
+    /// <param name="pointStart">Точка начало движения</param>
+    /// <param name="pointEnd">Точка окончания движения.</param>
+    /// <param name="currentOffset">Текущее смещение.</param>
+    /// <param name="scaleCurrent">Текущий масштаб</param>
+    /// <returns>Скорректированное смещение.</returns>
+    public PointT CalculateOffset(PointT pointStart, PointT pointEnd, PointT currentOffset, double scaleCurrent);
 }

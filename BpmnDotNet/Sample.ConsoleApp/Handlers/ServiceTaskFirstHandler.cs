@@ -16,6 +16,7 @@ public class ServiceTaskFirstHandler : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFirstHandler);
+    public string Description { get; init; } =   "Осмоторщик должен проверять пломбы на вагонах перед отправкой.\nЗапрещается допускать к эксплуатации вагоны с заметными повреждениями.\nРегулярно вести журнал осмотров и фиксировать все замечания.\nВнимательно осматривать дверные механизмы и системы безопасности.\nСоблюдать правила техники безопасности при работе с подвижным составом.";
 
     public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
     {

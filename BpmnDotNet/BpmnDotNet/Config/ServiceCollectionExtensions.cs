@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
         services.AddScoped<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
+        services.AddScoped<IDescriptionWriteService, DescriptionWriteService>();
         services.AddScoped<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
@@ -42,13 +43,15 @@ public static class ServiceCollectionExtensions
             var pathFinder = options.GetRequiredService<IPathFinder>();
             var elasticClient = options.GetRequiredService<IElasticClientSetDataAsync>();
             var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
+            var descriptionWriteService = options.GetRequiredService<IDescriptionWriteService>();
 
             return BpmnClientBuilder.Build(
                 pathDiagram,
                 loggerFactory,
                 pathFinder,
                 elasticClient,
-                historyNodeStateWriter);
+                historyNodeStateWriter,
+                descriptionWriteService);
         });
 
         return services;

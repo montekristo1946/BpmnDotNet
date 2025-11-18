@@ -4,6 +4,7 @@ using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Common.Models;
 using BpmnDotNet.Utils;
 
@@ -60,11 +61,21 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         var shapes = GetShapesFromPlane(bpmnPlane, idBpmnPlane);
         shapes = FillTypeAndName(shapes, processBlock);
 
+        var namePrecess = GetNameProcess(processBlock, bpmnElementPlane);
         return new BpmnPlane
         {
             IdBpmnProcess = bpmnElementPlane,
             Shapes = shapes,
+            Name = namePrecess,
         };
+    }
+
+    private string GetNameProcess(XmlNode? processBlock, string idBpmnPlane)
+    {
+        var processName = processBlock?.Attributes?[Constants.BpmnAttributesName]?.Value;
+
+        return processName ??
+               throw new InvalidDataException($"Not Find Get Name Process from:{idBpmnPlane}");
     }
 
     private BpmnShape[] FillTypeAndName(BpmnShape[] shapes, XmlNode processBlock)

@@ -4,7 +4,7 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class ServiceTaskBuilder : IBpmnBuild<ServiceTaskBuilder>
+public class ServiceTaskBuilder : IBpmnBuild<ServiceTaskBuilder>,ITitleBuilder<ServiceTaskBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private string _color = string.Empty;
@@ -12,14 +12,16 @@ public class ServiceTaskBuilder : IBpmnBuild<ServiceTaskBuilder>
     private readonly List<string> _childElements = new();
     private int _xElement;
     private int _yElement;
+    private string _titleText  = string.Empty;
 
     public string Build()
     {
         var hider =
             $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
         var mainRect = IBpmnBuild<RectBuilder>.Create().AddColor(_color).Build();
-
+        
         _svgStorage.AppendLine(hider);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(mainRect);
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(CreateCircleTop());
@@ -79,6 +81,15 @@ public class ServiceTaskBuilder : IBpmnBuild<ServiceTaskBuilder>
     {
         _xElement = x;
         _yElement = y;
+        return this;
+    }
+
+    public ServiceTaskBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

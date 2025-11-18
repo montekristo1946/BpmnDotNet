@@ -17,7 +17,7 @@ internal interface IHistoryNodeStateWriter
     /// <param name="isCompleted">Флаг. Финальная запись проходит.</param>
     /// <param name="dateFromInitInstance">Временная метка создания отчета.</param>
     /// <returns> <see cref="Task"/> representing the asynchronous operation.</returns>
-    Task SetStateProcess(
+    Task SetStateProcessAsync(
         string idBpmnProcess,
         string tokenProcess,
         NodeJobStatus[] nodeStateRegistry,

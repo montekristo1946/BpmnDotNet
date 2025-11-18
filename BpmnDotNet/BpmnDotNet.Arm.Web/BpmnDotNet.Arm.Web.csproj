@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+        <TargetFramework>$(TargetFrameworkVersionUI)</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <RazorLangVersion>9.0</RazorLangVersion>
         <RootNamespace>BpmnDotNet.Arm.Web</RootNamespace>
     </PropertyGroup>
 
@@ -22,6 +23,10 @@
     <ItemGroup>
         <ProjectReference Include="..\BpmnDotNet.Arm.Core\BpmnDotNet.Arm.Core.csproj"/>
         <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Components\Layout\" />
     </ItemGroup>
 
 

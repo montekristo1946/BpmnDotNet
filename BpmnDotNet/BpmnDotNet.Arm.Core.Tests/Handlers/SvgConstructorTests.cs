@@ -2,6 +2,7 @@ using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Arm.Core.Handlers;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Handlers;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;
@@ -26,9 +27,9 @@ public class SvgConstructorTests
             Height = 603,
             Width = 1594
         };
-        var res = await _svgConstructor.CreatePlane(_string, size);
+        var res = await _svgConstructor.CreatePlaneAsync(_string, [],size, []);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
-        Assert.Equal(37294, res.Length);
+        Assert.Equal(37265, res.Length);
     }
 }

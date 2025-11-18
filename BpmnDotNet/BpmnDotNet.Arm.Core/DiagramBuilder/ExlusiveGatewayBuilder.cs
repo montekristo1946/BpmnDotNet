@@ -4,7 +4,7 @@ using BpmnDotNet.Common.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class ExlusiveGatewayBuilder : IBpmnBuild<ExlusiveGatewayBuilder>
+public class ExlusiveGatewayBuilder : IBpmnBuild<ExlusiveGatewayBuilder>,ITitleBuilder<ExlusiveGatewayBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private string _color = string.Empty;
@@ -12,13 +12,14 @@ public class ExlusiveGatewayBuilder : IBpmnBuild<ExlusiveGatewayBuilder>
     private readonly List<string> _childElements = new();
     private int _xElement;
     private int _yElement;
-
+    private string _titleText  = string.Empty;
     public string Build()
     {
         var hider =
             $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
 
         _svgStorage.AppendLine(hider);
+        _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(CreatePolygon());
         _svgStorage.AppendLine(CreateBody());
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
@@ -68,6 +69,15 @@ public class ExlusiveGatewayBuilder : IBpmnBuild<ExlusiveGatewayBuilder>
     {
         _xElement = x;
         _yElement = y;
+        return this;
+    }
+
+    public ExlusiveGatewayBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText =  titleText;
+        }
         return this;
     }
 }

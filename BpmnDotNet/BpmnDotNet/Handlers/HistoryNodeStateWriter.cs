@@ -24,7 +24,7 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
     }
 
     /// <inheritdoc/>
-    public async Task SetStateProcess(
+    public async Task SetStateProcessAsync(
         string idBpmnProcess,
         string tokenProcess,
         NodeJobStatus[] nodeStateRegistry,

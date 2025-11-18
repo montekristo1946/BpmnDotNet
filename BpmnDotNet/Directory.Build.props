@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
-        <TargetFrameworkVersion>net9.0</TargetFrameworkVersion>
+        <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+        <TargetFrameworkVersionUI>net9.0</TargetFrameworkVersionUI>
 
         <SerilogVersion>4.3.0</SerilogVersion>
         <SerilogAspNetCoreVersion>[8.0.0,9.0.0)</SerilogAspNetCoreVersion>
@@ -14,13 +15,14 @@
         <SerilogSinksConsoleVersion>6.0.0</SerilogSinksConsoleVersion>
         <SerilogSinksFileVersion>7.0.0</SerilogSinksFileVersion>
 
-        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.8</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
-        <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.8</MicrosoftExtensionsLoggingAbstractionsVersion>
-        <MicrosoftExtensionsDependencyInjectionVersion>9.0.8</MicrosoftExtensionsDependencyInjectionVersion>
-        <MicrosoftExtensionsHostingVerson>9.0.8</MicrosoftExtensionsHostingVerson>
-        <MicrosoftAspNetCoreComponentsWebVersion>9.0.8</MicrosoftAspNetCoreComponentsWebVersion>
+        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>[9.0.8]</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
+        <MicrosoftExtensionsLoggingAbstractionsVersion>[9.0.8]</MicrosoftExtensionsLoggingAbstractionsVersion>
+        <MicrosoftExtensionsLoggingVersion>[9.0.8]</MicrosoftExtensionsLoggingVersion>
+        <MicrosoftExtensionsDependencyInjectionVersion>[9.0.8]</MicrosoftExtensionsDependencyInjectionVersion>
+        <MicrosoftExtensionsHostingVerson>[9.0.8]</MicrosoftExtensionsHostingVerson>
+        <MicrosoftAspNetCoreComponentsWebVersion>[9.0.8]</MicrosoftAspNetCoreComponentsWebVersion>
 
-        <ElasticClientsElasticsearchVersion>9.1.4</ElasticClientsElasticsearchVersion>
+        <ElasticClientsElasticsearchVersion>[9.1.4]</ElasticClientsElasticsearchVersion>
 
 
         <!--    Test service-->

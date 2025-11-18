@@ -1,6 +1,6 @@
 namespace BpmnDotNet.Arm.Core.Abstractions;
 
-public interface IBpmnBuild<T> where T : new()
+public interface IBpmnBuild<out T> where T : new()
 {
     public string Build();
 

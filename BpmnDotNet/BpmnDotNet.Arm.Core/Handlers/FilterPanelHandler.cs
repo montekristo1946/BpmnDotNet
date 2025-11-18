@@ -1,6 +1,8 @@
 using BpmnDotNet.Arm.Core.Abstractions;
+using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.Common.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.Arm.Core.Handlers;
@@ -16,10 +18,16 @@ public class FilterPanelHandler : IFilterPanelHandler
         _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
     }
 
-    public async Task<string[]> GetAllProcessId()
+    public async Task<ProcessDataFilterPanel[]> GetAllProcessIdAsync()
     {
-        var bpmnPlanes = await _elasticClient.GetAllFieldsAsync<BpmnPlane, string>(nameof(BpmnPlane.IdBpmnProcess), 100);
+        var searchFields = new[] { nameof(BpmnPlane.IdBpmnProcess), nameof(BpmnPlane.Name) };
+        var bpmnPlanes = await _elasticClient.GetAllFieldsAsync<BpmnPlane>(searchFields, 100);
 
-        return bpmnPlanes ?? [];
+        var retArray = bpmnPlanes.Select(p => new ProcessDataFilterPanel()
+        {
+            IdBpmnProcess = p.IdBpmnProcess,
+            NameBpmnProcess = p.Name,
+        }).ToArray();
+        return retArray;
     }
 }

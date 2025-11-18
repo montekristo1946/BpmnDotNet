@@ -1,7 +1,6 @@
 namespace BpmnDotNet.Common.Abstractions;
 
-using System;
-using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using System.Threading.Tasks;
 using BpmnDotNet.Common.Dto;
 
@@ -15,19 +14,20 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// </summary>
     /// <param name="id">ID объекта в базе данных.</param>
     /// <param name="sourceExcludes">Source которые запросим.</param>
+    /// <param name="token">Токен отмены.</param>
     /// <typeparam name="T">Тип индекса в базе данных.</typeparam>
     /// <returns>ДТО которую запросили со всеми заполненными полями.</returns>
-    public Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes = null);
+    public Task<T?> GetDataFromIdAsync<T>(string id, string[]? sourceExcludes = null, CancellationToken token = default);
 
     /// <summary>
     /// Получить все записи по полю TField из TIndex.
     /// </summary>
-    /// <param name="nameField">Название поля.</param>
+    /// <param name="searchFields">Поля которые нужно выбрать.</param>
     /// <param name="maxCountElements">Масимальное количество возращаемых обьектов.</param>
+    /// <param name="token">Токен отмены.</param>
     /// <typeparam name="TIndex">Тип индекса.</typeparam>
-    /// <typeparam name="TField">Тип таблицы.</typeparam>
     /// <returns>Массив полей.</returns>
-    public Task<TField[]> GetAllFieldsAsync<TIndex, TField>(string nameField, int maxCountElements)
+    public Task<TIndex[]> GetAllFieldsAsync<TIndex>(string [] searchFields, int maxCountElements, CancellationToken token = default)
         where TIndex : class;
 
     /// <summary>
@@ -36,8 +36,9 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// <param name="idBpmnProcess">ID BpmnProcess.</param>
     /// <param name="processStatus">Массив ProcessStatus.</param>
     /// <param name="sizeSample">Количество, которое будем анализировать.</param>
+    /// <param name="token">Токен отмены.</param>
     /// <returns>Найденное количество.</returns>
-    public Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus, int sizeSample = 10000);
+    public Task<int> GetCountHistoryNodeStateAsync(string idBpmnProcess, string[] processStatus, int sizeSample = 10000, CancellationToken token = default);
 
     /// <summary>
     /// Выдача результатов пагинация, с фильтром ProcessStatus.
@@ -46,8 +47,9 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// <param name="from">С какого элемента.</param>
     /// <param name="size">Сколько элементов.</param>
     /// <param name="processStatus">Массив ProcessStatus.</param>
+    /// <param name="token">Токен отмены.</param>
     /// <returns>Массив HistoryNodeState.</returns>
-    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus);
+    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus, CancellationToken token = default);
 
     /// <summary>
     /// Поиск HistoryNodeState по маске в поле Token.
@@ -55,6 +57,7 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// <param name="idBpmnProcess">ID BpmnProcess.</param>
     /// <param name="mask">Маска поиска формата elastic.</param>
     /// <param name="sizeSample">Количество выдаваемого результата.</param>
+    /// <param name="token">Токен отмены.</param>
     /// <returns>Массив HistoryNodeState.</returns>
-    public Task<HistoryNodeState[]> GetHistoryNodeFromTokenMaskAsync(string idBpmnProcess, string mask, int sizeSample = 100);
+    public Task<HistoryNodeState[]> GetHistoryNodeFromTokenMaskAsync(string idBpmnProcess, string mask, int sizeSample = 100, CancellationToken token = default);
 }

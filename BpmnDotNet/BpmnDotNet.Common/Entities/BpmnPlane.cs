@@ -1,6 +1,6 @@
-namespace BpmnDotNet.Common.BPMNDiagram;
+namespace BpmnDotNet.Common.Entities;
 
-using System;
+using BpmnDotNet.Common.BPMNDiagram;
 
 /// <summary>
 ///     В нотации секция: bpmndi:BPMNPlane.
@@ -21,4 +21,9 @@ public record BpmnPlane
     ///     Gets массив фигур для отрисовки.
     /// </summary>
     public BpmnShape[] Shapes { get; init; } = [];
+
+    /// <summary>
+    ///     Gets текст в элементах. Описывает name.
+    /// </summary>
+    public string Name { get; init; } = string.Empty;
 }

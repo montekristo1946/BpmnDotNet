@@ -52,6 +52,9 @@
         <None Update="BpmnDiagram\CheckError\FailId_8.bpmn">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="BpmnDiagram\CheckError\LoadXmlBpmn_CheckFailGetNameProcess_Exception.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 

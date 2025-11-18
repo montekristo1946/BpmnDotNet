@@ -3,6 +3,7 @@ using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.Logging;
 
@@ -22,12 +23,27 @@ public class PlanePanelHandler : IPlanePanelHandler
         _svgConstructor = svgConstructor ?? throw new ArgumentNullException(nameof(svgConstructor));
     }
 
-    public async Task<string> GetPlane(string IdBpmnProcess, SizeWindows sizeWindows)
+    public async Task<string> GetPlane(string idBpmnProcess, SizeWindows sizeWindows)
     {
-        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(IdBpmnProcess) ?? new BpmnPlane();
-        var svg = await _svgConstructor.CreatePlane(plane, sizeWindows);
+        var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(idBpmnProcess) ?? new BpmnPlane();
+        var descriptors = await GetDescriptor(plane);
+        var svg = await _svgConstructor.CreatePlaneAsync(plane, [], sizeWindows,descriptors);
 
         return svg;
+    }
+
+    private async Task<DescriptionData[]> GetDescriptor(BpmnPlane plane)
+    {
+        var result = new List<DescriptionData>(); 
+        foreach (var planeShape in plane.Shapes)
+        {
+            var data = await _elasticClient.GetDataFromIdAsync<DescriptionData>(planeShape.BpmnElement);
+            if (data != null)
+            {
+                result.Add(data);
+            }
+        }
+        return result.ToArray();
     }
 
     public async Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows)
@@ -36,10 +52,46 @@ public class PlanePanelHandler : IPlanePanelHandler
             [nameof(HistoryNodeState.ArrayMessageErrors)]) ?? new HistoryNodeState();
 
         var plane = await _elasticClient.GetDataFromIdAsync<BpmnPlane>(historyNodeState.IdBpmnProcess) ?? new BpmnPlane();
-
-        var svg = await _svgConstructor.CreatePlane(plane, historyNodeState.NodeStaus, sizeWindows);
+        var descriptors = await GetDescriptor(plane);
+        var svg = await _svgConstructor.CreatePlaneAsync(plane, historyNodeState.NodeStaus, sizeWindows,descriptors);
 
         return svg;
     }
 
+    public double SetScrollValue(double? deltaY, double scaleInput)
+    {
+        const double maxScale = 6F;
+        const double minScale = 0.5F;
+        const double stepScale = 0.2f;
+
+        var scale = scaleInput;
+
+        if (deltaY < 0)
+        {
+            scale *= 1.0f + stepScale;
+        }
+
+
+        if (deltaY > 0)
+        {
+            scale *= 1.0f - stepScale;
+        }
+
+
+        if (scale < minScale || scale > maxScale) 
+        {
+            return scaleInput;
+        }
+        
+        return scale;
+    }
+
+    public PointT CalculateOffset(PointT pointStart, PointT pointEnd, PointT currentOffset, double scaleCurrent)
+    {
+        var coefValueMoved = 1/scaleCurrent;
+        currentOffset.X += (pointStart.X - pointEnd.X)*-1*coefValueMoved;
+        currentOffset.Y += (pointStart.Y - pointEnd.Y)*-1*coefValueMoved;
+
+        return currentOffset;
+    }
 }
