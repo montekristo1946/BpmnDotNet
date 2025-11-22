@@ -24,10 +24,16 @@ public partial class Operate : ComponentBase
         return Task.CompletedTask;
     }
 
-    private async Task ChoseIdProcess(string value)
+    private async Task ChoseIdProcess(string idProcess)
     {
-        await _drawingPlanePanel.BaseUpdatePanel(value);
-        await _listProcessPanel.SetIdProcess(value);
+        await _drawingPlanePanel.BaseUpdatePanel(idProcess);
+        await _listProcessPanel.SetIdProcess(idProcess);
+    }
+    private async Task ChoseIdProcessCallingFilterPanel(string idProcess)
+    {
+        await _listProcessPanel.ResetData();
+        await _listProcessPanel.SetIdProcess(idProcess);
+        await _drawingPlanePanel.BaseUpdatePanel(idProcess);
     }
 
     private async Task SetStatusFilter(string[] filters)
@@ -77,7 +83,7 @@ public partial class Operate : ComponentBase
         return builder =>
         {
             builder.OpenComponent(0, typeof(FilterPanel));
-            builder.AddAttribute(1, nameof(FilterPanel.ChoseIdProcess), ChoseIdProcess);
+            builder.AddAttribute(1, nameof(FilterPanel.ChoseIdProcess), ChoseIdProcessCallingFilterPanel);
             builder.AddAttribute(2, nameof(FilterPanel.SetStatusFilter), SetStatusFilter);
             builder.AddAttribute(3, nameof(FilterPanel.SetFilterToken), SetFilterToken);
             builder.AddComponentReferenceCapture(4, value =>
@@ -90,7 +96,7 @@ public partial class Operate : ComponentBase
             builder.CloseComponent();
         };
     }
-
+    
 
     private RenderFragment CreateBpmnPlanePanelTemplate()
     {
