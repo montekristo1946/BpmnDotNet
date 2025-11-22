@@ -1,5 +1,7 @@
-using BpmnDotNet.Arm.Core.Abstractions;
-using BpmnDotNet.Arm.Core.Handlers;
+using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
+using BpmnDotNet.Arm.Core.SvgDomain.Service;
+using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
+using BpmnDotNet.Arm.Core.UiDomain.Services;
 using BpmnDotNet.Arm.Web.AppWeb;
 using BpmnDotNet.Arm.Web.Config;
 using BpmnDotNet.Arm.Web.Extensions;

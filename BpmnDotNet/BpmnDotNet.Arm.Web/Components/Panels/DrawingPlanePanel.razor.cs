@@ -1,6 +1,6 @@
 using BlazorBrowserInteractLabeler.Web.Common;
-using BpmnDotNet.Arm.Core.Abstractions;
-using BpmnDotNet.Arm.Core.Dto;
+using BpmnDotNet.Arm.Core.Common;
+using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;

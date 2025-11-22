@@ -1,6 +1,6 @@
-using BpmnDotNet.Arm.Core.Abstractions;
-using BpmnDotNet.Arm.Core.Dto;
-using BpmnDotNet.Arm.Core.Handlers;
+using BpmnDotNet.Arm.Core.Common;
+using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
+using BpmnDotNet.Arm.Core.SvgDomain.Service;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Handlers;
