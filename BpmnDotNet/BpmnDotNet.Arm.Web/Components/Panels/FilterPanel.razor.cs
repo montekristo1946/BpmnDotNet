@@ -1,5 +1,5 @@
-using BpmnDotNet.Arm.Core.Abstractions;
-using BpmnDotNet.Arm.Core.Dto;
+using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
+using BpmnDotNet.Arm.Core.UiDomain.Dto;
 using BpmnDotNet.Common.Dto;
 using Microsoft.AspNetCore.Components;
 

@@ -1,4 +1,4 @@
-using BpmnDotNet.Arm.Core.DiagramBuilder;
+using BpmnDotNet.Arm.Core.SvgDomain.Service;
 
 namespace BpmnDotNet.Arm.Core.Tests.DiagramBuilder;
 
