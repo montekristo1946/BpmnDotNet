@@ -150,7 +150,7 @@ public class ElasticClient : IElasticClient
     public async Task<int> GetCountHistoryNodeStateAsync(
         string idBpmnProcess,
         string[] processStatus,
-        int sizeSample = 10000,
+        int sizeSample = 1000,
         CancellationToken token = default)
     {
         var fieldsValue = GetFields(processStatus);

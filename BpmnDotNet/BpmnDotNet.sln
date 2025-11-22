@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{FBDE75
 		..\Documents\Images\service_task.jpg = ..\Documents\Images\service_task.jpg
 		..\Documents\Images\start_event.jpg = ..\Documents\Images\start_event.jpg
 		..\Documents\Images\sub_process.jpg = ..\Documents\Images\sub_process.jpg
+		..\Documents\Images\all_web_interfacejpg.jpg = ..\Documents\Images\all_web_interfacejpg.jpg
+		..\Documents\Images\all_web_interfacejpg_erorr.jpg = ..\Documents\Images\all_web_interfacejpg_erorr.jpg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{D6184085-5C9B-4E07-840F-C0A56357C266}"

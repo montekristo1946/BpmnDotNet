@@ -61,7 +61,7 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
     }
 
     /// <summary>
-    /// Добавить грацинцы.
+    /// Добавить гоацины.
     /// </summary>
     /// <param name="bounds">Bound.</param>
     /// <returns>Собираемая фигура.</returns>
