@@ -44,12 +44,12 @@ public interface IElasticClient : IElasticClientSetDataAsync
     /// Выдача результатов пагинация, с фильтром ProcessStatus.
     /// </summary>
     /// <param name="idBpmnProcess">ID BpmnProcess.</param>
-    /// <param name="from">С какого элемента.</param>
-    /// <param name="size">Сколько элементов.</param>
+    /// <param name="skip">С какого элемента.</param>
+    /// <param name="take">Сколько элементов.</param>
     /// <param name="processStatus">Массив ProcessStatus.</param>
     /// <param name="token">Токен отмены.</param>
     /// <returns>Массив HistoryNodeState.</returns>
-    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int from, int size, string[] processStatus, CancellationToken token = default);
+    public Task<HistoryNodeState[]> GetHistoryNodeStateAsync(string idBpmnProcess, int skip, int take, string[] processStatus, CancellationToken token = default);
 
     /// <summary>
     /// Поиск HistoryNodeState по маске в поле Token.

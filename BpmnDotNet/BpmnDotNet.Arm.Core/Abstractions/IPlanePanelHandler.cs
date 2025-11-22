@@ -13,35 +13,36 @@ namespace BpmnDotNet.Arm.Core.Abstractions;
 internal interface IPlanePanelHandler
 {
     /// <summary>
-    ///     Вернет BpmnPlane для отрисовки.
+    ///     Вернет svg BpmnPlane для отрисовки.
     /// </summary>
-    /// <param name="IdBpmnProcess"></param>
-    /// <param name="sizeWindows"></param>
-    public Task<string> GetPlane(string IdBpmnProcess, SizeWindows sizeWindows);
+    /// <param name="idBpmnProcess">ID процесса.</param>
+    /// <param name="sizeWindows">Размер окна.</param>
+    /// <returns>SVG Bpmn. <see cref="Task"/> representing the asynchronous operation.</returns>
+    public Task<string> GetPlane(string idBpmnProcess, SizeWindows sizeWindows);
 
     /// <summary>
     ///     Вернет BpmnPlane с раскрашенными состояниями.
     /// </summary>
-    /// <param name="idUpdateNodeJobStatus"></param>
-    /// <param name="sizeWindows"></param>
-    /// <returns></returns>
+    /// <param name="idUpdateNodeJobStatus"> id HistoryNodeState.</param>
+    /// <param name="sizeWindows">Размер окна.</param>
+    /// <returns>SVG Bpmn. <see cref="Task"/> representing the asynchronous operation.</returns>
     public Task<string> GetColorPlane(string idUpdateNodeJobStatus, SizeWindows sizeWindows);
 
     /// <summary>
     /// Установить масштаб.
     /// </summary>
     /// <param name="deltaY">The vertical scroll amount.</param>
-    /// <param name="scaleCurrent"></param>
-    /// <returns></returns>
+    /// <param name="scaleCurrent">Текущий масштаб.</param>
+    /// <returns>Скорректированный масштаб.</returns>
     public double SetScrollValue(double? deltaY, double scaleCurrent);
 
     /// <summary>
     /// Рассчитает точку смещения svg.
     /// </summary>
-    /// <param name="pointStart">Точка начало движения</param>
+    /// <param name="pointStart">Точка начало движения.</param>
     /// <param name="pointEnd">Точка окончания движения.</param>
     /// <param name="currentOffset">Текущее смещение.</param>
-    /// <param name="scaleCurrent">Текущий масштаб</param>
+    /// <param name="scaleCurrent">Текущий масштаб.</param>
     /// <returns>Скорректированное смещение.</returns>
     public PointT CalculateOffset(PointT pointStart, PointT pointEnd, PointT currentOffset, double scaleCurrent);
 }

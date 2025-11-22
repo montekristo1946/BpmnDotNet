@@ -1,9 +1,9 @@
+namespace BpmnDotNet.Arm.Core.Abstractions;
+
 using BpmnDotNet.Arm.Core.Dto;
 using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Common.Entities;
-
-namespace BpmnDotNet.Arm.Core.Abstractions;
 
 /// <summary>
 /// Отрисовка svg.
@@ -17,7 +17,10 @@ public interface ISvgConstructor
     /// <param name="nodeJobStatus">Состояние узлов на Bpmn схеме.</param>
     /// <param name="sizeWindows">Размер окна под которое подогнать svg.</param>
     /// <param name="descriptions">Текст всплывающие подсказки.</param>
-    /// <returns></returns>
-    Task<string> CreatePlaneAsync(BpmnPlane plane, NodeJobStatus[] nodeJobStatus, SizeWindows sizeWindows,
+    /// <returns>SVG для отрисовки.</returns>
+    Task<string> CreatePlaneAsync(
+        BpmnPlane plane,
+        NodeJobStatus[] nodeJobStatus,
+        SizeWindows sizeWindows,
         DescriptionData[] descriptions);
 }

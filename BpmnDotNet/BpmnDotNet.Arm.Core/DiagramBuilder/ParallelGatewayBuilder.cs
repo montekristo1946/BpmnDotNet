@@ -1,19 +1,24 @@
-using System.Text;
-using BpmnDotNet.Arm.Core.Abstractions;
-using BpmnDotNet.Common.BPMNDiagram;
-
 namespace BpmnDotNet.Arm.Core.DiagramBuilder;
 
-public class ParallelGatewayBuilder : IBpmnBuild<ParallelGatewayBuilder>,ITitleBuilder<ParallelGatewayBuilder>
+using System.Text;
+using BpmnDotNet.Arm.Core.Abstractions;
+
+/// <summary>
+/// Параллельный гетвей.
+/// </summary>
+public class ParallelGatewayBuilder : IFullBodiedFigure<ParallelGatewayBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
+    private readonly List<string> _childElements = new();
     private string _color = string.Empty;
     private string _id = string.Empty;
-    private readonly List<string> _childElements = new();
+
     private int _xElement;
     private int _yElement;
-    private string _titleText  = string.Empty;
-    public string Build()
+    private string _titleText = string.Empty;
+
+    /// <inheritdoc />
+    public string BuildSvg()
     {
         var hider =
             $"<g data-element-id=\"{_id}\" style=\"display: block;\" transform=\"matrix(1 0 0 1 {_xElement} {_yElement})\">";
@@ -27,6 +32,46 @@ public class ParallelGatewayBuilder : IBpmnBuild<ParallelGatewayBuilder>,ITitleB
         var footer = "</g>";
         _svgStorage.AppendLine(footer);
         return _svgStorage.ToString();
+    }
+
+    /// <inheritdoc />
+    public ParallelGatewayBuilder AddChild(string childElement)
+    {
+        _childElements.Add(childElement);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ParallelGatewayBuilder AddColor(string color)
+    {
+        _color = color;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ParallelGatewayBuilder AddId(string id)
+    {
+        _id = id;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ParallelGatewayBuilder AddPositionOffsets(int x, int y)
+    {
+        _xElement = x;
+        _yElement = y;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ParallelGatewayBuilder AddTitle(string? titleText)
+    {
+        if (titleText is not null)
+        {
+            _titleText = titleText;
+        }
+
+        return this;
     }
 
     private string CreateBody()
@@ -43,39 +88,5 @@ public class ParallelGatewayBuilder : IBpmnBuild<ParallelGatewayBuilder>,ITitleB
                      $"style=\"stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; stroke-width: 2px; fill: white; fill-opacity: 0.95;\"> " +
                      $"</polygon>";
         return retRes;
-    }
-
-
-    public ParallelGatewayBuilder AddChild(string childElement)
-    {
-        _childElements.Add(childElement);
-        return this;
-    }
-
-    public ParallelGatewayBuilder AddColor(string color)
-    {
-        _color = color;
-        return this;
-    }
-
-    public ParallelGatewayBuilder AddId(string id)
-    {
-        _id = id;
-        return this;
-    }
-
-    public ParallelGatewayBuilder AddPosition(int x, int y)
-    {
-        _xElement = x;
-        _yElement = y;
-        return this;
-    }
-    public ParallelGatewayBuilder AddTitle(string? titleText)
-    {
-        if (titleText is not null)
-        {
-            _titleText =  titleText;
-        }
-        return this;
     }
 }

@@ -1,15 +1,15 @@
-using BpmnDotNet.Arm.Core.Dto;
-
 namespace BpmnDotNet.Arm.Core.Abstractions;
 
+using BpmnDotNet.Arm.Core.Dto;
+
 /// <summary>
-/// Интерфейс сервиса для панели FilterPane
+/// Интерфейс сервиса для панели FilterPane.
 /// </summary>
-public interface IFilterPanelHandler
+internal interface IFilterPanelHandler
 {
     /// <summary>
-    /// Получить Инфоу по процессам.
+    /// Получить Инфу по процессам.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>ДТО панели FilterPanel.</returns>
     public Task<ProcessDataFilterPanel[]> GetAllProcessIdAsync();
 }

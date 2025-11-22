@@ -38,7 +38,7 @@ public partial class ListProcessPanel : ComponentBase
             await InvokeAsync(async () =>
             {
                 var allprocessLine = await ListProcessPanelHandler
-                    .GetCountAllPages(_activeIdBpmnProcess, _filtersProcessStatus);
+                    .GetCountAllRows(_activeIdBpmnProcess, _filtersProcessStatus);
                 if (allprocessLine == 0)
                 {
                     _listProcessPanel = [];

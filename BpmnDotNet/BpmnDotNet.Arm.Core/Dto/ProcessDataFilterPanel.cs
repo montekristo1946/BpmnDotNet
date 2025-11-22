@@ -1,17 +1,17 @@
 namespace BpmnDotNet.Arm.Core.Dto;
 
 /// <summary>
-/// ДТО для отображения в панели FilterPanel
+/// ДТО для отображения в панели FilterPanel.
 /// </summary>
 public record ProcessDataFilterPanel
 {
     /// <summary>
-    /// ID из схемы процесса.
+    /// Gets iD из схемы процесса.
     /// </summary>
-    public string IdBpmnProcess { get; init; } =  string.Empty;
-    
+    public string IdBpmnProcess { get; init; } = string.Empty;
+
     /// <summary>
-    /// Имя из схемы процесса.
+    /// Gets имя из схемы процесса.
     /// </summary>
-    public string NameBpmnProcess { get; init; } =  string.Empty;
+    public string NameBpmnProcess { get; init; } = string.Empty;
 }
