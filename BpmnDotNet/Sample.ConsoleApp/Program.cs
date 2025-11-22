@@ -27,7 +27,7 @@ services.AddSingleton<ILoggerFactory>(option =>
 
 //Инструменты для записи в ElasticSearch
 services.AddTransient<ElasticClientConfig>();
-services.AddTransient<IElasticClientSetDataAsync, ElasticClientMoq>();
+services.AddTransient<IElasticClientSetDataAsync, ElasticClient>();
 
 //Создадим IBpmnClient, загрузим схемы
 services.AddBusinessProcess("./BpmnDiagram");

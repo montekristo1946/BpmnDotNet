@@ -25,7 +25,9 @@ public partial class ListProcessPanel : ComponentBase
 
     private string[] _filtersProcessStatus =
     [
-        nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed),
+        nameof(ProcessStatus.None), 
+        nameof(ProcessStatus.Works), 
+        nameof(ProcessStatus.Completed),
         nameof(ProcessStatus.Error)
     ];
 
@@ -41,9 +43,7 @@ public partial class ListProcessPanel : ComponentBase
                     .GetCountAllRows(_activeIdBpmnProcess, _filtersProcessStatus);
                 if (allprocessLine == 0)
                 {
-                    _listProcessPanel = [];
-                    _countAllPage = 0;
-                    _currentPage = 0;
+                    ClearPageData();
                     ClearValue();
                 }
 
@@ -74,6 +74,12 @@ public partial class ListProcessPanel : ComponentBase
     {
         _arrErrors = [];
         _acitveTable = new ListProcessPanelDto();
+    }
+    private void ClearPageData()
+    {
+        _listProcessPanel = [];
+        _countAllPage = 0;
+        _currentPage = 0;
     }
 
     public async Task SetIdProcess(string value)
@@ -156,11 +162,9 @@ public partial class ListProcessPanel : ComponentBase
     {
         try
         {
-            _listProcessPanel = [];
-            _countAllPage = 0;
-            _currentPage = 0;
+            
             ClearValue();
-
+            ClearPageData();
 
             var sizeSample = 100;
             var currentList = await ListProcessPanelHandler
@@ -181,5 +185,14 @@ public partial class ListProcessPanel : ComponentBase
         {
             StateHasChanged();
         }
+    }
+
+ 
+
+    public Task ResetData()
+    {
+        ClearPageData();
+        ClearValue();
+        return Task.CompletedTask;
     }
 }
