@@ -1,16 +1,16 @@
 namespace BpmnDotNet.Arm.Core.Abstractions;
 
 /// <summary>
-/// Конструктор Title для SVG блоков.
+/// Конструктор Color для SVG блоков.
 /// </summary>
 /// <typeparam name="T">Тип блока.</typeparam>
-internal interface ITitleBuilder<out T>
+internal interface IColorBuilder<out T>
     where T : new()
 {
     /// <summary>
-    /// Добавить Титл.
+    /// Добавить цвет.
     /// </summary>
-    /// <param name="titleText">Текст титла.</param>
+    /// <param name="color">Цвет фигуры.</param>
     /// <returns>Вернет текущий блок.</returns>
-    public T AddTitle(string? titleText);
+    public T AddColor(string color);
 }

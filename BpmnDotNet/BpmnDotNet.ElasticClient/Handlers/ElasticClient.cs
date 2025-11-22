@@ -194,8 +194,8 @@ public class ElasticClient : IElasticClient
     /// <inheritdoc />
     public async Task<HistoryNodeState[]> GetHistoryNodeStateAsync(
         string idBpmnProcess,
-        int from,
-        int size,
+        int skip,
+        int take,
         string[] processStatus,
         CancellationToken token = default)
     {
@@ -207,8 +207,8 @@ public class ElasticClient : IElasticClient
 
             var searchRequest = await client.SearchAsync<HistoryNodeState>(
                 s => s
-                .From(from)
-                .Size(size)
+                .From(skip)
+                .Size(take)
                 .Query(q => q
                     .Bool(b => b
                         .Must(

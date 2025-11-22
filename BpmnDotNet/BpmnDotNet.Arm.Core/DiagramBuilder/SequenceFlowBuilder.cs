@@ -1,23 +1,28 @@
+namespace BpmnDotNet.Arm.Core.DiagramBuilder;
+
 using System.Text;
 using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Common.BPMNDiagram;
 
-namespace BpmnDotNet.Arm.Core.DiagramBuilder;
-
-public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>,ITitleBuilder<SequenceFlowBuilder>
+/// <summary>
+/// Строитель стрелочек на SVG.
+/// </summary>
+public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBuilder<SequenceFlowBuilder>, IBpmnBuild<SequenceFlowBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
+    private readonly List<string> _childElements = new();
     private Bound[] _bounds = [];
     private string _color = string.Empty;
     private string _id = string.Empty;
-    private string _titleText  = string.Empty;
+    private string _titleText = string.Empty;
 
-    public string Build()
+    /// <inheritdoc />
+    public string BuildSvg()
     {
         var firstLine = $"<g data-element-id=\"{_id}\" style=\"display: block;\">";
         var marker = Guid.NewGuid();
         var arrPoints = _bounds.Select(p => $"{p.X},{p.Y}L").ToArray();
-        var pathPoints = string.Join("", arrPoints);
+        var pathPoints = string.Join(string.Empty, arrPoints);
 
         var defs =
             $"\t<defs>\n" +
@@ -31,47 +36,56 @@ public class SequenceFlowBuilder : IBpmnBuild<SequenceFlowBuilder>,ITitleBuilder
             $"d=\"M{pathPoints}\"></path>";
         var footer = "</g>";
 
-
         _svgStorage.AppendLine(firstLine);
         _svgStorage.AppendLine($"<title>{_titleText}</title>");
         _svgStorage.AppendLine(defs);
         _svgStorage.AppendLine(path);
+        _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(footer);
 
         return _svgStorage.ToString();
-
-
     }
 
+    /// <inheritdoc />
     public SequenceFlowBuilder AddId(string id)
     {
         _id = id;
         return this;
     }
 
+    /// <inheritdoc />
     public SequenceFlowBuilder AddChild(string childElement)
     {
+        _childElements.Add(childElement);
         return this;
     }
 
+    /// <summary>
+    /// Добавить грацинцы.
+    /// </summary>
+    /// <param name="bounds">Bound.</param>
+    /// <returns>Собираемая фигура.</returns>
     public SequenceFlowBuilder AddBound(Bound[] bounds)
     {
         _bounds = bounds;
         return this;
     }
 
+    /// <inheritdoc />
     public SequenceFlowBuilder AddColor(string color)
     {
         _color = color;
         return this;
     }
-    
+
+    /// <inheritdoc />
     public SequenceFlowBuilder AddTitle(string? titleText)
     {
         if (titleText is not null)
         {
-            _titleText =  titleText;
+            _titleText = titleText;
         }
+
         return this;
     }
 }

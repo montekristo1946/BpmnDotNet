@@ -1,16 +1,21 @@
+namespace BpmnDotNet.Arm.Core.DiagramBuilder;
+
 using System.Text;
 using BpmnDotNet.Arm.Core.Abstractions;
 
-namespace BpmnDotNet.Arm.Core.DiagramBuilder;
-
+/// <summary>
+/// Собрать блок root svg.
+/// </summary>
 public class SvgRootBuilder : IBpmnBuild<SvgRootBuilder>
 {
     private readonly List<string> _childElements = new();
     private readonly StringBuilder _svgStorage = new();
+    private string _id = string.Empty;
 
-    public string Build()
+    /// <inheritdoc />
+    public string BuildSvg()
     {
-        var hider = "<svg width=\"100%\" height=\"100%\" xmlns=\"http://www.w3.org/2000/svg\">";
+        var hider = $"<svg id=\"{_id}\" width=\"100%\" height=\"100%\" xmlns=\"http://www.w3.org/2000/svg\">";
         var footer = "</svg>";
 
         _svgStorage.AppendLine(hider);
@@ -20,9 +25,17 @@ public class SvgRootBuilder : IBpmnBuild<SvgRootBuilder>
         return _svgStorage.ToString();
     }
 
+    /// <inheritdoc />
     public SvgRootBuilder AddChild(string childElement)
     {
         _childElements.Add(childElement);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public SvgRootBuilder AddId(string id)
+    {
+        _id = id;
         return this;
     }
 }

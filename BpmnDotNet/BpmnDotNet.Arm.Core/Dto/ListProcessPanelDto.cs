@@ -1,36 +1,37 @@
 namespace BpmnDotNet.Arm.Core.Dto;
 
+/// <summary>
+/// ДТО для панели ListProcess.
+/// </summary>
 public class ListProcessPanelDto
 {
     /// <summary>
-    ///     ID Bpmn процесса из схемы bpmn.
+    ///     Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Текущий Token процесса.
+    ///     Gets текущий Token процесса.
     /// </summary>
     public string TokenProcess { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Время создания документа.
+    ///     Gets время создания документа.
     /// </summary>
     public DateTime DateCreated { get; init; } = DateTime.Now;
 
     /// <summary>
-    ///     Время последнего изменения
+    ///     Gets время последнего изменения.
     /// </summary>
     public DateTime DateLastModified { get; init; } = DateTime.Now;
 
-
     /// <summary>
-    ///     Состояние процесса.
+    ///     Gets состояние процесса.
     /// </summary>
     public ProcessState State { get; init; } = ProcessState.None;
 
-
     /// <summary>
-    ///     IdStorageHistoryNodeState.
+    ///     Gets idStorageHistoryNodeState.
     /// </summary>
     public string IdStorageHistoryNodeState { get; init; } = string.Empty;
 }

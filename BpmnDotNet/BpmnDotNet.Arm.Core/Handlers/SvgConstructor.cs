@@ -1,4 +1,5 @@
-using System.Text;
+namespace BpmnDotNet.Arm.Core.Handlers;
+
 using BpmnDotNet.Arm.Core.Abstractions;
 using BpmnDotNet.Arm.Core.DiagramBuilder;
 using BpmnDotNet.Arm.Core.Dto;
@@ -6,8 +7,6 @@ using BpmnDotNet.Common.BPMNDiagram;
 using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Common.Entities;
 using BpmnDotNet.Common.Models;
-
-namespace BpmnDotNet.Arm.Core.Handlers;
 
 /// <inheritdoc />
 public class SvgConstructor : ISvgConstructor
@@ -33,8 +32,12 @@ public class SvgConstructor : ISvgConstructor
         return Task.FromResult(shapes);
     }
 
-    private string CreateColorShapes(BpmnShape[] shapes, NodeJobStatus[] nodeJobStatus, int widthWindows,
-        int heightWindows, DescriptionData[] descriptions)
+    private string CreateColorShapes(
+        BpmnShape[] shapes,
+        NodeJobStatus[] nodeJobStatus,
+        int widthWindows,
+        int heightWindows,
+        DescriptionData[] descriptions)
     {
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
@@ -65,7 +68,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
                 ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
                 ElementType.SubProcess => CreateSubProcess(shape, color, title),
-                _ => string.Empty
+                _ => string.Empty,
             };
 
             viewportBuilder.AddChild(stringShape);
@@ -73,9 +76,9 @@ public class SvgConstructor : ISvgConstructor
             viewportBuilder.AddChild(label);
         }
 
-        var viewportString = viewportBuilder.Build();
+        var viewportString = viewportBuilder.BuildSvg();
         svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.Build();
+        var retStringSvg = svgRootBuilder.BuildSvg();
         return retStringSvg;
     }
 
@@ -94,7 +97,6 @@ public class SvgConstructor : ISvgConstructor
         var completed = "#319940";
         var error = "#f34848";
 
-
         return state switch
         {
             StatusType.None => defaultColor,
@@ -104,10 +106,9 @@ public class SvgConstructor : ISvgConstructor
             StatusType.Failed => error,
             StatusType.WaitingCompletedWays => running,
             StatusType.WaitingReceivedMessage => running,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
-
 
     private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows, DescriptionData[] descriptions)
     {
@@ -139,7 +140,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
                 ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
                 ElementType.SubProcess => CreateSubProcess(shape, color, title),
-                _ => string.Empty
+                _ => string.Empty,
             };
 
             viewportBuilder.AddChild(stringShape);
@@ -147,9 +148,9 @@ public class SvgConstructor : ISvgConstructor
             viewportBuilder.AddChild(label);
         }
 
-        var viewportString = viewportBuilder.Build();
+        var viewportString = viewportBuilder.BuildSvg();
         svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.Build();
+        var retStringSvg = svgRootBuilder.BuildSvg();
         return retStringSvg;
     }
 
@@ -181,7 +182,6 @@ public class SvgConstructor : ISvgConstructor
         return retValue;
     }
 
-
     private string CreateSubProcess(BpmnShape shape, string color, string titleText)
     {
         var boundServiceTask = shape.Bounds.FirstOrDefault()
@@ -193,23 +193,22 @@ public class SvgConstructor : ISvgConstructor
             .AddMaxLenLine(14)
             .AddPaddingY(25)
             .AddPaddingX(10)
-            .Build();
+            .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
             .AddColor(color)
-            .Build();
-
+            .BuildSvg();
 
         var task = IBpmnBuild<SubProcessBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return task;
     }
 
@@ -222,9 +221,9 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return gateway;
     }
 
@@ -237,9 +236,9 @@ public class SvgConstructor : ISvgConstructor
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return gateway;
     }
 
@@ -254,23 +253,22 @@ public class SvgConstructor : ISvgConstructor
             .AddMaxLenLine(14)
             .AddPaddingY(25)
             .AddPaddingX(10)
-            .Build();
+            .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
             .AddColor(color)
-            .Build();
-
+            .BuildSvg();
 
         var task = IBpmnBuild<ReceiveTaskBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return task;
     }
 
@@ -285,23 +283,22 @@ public class SvgConstructor : ISvgConstructor
             .AddMaxLenLine(14)
             .AddPaddingY(25)
             .AddPaddingX(10)
-            .Build();
+            .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
             .AddColor(color)
-            .Build();
-
+            .BuildSvg();
 
         var task = IBpmnBuild<SendTaskBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return task;
     }
 
@@ -316,48 +313,49 @@ public class SvgConstructor : ISvgConstructor
             .AddMaxLenLine(14)
             .AddPaddingY(25)
             .AddPaddingX(10)
-            .Build();
+            .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
             .AddColor(color)
-            .Build();
-
+            .BuildSvg();
 
         var task = IBpmnBuild<ServiceTaskBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
-            .AddPosition(boundServiceTask.X, boundServiceTask.Y)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
             .AddTitle(titleText)
-            .Build();
+            .BuildSvg();
         return task;
     }
 
     private string AddLabel(BpmnShape shape, string color)
     {
         if (shape.BpmnLabel.X < 0 || shape.BpmnLabel.Y < 0)
+        {
             return string.Empty;
+        }
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .Build();
+            .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
             .AddColor(color)
-            .Build();
+            .BuildSvg();
 
         var label = IBpmnBuild<LabelBuilder>
             .Create()
-            .AddPosition(shape.BpmnLabel.X, shape.BpmnLabel.Y)
+            .AddPositionOffsets(shape.BpmnLabel.X, shape.BpmnLabel.Y)
             .AddChild(textBuilder)
             .AddId($"Label_{shape.Id}")
-            .Build();
+            .BuildSvg();
 
         return label;
     }
@@ -378,10 +376,9 @@ public class SvgConstructor : ISvgConstructor
             .AddBound(bounds)
             .AddId(id)
             .AddTitle(title)
-            .Build();
+            .BuildSvg();
         return sequenceFlow;
     }
-
 
     private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
     {
@@ -398,16 +395,15 @@ public class SvgConstructor : ISvgConstructor
             .AddColor(color)
             .AddRadius(radius)
             .AddStokeWidth(stokeWidth)
-            .Build();
-
+            .BuildSvg();
 
         var startEvent = IBpmnBuild<StartEventBuilder>
             .Create()
             .AddId(id)
-            .AddPosition(xStart, yStart)
+            .AddPositionOffsets(xStart, yStart)
             .AddChild(circle)
             .AddTitle(title)
-            .Build();
+            .BuildSvg();
 
         return startEvent;
     }
