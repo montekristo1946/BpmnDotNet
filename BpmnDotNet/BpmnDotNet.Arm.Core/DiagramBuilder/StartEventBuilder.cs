@@ -14,7 +14,9 @@ public class StartEventBuilder : IFullBodiedFigure<StartEventBuilder>
     private int _xElement;
     private int _yElement;
     private string _titleText = string.Empty;
-    private string _color = string.Empty; // TODO: почему-то не используется! посмотреть возможно ошибка.
+    private int _radius;
+    private int _strokeWidth = 0;
+    private string _color = string.Empty;
 
     /// <inheritdoc />
     public string BuildSvg()
@@ -25,6 +27,7 @@ public class StartEventBuilder : IFullBodiedFigure<StartEventBuilder>
         var footer = "\t</g>";
         _svgStorage.AppendLine(hider);
         _svgStorage.AppendLine($"<title>{_titleText}</title>");
+        _svgStorage.AppendLine(AddCircle());
         _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine(footer);
 
@@ -69,5 +72,38 @@ public class StartEventBuilder : IFullBodiedFigure<StartEventBuilder>
     {
         _color = color;
         return this;
+    }
+
+    /// <summary>
+    /// Добавить размер круга.
+    /// </summary>
+    /// <param name="r">Величина радиуса.</param>
+    /// <returns>Вернет билдер круга.</returns>
+    public StartEventBuilder AddRadius(int r)
+    {
+        _radius = r;
+        return this;
+    }
+
+    /// <summary>
+    /// Задать толщину обьекта.
+    /// </summary>
+    /// <param name="strokeWidth">Тощина обьекта.</param>
+    /// <returns>Обьект сборки.</returns>
+    public StartEventBuilder AddStokeWidth(int strokeWidth)
+    {
+        _strokeWidth = strokeWidth;
+        return this;
+    }
+
+    private string AddCircle()
+    {
+        var circle = IBpmnBuild<CircleBuilder>
+            .Create()
+            .AddColor(_color)
+            .AddRadius(_radius)
+            .AddStokeWidth(_strokeWidth)
+            .BuildSvg();
+        return circle;
     }
 }

@@ -390,18 +390,13 @@ public class SvgConstructor : ISvgConstructor
         var yStart = boundCircle.Y;
         var id = shape.Id;
 
-        var circle = IBpmnBuild<CircleBuilder>
-            .Create()
-            .AddColor(color)
-            .AddRadius(radius)
-            .AddStokeWidth(stokeWidth)
-            .BuildSvg();
-
         var startEvent = IBpmnBuild<StartEventBuilder>
             .Create()
             .AddId(id)
+            .AddColor(color)
+            .AddRadius(radius)
+            .AddStokeWidth(stokeWidth)
             .AddPositionOffsets(xStart, yStart)
-            .AddChild(circle)
             .AddTitle(title)
             .BuildSvg();
 
