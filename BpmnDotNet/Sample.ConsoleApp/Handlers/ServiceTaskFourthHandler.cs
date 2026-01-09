@@ -24,6 +24,13 @@ public class ServiceTaskFourthHandler : IBpmnHandler
             _logger.LogDebug($"[ServiceTaskFourthHandler:AsyncJobHandler]  " +
                              $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {cont.TestValue2}");
 
+        var random = new Random();
+        var randomState = random.Next(0, 10);
+        if (randomState > 5)
+        {
+            throw new Exception("Test exception!");
+        }
+        
         await Task.Delay(1, ctsToken);
     }
 }

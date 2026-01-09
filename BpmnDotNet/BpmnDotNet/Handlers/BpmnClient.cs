@@ -173,9 +173,10 @@ internal class BpmnClient : IBpmnClient
                 processJob?.Process?.ForceCancel();
                 processJob?.Process?.Dispose();
                 _logger.LogDebug(
-                    "Delete the process {IdBpmnProcess} {TokenProcess}",
+                    "Delete the process {IdBpmnProcess} {TokenProcess} {StatusType}",
                     status.IdBpmnProcess,
-                    status.TokenProcess);
+                    status.TokenProcess,
+                    status.StatusType);
             }
         }
     }
