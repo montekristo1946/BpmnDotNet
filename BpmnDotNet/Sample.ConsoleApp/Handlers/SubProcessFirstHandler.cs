@@ -29,7 +29,7 @@ public class SubProcessFirstHandler : IBpmnHandler
         var timeout = TimeSpan.FromMinutes(10);
         var contextSubProcess = CreateContextSubProcess();
         var taskNode = _bpmnClient.StartNewProcess(contextSubProcess, timeout);
-
+        
         await taskNode.ProcessTask;
 
         await Task.Delay(1, ctsToken);
