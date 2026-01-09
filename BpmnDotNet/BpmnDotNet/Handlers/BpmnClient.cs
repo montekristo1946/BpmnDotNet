@@ -11,11 +11,12 @@ using Microsoft.Extensions.Logging;
 /// <inheritdoc />
 internal class BpmnClient : IBpmnClient
 {
+    /// <summary>
+    /// Хранилище процессов.
+    /// </summary>
+    internal readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus> BpmnProcesses = new();
+
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
-
-    private readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus>
-        _bpmnProcesses = new();
-
     private readonly Task _cleanerTask;
     private readonly CancellationTokenSource _cts = new();
 
@@ -35,12 +36,14 @@ internal class BpmnClient : IBpmnClient
     /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
     /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполенения.</param>
+    /// <param name="delayMs">Интервал очистки исполненных тасков. </param>
     public BpmnClient(
         BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter,
-        IDescriptionWriteService descriptionWriteService)
+        IDescriptionWriteService descriptionWriteService,
+        int delayMs = 1000)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
@@ -54,7 +57,7 @@ internal class BpmnClient : IBpmnClient
 
         FillingBusinessProcessDtos(businessProcessDtos);
 
-        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token), _cts.Token);
+        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, TimeSpan.FromMilliseconds(delayMs)), _cts.Token);
     }
 
     /// <inheritdoc/>
@@ -73,7 +76,7 @@ internal class BpmnClient : IBpmnClient
             timeout,
             _historyNodeStateWriter);
 
-        var resAdd = _bpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
+        var resAdd = BpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
         if (resAdd is false)
         {
             throw new InvalidOperationException(
@@ -110,7 +113,7 @@ internal class BpmnClient : IBpmnClient
     /// <inheritdoc />
     public void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message)
     {
-        var resGet = _bpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
+        var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
         {
             throw new InvalidOperationException(
@@ -142,54 +145,22 @@ internal class BpmnClient : IBpmnClient
         _cts?.Dispose();
     }
 
-    private void RegisterHandler<THandler>(THandler handlerBpmn)
-        where THandler : IBpmnHandler
+    /// <summary>
+    /// Очистит кэш от завершенных процессов.
+    /// </summary>
+    /// <param name="isForce">Форсированный запуск.</param>
+    internal void ClearBpmnProcessesDictionary(bool isForce = false)
     {
-        ArgumentNullException.ThrowIfNull(handlerBpmn);
-
-        var handler = (IBpmnHandler)handlerBpmn;
-        var taskDefinitionId = handler.TaskDefinitionId;
-
-        var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
-
-        if (resAdd is false)
+        foreach (var status in BpmnProcesses.Values)
         {
-            throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
-        }
-    }
-
-    private async Task CleaningBpmnProcesses(CancellationToken cts)
-    {
-        var deleayMs = 1000;
-        try
-        {
-            while (!cts.IsCancellationRequested)
-            {
-                await Task.Delay(deleayMs, cts);
-
-                ClearBpmnProcessesDictionary();
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogWarning("[CleaningBpmnProcesses] Cancel Thread ");
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, e.Message);
-        }
-    }
-
-    private void ClearBpmnProcessesDictionary(bool isForce = false)
-    {
-        foreach (var status in _bpmnProcesses.Values)
-        {
-            if (status.StatusType != StatusType.Completed && !isForce)
+            if (status.StatusType != StatusType.Completed
+                && status.StatusType != StatusType.Failed
+                && !isForce)
             {
                 continue;
             }
 
-            var resRemote = _bpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);
+            var resRemote = BpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);
             if (!resRemote)
             {
                 _logger.LogWarning(
@@ -202,10 +173,32 @@ internal class BpmnClient : IBpmnClient
                 processJob?.Process?.ForceCancel();
                 processJob?.Process?.Dispose();
                 _logger.LogDebug(
-                    "Delete the process {IdBpmnProcess} {TokenProcess}",
+                    "Delete the process {IdBpmnProcess} {TokenProcess} {StatusType}",
                     status.IdBpmnProcess,
-                    status.TokenProcess);
+                    status.TokenProcess,
+                    status.StatusType);
             }
+        }
+    }
+
+    private async Task CleaningBpmnProcesses(CancellationToken cts, TimeSpan delay)
+    {
+        try
+        {
+            while (!cts.IsCancellationRequested)
+            {
+                await Task.Delay(delay, cts);
+
+                ClearBpmnProcessesDictionary();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("[CleaningBpmnProcesses] Cancel Thread ");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
         }
     }
 
