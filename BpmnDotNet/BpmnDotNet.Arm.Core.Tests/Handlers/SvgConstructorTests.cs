@@ -1,8 +1,7 @@
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
-using BpmnDotNet.Common.BPMNDiagram;
-using BpmnDotNet.Common.Entities;
+using BpmnDotNet.Entities;
 using BpmnDotNet.Handlers;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;

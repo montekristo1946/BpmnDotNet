@@ -1,4 +1,4 @@
-namespace BpmnDotNet.ElasticClient.Handlers;
+namespace BpmnDotNet.ElasticClientDomain;
 
 using System.Globalization;
 

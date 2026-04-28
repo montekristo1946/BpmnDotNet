@@ -1,7 +1,7 @@
 namespace BpmnDotNet.Elements.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Common.Models;
+using BpmnDotNet.Models;
 
 /// <summary>
 /// Node в объектовом виде, ReceiveTask.

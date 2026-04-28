@@ -1,7 +1,7 @@
 namespace BpmnDotNet.Abstractions.Handlers;
 
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Common.Abstractions;
 
 /// <summary>
 /// Инструмент поиска путей дальнейшего выполнения процесса.

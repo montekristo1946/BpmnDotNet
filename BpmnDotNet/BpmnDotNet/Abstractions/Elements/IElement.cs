@@ -1,6 +1,6 @@
 namespace BpmnDotNet.Abstractions.Elements;
 
-using BpmnDotNet.Common.Models;
+using BpmnDotNet.Models;
 
 /// <summary>
 ///     Базовый тип элемента.

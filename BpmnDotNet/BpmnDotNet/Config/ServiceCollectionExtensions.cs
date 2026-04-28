@@ -2,8 +2,8 @@ namespace BpmnDotNet.Config;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

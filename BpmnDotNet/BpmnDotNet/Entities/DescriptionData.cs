@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Common.Entities;
+namespace BpmnDotNet.Entities;
 
 /// <summary>
 /// Описывает Данные для узла Bpmn.

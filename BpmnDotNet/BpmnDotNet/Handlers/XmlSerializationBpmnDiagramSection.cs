@@ -3,9 +3,9 @@ namespace BpmnDotNet.Handlers;
 using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.BPMNDiagram;
-using BpmnDotNet.Common.Entities;
-using BpmnDotNet.Common.Models;
+using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.Entities;
+using BpmnDotNet.Models;
 using BpmnDotNet.Utils;
 
 /// <inheritdoc />

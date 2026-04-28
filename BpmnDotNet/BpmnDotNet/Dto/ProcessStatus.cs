@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Common.Dto;
+namespace BpmnDotNet.Dto;
 
 /// <summary>
 ///     Статусы процессов.

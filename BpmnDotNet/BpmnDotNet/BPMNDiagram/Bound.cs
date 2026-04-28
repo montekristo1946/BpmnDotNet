@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Common.BPMNDiagram;
+namespace BpmnDotNet.BPMNDiagram;
 
 /// <summary>
 ///     В нотации секция: dc:Bounds (границы).

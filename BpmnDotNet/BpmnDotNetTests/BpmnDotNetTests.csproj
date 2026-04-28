@@ -14,6 +14,8 @@
         <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)"/>
         <PackageReference Include="xunit" Version="$(XunitVersion)"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualstudioVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingVersion)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -56,6 +58,7 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
 
 
 </Project>

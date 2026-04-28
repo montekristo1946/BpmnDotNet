@@ -1,6 +1,6 @@
 using System.Globalization;
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 

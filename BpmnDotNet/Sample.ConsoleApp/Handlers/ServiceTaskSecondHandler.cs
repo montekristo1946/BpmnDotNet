@@ -1,5 +1,5 @@
 using System.Globalization;
-using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Abstractions.Common;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 

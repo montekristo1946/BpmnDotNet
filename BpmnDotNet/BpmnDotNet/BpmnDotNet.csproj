@@ -28,11 +28,9 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsDependencyInjectionAbstractionsVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)"/>
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="$(ElasticClientsElasticsearchVersion)"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\BpmnDotNet.Common\BpmnDotNet.Common.csproj"/>
-    </ItemGroup>
+    
 
 
     <ItemGroup>

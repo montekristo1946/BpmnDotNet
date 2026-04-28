@@ -1,6 +1,6 @@
-namespace BpmnDotNet.Common.Dto;
+namespace BpmnDotNet.Dto;
 
-using BpmnDotNet.Common.Entities;
+using BpmnDotNet.Entities;
 
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.

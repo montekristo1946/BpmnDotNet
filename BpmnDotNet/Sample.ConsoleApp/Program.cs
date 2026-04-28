@@ -1,13 +1,11 @@
-﻿using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
+﻿using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Config;
-using BpmnDotNet.ElasticClient;
-using BpmnDotNet.ElasticClient.Handlers;
+using BpmnDotNet.ElasticClientDomain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp;
 using Sample.ConsoleApp.Handlers;
-using Sample.ConsoleApp.Moq;
 using Serilog;
 
 //Логер
