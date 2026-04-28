@@ -22,7 +22,7 @@
         <MicrosoftExtensionsHostingVerson>[10.0.6,11)</MicrosoftExtensionsHostingVerson>
         <MicrosoftAspNetCoreComponentsWebVersion>[10.0.6,11)</MicrosoftAspNetCoreComponentsWebVersion>
 
-        <ElasticClientsElasticsearchVersion>[9.1.4]</ElasticClientsElasticsearchVersion>
+        <ElasticClientsElasticsearchVersion>[9.3.6]</ElasticClientsElasticsearchVersion>
 
 
         <!--    Test service-->
