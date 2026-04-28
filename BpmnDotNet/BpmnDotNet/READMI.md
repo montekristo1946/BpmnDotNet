@@ -9,5 +9,10 @@
  dotnet pack BpmnDotNet/ \
   --configuration Release \
   -o ./nupkgs \
-  -p:Version=1.0.21
+  -p:Version=1.0.22
+~~~
+## Опубликовать пакет
+~~~
+export NUGET_PRIVATE="https://172.29.14.53:5002/v3/index.json"
+dotnet nuget push -s $NUGET_PRIVATE ./nupkgs/*.nupkg -k " "
 ~~~
