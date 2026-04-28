@@ -18,7 +18,7 @@ dotnet nuget push -s $NUGET_PRIVATE ./nupkgs/*.nupkg -k " "
 ~~~
 
 
-# BpmnDotNet.ElasticClient
+# ElasticClient
 
 ## Назначение:
 Библиотека для работы с elastic. Реализует интерфейса IElasticClient.
