@@ -39,6 +39,7 @@ public class BpmnClientHost : IHostedService
             throw new InvalidOperationException("[BpmnClientHost] Bpmn handlers not found");
         }
 
+        //Регистрация IBpmnHandler в IBpmnClient.
         _bpmnClient.RegisterHandlers<IBpmnHandler>(handlerTypes);
 
         await Task.CompletedTask;

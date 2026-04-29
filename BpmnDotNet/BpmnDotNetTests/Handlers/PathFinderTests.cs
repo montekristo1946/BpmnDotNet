@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Elements.BpmnNatation;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -61,5 +63,60 @@ public class PathFinderTests
         var res = _pathFinder.GetConditionRouteWithExclusiveGateWay(_context, element);
 
         Assert.Equal(truePath, res);
+    }
+    
+    [Fact]
+    public void GetStartEvent_WithNullInput_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IElement[] elementsSrc = null;
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => _pathFinder.GetStartEvent(elementsSrc));
+    }
+    
+    [Fact]
+    public void GetStartEvent_WithEmptyArray_ThrowsInvalidDataException()
+    {
+        // Arrange
+        var elementsSrc = Array.Empty<IElement>();
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidDataException>(() => _pathFinder.GetStartEvent(elementsSrc));
+        Assert.Equal(nameof(BpmnProcessDto), exception.Message);
+    }
+    
+    [Fact]
+    public void GetStartEvent_WithSingleStartEvent_ReturnsStartEvent()
+    {
+        // Arrange
+        var elementsSrc = new IElement[]
+        {
+            new StartEventComponent("id",["firstName"]),
+            new SequenceFlowComponent("id",["LastName"],["LastName"]),
+        };
+
+        // Act
+        var result = _pathFinder.GetStartEvent(elementsSrc);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal("id",result[0].IdElement);
+        Assert.Equal(ElementType.StartEvent, result[0].ElementType);
+    }
+    
+    [Fact]
+    public void GetStartEvent_CheckCountEvents_ThrowsInvalidDataException()
+    {
+        // Arrange
+        var elementsSrc = new IElement[]
+        {
+            new EndEventComponent("id",["firstName"]),
+            new SequenceFlowComponent("id",["LastName"],["LastName"]),
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidDataException>(() => _pathFinder.GetStartEvent(elementsSrc));
+        Assert.Equal("[GetStartEvent] not find StartEvent", exception.Message);
     }
 }
