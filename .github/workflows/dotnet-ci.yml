@@ -1,0 +1,30 @@
+yaml
+name: BpmnDotNet CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./BpmnDotNet/BpmnDotNet.sln
+
+    - name: Build solution
+      run: dotnet build ./BpmnDotNet/BpmnDotNet.sln --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test ./BpmnDotNet/BpmnDotNet.sln --configuration Release --no-build --verbosity normal
