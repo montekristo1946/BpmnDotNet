@@ -1,4 +1,3 @@
-yaml
 name: BpmnDotNet CI
 
 on:
