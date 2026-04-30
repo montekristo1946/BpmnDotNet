@@ -1,9 +1,9 @@
 namespace BpmnDotNet.Handlers;
 
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.Models;
+using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

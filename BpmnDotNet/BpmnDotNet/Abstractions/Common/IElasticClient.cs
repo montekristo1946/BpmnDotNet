@@ -1,8 +1,8 @@
-namespace BpmnDotNet.Common.Abstractions;
+namespace BpmnDotNet.Abstractions.Common;
 
 using System.Threading;
 using System.Threading.Tasks;
-using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Dto;
 
 /// <summary>
 ///     Клиент для записи в Elastic.

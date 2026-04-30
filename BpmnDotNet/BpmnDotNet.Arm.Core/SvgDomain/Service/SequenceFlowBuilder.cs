@@ -2,7 +2,7 @@ namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 
 using System.Text;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
-using BpmnDotNet.Common.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram;
 
 /// <summary>
 /// Строитель стрелочек на SVG.

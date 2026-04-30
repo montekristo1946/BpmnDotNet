@@ -14,12 +14,14 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingVersion)"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsoleVersion)"/>
         <PackageReference Include="Serilog.Sinks.File" Version="$(SerilogSinksFileVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsHostingVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsHostingAbstractionsVersion)" />
+
 
 
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BpmnDotNet.ElasticClient\BpmnDotNet.ElasticClient.csproj" />
         <ProjectReference Include="..\BpmnDotNet\BpmnDotNet.csproj"/>
     </ItemGroup>
 

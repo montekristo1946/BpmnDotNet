@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Common.Abstractions;
+using BpmnDotNet.Abstractions.Common;
 using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;

@@ -1,6 +1,6 @@
 using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using BpmnDotNet.Arm.Core.UiDomain.Dto;
-using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Dto;
 using Microsoft.AspNetCore.Components;
 
 namespace BpmnDotNet.Arm.Web.Components.Panels;

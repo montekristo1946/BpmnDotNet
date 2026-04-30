@@ -1,10 +1,8 @@
-﻿namespace BpmnDotNet.ElasticClient.Handlers;
+﻿namespace BpmnDotNet.ElasticClientDomain;
 
-using System.Reflection;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.BPMNDiagram;
-using BpmnDotNet.Common.Dto;
-using BpmnDotNet.Common.Entities;
+using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Dto;
+using BpmnDotNet.Entities;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Logging;
 

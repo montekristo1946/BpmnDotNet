@@ -1,16 +1,15 @@
-﻿using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
+﻿using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Config;
-using BpmnDotNet.ElasticClient;
-using BpmnDotNet.ElasticClient.Handlers;
+using BpmnDotNet.ElasticClientDomain;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp;
 using Sample.ConsoleApp.Handlers;
-using Sample.ConsoleApp.Moq;
+using Sample.ConsoleApp.Service;
 using Serilog;
 
-//Логер
+//Логгер.
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console()
@@ -18,37 +17,46 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 
-//  Service registration pipeline...
-var services = new ServiceCollection();
-services.AddSingleton<ILoggerFactory>(option =>
-{
-    return LoggerFactory.Create(builder => { builder.AddSerilog(Log.Logger); });
-});
+var host = Host.CreateDefaultBuilder()
+    .UseDefaultServiceProvider((context, options) =>
+    {
+        options.ValidateScopes       = true;   // проверка lifetimes
+        options.ValidateOnBuild      = true;   // проверка при Build()
+    })
+    .ConfigureServices((context, services) =>
+    {
+        services.AddSingleton<ILoggerFactory>(option =>
+        {
+            return LoggerFactory.Create(builder => { builder.AddSerilog(Log.Logger); });
+        });
+        
+        //Инструменты для записи в ElasticSearch
+        services.AddTransient<ElasticClientConfig>();
+        services.AddTransient<IElasticClientSetDataAsync, ElasticClient>();
 
-//Инструменты для записи в ElasticSearch
-services.AddTransient<ElasticClientConfig>();
-services.AddTransient<IElasticClientSetDataAsync, ElasticClient>();
+        //Создадим IBpmnClient, загрузим схемы
+        services.AddBusinessProcess("./BpmnDiagram");
 
-//Создадим IBpmnClient, загрузим схемы
-services.AddBusinessProcess("./BpmnDiagram");
+        //Зарегистрирует все Handlers реализующие интерфейс IBpmnHandler
+        services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
 
-//Зарегистрирует все Handlers реализующие интерфейс IBpmnHandler
-services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
+        //Вспомогательные классы для тестовой консоли.
+        services.AddSingleton<Producer>();
+        services.AddSingleton<SampleService>();
+        services.AddLogging();
+        
+        //Регистрация IBpmnHandler в IBpmnClient.
+        //Необходимо делать после инициализации IBpmnClient,
+        //чтоб избежать циклических зависимостей в компонентах.
+        services.AddHostedService<BpmnClientHost>();
+        
+    })
+    .Build();
+    
+await host.StartAsync();
+var producer = host.Services.GetRequiredService<Producer>();
 
-//Вспомогательные классы для тестовой консоли.
-services.AddSingleton<Producer>();
-services.AddScoped<SampleService>();
-services.AddLogging();
-
-// Run service
-using var provider = services.BuildServiceProvider();
-
-var handlerTypes = provider.GetServices<IBpmnHandler>().ToArray();
-var bpmnClient = provider.GetRequiredService<IBpmnClient>();
-
-//Регистрация IBpmnHandler в IBpmnClient.
-bpmnClient.RegisterHandlers<IBpmnHandler>(handlerTypes);
-
-
-var producer = provider.GetRequiredService<Producer>();
 producer.Produce();
+
+await host.StopAsync();
+host.Dispose();

@@ -1,6 +1,6 @@
 namespace BpmnDotNet.Abstractions.Handlers;
 
-using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Dto;
 
 /// <summary>
 /// Запишет NodeJobStatus в хранилище отчетов.

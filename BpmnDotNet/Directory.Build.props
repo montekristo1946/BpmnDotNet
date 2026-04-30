@@ -1,28 +1,30 @@
 <Project>
     <PropertyGroup>
-        <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
-        <TargetFrameworkVersionUI>net9.0</TargetFrameworkVersionUI>
+        <TargetFrameworkVersion>net10.0</TargetFrameworkVersion>
+        <TargetFrameworkVersionUI>net10.0</TargetFrameworkVersionUI>
 
-        <SerilogVersion>4.3.0</SerilogVersion>
-        <SerilogAspNetCoreVersion>[8.0.0,9.0.0)</SerilogAspNetCoreVersion>
-        <SerilogEnrichersEnvironmentVersion>[3.0.0,4.0.0)</SerilogEnrichersEnvironmentVersion>
+        <SerilogVersion>[4.3.0,5.0.0)</SerilogVersion>
+        <SerilogAspNetCoreVersion>[10.0.0,11)</SerilogAspNetCoreVersion>
+        <SerilogEnrichersEnvironmentVersion>[3.0.1,4)</SerilogEnrichersEnvironmentVersion>
         <SerilogEnrichersProcessVersion>[3.0.0,4.0.0)</SerilogEnrichersProcessVersion>
-        <SerilogExceptionsVersion>[8.0.0,9.0.0)</SerilogExceptionsVersion>
+        <SerilogExceptionsVersion>[8.4.0,9.0.0)</SerilogExceptionsVersion>
         <SerilogSinksRollingFileSizeLimitVersion>[1.0.0,2.0.0)</SerilogSinksRollingFileSizeLimitVersion>
-        <SerilogSinksConsoleVersion>[5.0.0,6.0.0)</SerilogSinksConsoleVersion>
-        <SerilogExtensionsHostingVersion>[8.0.0,9.0.0)</SerilogExtensionsHostingVersion>
-        <SerilogExtensionsLoggingVersion>9.0.2</SerilogExtensionsLoggingVersion>
-        <SerilogSinksConsoleVersion>6.0.0</SerilogSinksConsoleVersion>
-        <SerilogSinksFileVersion>7.0.0</SerilogSinksFileVersion>
+        <SerilogSinksConsoleVersion>[6.1.1,7)</SerilogSinksConsoleVersion>
+        <SerilogExtensionsHostingVersion>[10.0.0,11)</SerilogExtensionsHostingVersion>
+        <SerilogExtensionsLoggingVersion>[10.0.0,11)</SerilogExtensionsLoggingVersion>
+        <SerilogSinksConsoleVersion>[6.1.1,7)</SerilogSinksConsoleVersion>
+        <SerilogSinksFileVersion>[7.0.0,8)</SerilogSinksFileVersion>
 
-        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>[9.0.8]</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
-        <MicrosoftExtensionsLoggingAbstractionsVersion>[9.0.8]</MicrosoftExtensionsLoggingAbstractionsVersion>
-        <MicrosoftExtensionsLoggingVersion>[9.0.8]</MicrosoftExtensionsLoggingVersion>
-        <MicrosoftExtensionsDependencyInjectionVersion>[9.0.8]</MicrosoftExtensionsDependencyInjectionVersion>
-        <MicrosoftExtensionsHostingVerson>[9.0.8]</MicrosoftExtensionsHostingVerson>
-        <MicrosoftAspNetCoreComponentsWebVersion>[9.0.8]</MicrosoftAspNetCoreComponentsWebVersion>
-
-        <ElasticClientsElasticsearchVersion>[9.1.4]</ElasticClientsElasticsearchVersion>
+        <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>[10.0.6,11]</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
+        <MicrosoftExtensionsLoggingAbstractionsVersion>[10.0.6,11)</MicrosoftExtensionsLoggingAbstractionsVersion>
+        <MicrosoftExtensionsLoggingVersion>[10.0.6,11)</MicrosoftExtensionsLoggingVersion>
+        <MicrosoftExtensionsDependencyInjectionVersion>[10.0.6,11)</MicrosoftExtensionsDependencyInjectionVersion>
+        <MicrosoftExtensionsHostingVerson>[10.0.6,11)</MicrosoftExtensionsHostingVerson>
+        <MicrosoftAspNetCoreComponentsWebVersion>[10.0.6,11)</MicrosoftAspNetCoreComponentsWebVersion>
+        <MicrosoftExtensionsHostingVersion>[10.0.6,11)</MicrosoftExtensionsHostingVersion>
+        <MicrosoftExtensionsHostingAbstractionsVersion>[10.0.6,11)</MicrosoftExtensionsHostingAbstractionsVersion>
+        
+        <ElasticClientsElasticsearchVersion>[9.3.6]</ElasticClientsElasticsearchVersion>
 
 
         <!--    Test service-->

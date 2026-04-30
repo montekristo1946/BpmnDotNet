@@ -2,7 +2,7 @@
 
 ## Настройка
 Для работы сервиса необходимо запустить:
-1. [BpmnDotNet.ElasticClient](../BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
+1. [ElasticClient](../BpmnDotNet/BpmnDotNet/READMI.md)
 2. [BpmnDotNet.Arm.Web](../BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
 
 ## Визуализация выбранной схемы

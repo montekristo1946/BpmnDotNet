@@ -1,16 +1,16 @@
 using System.Globalization;
 using AutoFixture;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.BPMNDiagram;
-using BpmnDotNet.Common.Dto;
-using BpmnDotNet.Common.Entities;
+using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Dto;
+using BpmnDotNet.ElasticClientDomain;
+using BpmnDotNet.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace BpmnDotNet.ElasticClient.Tests.Handlers;
+namespace BpmnDotNetTests.Handlers;
 
 public class ElasticClientTestsIntegration
 {
-    private readonly ElasticClient.Handlers.ElasticClient _elasticClient;
+    private readonly ElasticClient _elasticClient;
     private readonly ILoggerFactory loggerFactory;
     private readonly Fixture _fixture;
 
@@ -24,7 +24,7 @@ public class ElasticClientTestsIntegration
     {
         var config = new ElasticClientConfig { ConnectionString = "http://localhost:9200" };
         var logger = LoggerFactory.Create(builder => { builder.AddConsole(); }).CreateLogger<IElasticClient>();
-        _elasticClient = new ElasticClient.Handlers.ElasticClient(config, logger);
+        _elasticClient = new ElasticClient(config, logger);
         _fixture = new Fixture();
     }
 

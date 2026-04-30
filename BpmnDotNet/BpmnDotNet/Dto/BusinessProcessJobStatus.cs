@@ -1,6 +1,5 @@
 namespace BpmnDotNet.Dto;
 
-using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Handlers;
 
 /// <summary>

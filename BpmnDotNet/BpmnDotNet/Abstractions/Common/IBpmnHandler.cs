@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Common.Abstractions;
+namespace BpmnDotNet.Abstractions.Common;
 
 using System.Threading;
 using System.Threading.Tasks;

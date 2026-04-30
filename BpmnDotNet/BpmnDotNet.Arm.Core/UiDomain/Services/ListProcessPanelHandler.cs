@@ -1,9 +1,9 @@
 namespace BpmnDotNet.Arm.Core.UiDomain.Services;
 
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using BpmnDotNet.Arm.Core.UiDomain.Dto;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.Dto;
+using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

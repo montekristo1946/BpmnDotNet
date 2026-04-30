@@ -1,8 +1,7 @@
 namespace BpmnDotNet.Handlers;
 
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.Dto;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
 

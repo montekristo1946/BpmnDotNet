@@ -2,9 +2,8 @@ namespace BpmnDotNet.Config;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.ElasticClient;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,9 +26,9 @@ public static class ServiceCollectionExtensions
     /// <returns>Коллекцию сервисов.</returns>
     public static IServiceCollection AddBusinessProcess(this IServiceCollection services, string pathDiagram)
     {
-        services.AddScoped<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
-        services.AddScoped<IDescriptionWriteService, DescriptionWriteService>();
-        services.AddScoped<IPathFinder>(options =>
+        services.AddSingleton<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
+        services.AddSingleton<IDescriptionWriteService, DescriptionWriteService>();
+        services.AddSingleton<IPathFinder>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger<PathFinder>();

@@ -1,4 +1,4 @@
-namespace BpmnDotNet.ElasticClient;
+namespace BpmnDotNet.ElasticClientDomain;
 
 /// <summary>
 ///     Конфигурация для Elastic.

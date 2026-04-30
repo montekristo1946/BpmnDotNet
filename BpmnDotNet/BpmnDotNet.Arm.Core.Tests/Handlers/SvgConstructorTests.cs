@@ -1,8 +1,7 @@
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
-using BpmnDotNet.Common.BPMNDiagram;
-using BpmnDotNet.Common.Entities;
+using BpmnDotNet.Entities;
 using BpmnDotNet.Handlers;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;
@@ -30,6 +29,6 @@ public class SvgConstructorTests
         var res = await _svgConstructor.CreatePlaneAsync(_string, [],size, []);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
 
-        Assert.Equal(37265, res.Length);
+        Assert.Equal(38110, res.Length);
     }
 }

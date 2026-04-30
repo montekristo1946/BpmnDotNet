@@ -1,4 +1,4 @@
-# Простой движок для Bpmn
+# Простой движок для BPMN
 
 ## BpmnDotNet
 При разработке данного продукта вдохновлялись продуктами Camunda [Camunda](https://github.com/camunda) <br>
@@ -15,10 +15,9 @@
 
 1. [BPMN нотация.](./Documents/BpmnNanation.md)
 2. [Инструкция по использованию](./Documents/Developer.md)
-3. [BpmnDotNet.ElasticClient](./BpmnDotNet/BpmnDotNet.ElasticClient/READMI.md)
-4. [BpmnDotNet.Arm.Web](./BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
-5. [BpmnDotNet](./BpmnDotNet/BpmnDotNet/READMI.md)
-6. [Sample.ConsoleApp](./BpmnDotNet/Sample.ConsoleApp/README.MD)
+3. [BpmnDotNet.Arm.Web](./BpmnDotNet/BpmnDotNet.Arm.Web/README.MD)
+4. [BpmnDotNet](./BpmnDotNet/BpmnDotNet/READMI.md)
+5. [Sample.ConsoleApp](./BpmnDotNet/Sample.ConsoleApp/README.MD)
 
 ## Кому это подойдет:
 1. Небольшой проект в котором не требуются распределенные вызовы обработчиков.

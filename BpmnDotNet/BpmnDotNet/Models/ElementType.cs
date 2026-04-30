@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Common.Models;
+namespace BpmnDotNet.Models;
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;

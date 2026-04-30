@@ -1,15 +1,14 @@
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
+using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Common.Abstractions;
-using BpmnDotNet.Common.Dto;
-using BpmnDotNet.Common.Models;
 using BpmnDotNet.Dto;
+using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 
-/// <inheritdoc />
+/// <inheritdoc cref="IBusinessProcess" />
 internal class BusinessProcess : IBusinessProcess, IDisposable
 {
     private readonly BpmnProcessDto _bpmnShema;
