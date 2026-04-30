@@ -119,4 +119,150 @@ public class PathFinderTests
         var exception = Assert.Throws<InvalidDataException>(() => _pathFinder.GetStartEvent(elementsSrc));
         Assert.Equal("[GetStartEvent] not find StartEvent", exception.Message);
     }
+    
+    private IElement[] CreateElements(params ElementType[] types)
+    {
+        return types.Select((type, index) => CreateElement(type, $"element_{index}")).ToArray();
+    }
+    private IElement CreateElement(ElementType elementType, string? id = null, string[]? incoming = null, string[]? outgoing = null)
+    {
+        var elementId = id ?? Guid.NewGuid().ToString();
+        var inc = incoming ?? [];
+        var outg = outgoing ??  [];
+    
+        return elementType switch
+        {
+            ElementType.ReceiveTask => new ReceiveTaskComponent(elementId, inc, outg),
+            ElementType.SendTask => new SendTaskComponent(elementId, inc, outg),
+            ElementType.ServiceTask => new ServiceTaskComponent(elementId, inc, outg),
+            ElementType.StartEvent => new StartEventComponent(elementId, outg),
+            ElementType.EndEvent => new EndEventComponent(elementId, inc),
+            ElementType.ExclusiveGateway => new ExclusiveGatewayComponent(elementId, inc, outg),
+            ElementType.ParallelGateway => new ParallelGatewayComponent(elementId, inc, outg),
+            ElementType.SubProcess => new SubProcessComponent(elementId, inc, outg),
+            ElementType.SequenceFlow => new SequenceFlowComponent(elementId, inc, outg),
+            _ => throw new ArgumentOutOfRangeException(nameof(elementType), elementType, null)
+        };
+    }
+    
+    [Fact]
+    public void GetNextNode_WhenElementsSrcIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IElement[] elementsSrc = null;
+        var currentNodes = CreateElements(ElementType.StartEvent);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => 
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, _context));
+    }
+    
+    [Fact]
+    public void GetNextNode_WhenCurrentNodesIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var elementsSrc = CreateElements(ElementType.ServiceTask);
+        IElement[] currentNodes = null;
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => 
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, _context));
+    }
+    
+    [Fact]
+    public void GetNextNode_WhenContextIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var elementsSrc = CreateElements(ElementType.ServiceTask);
+        var currentNodes = CreateElements(ElementType.StartEvent);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => 
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, null));
+    }
+    
+    [Fact]
+    public void GetNextNode_WhenElementsSrcIsEmpty_ThrowsInvalidDataException()
+    {
+        // Arrange
+        var elementsSrc = Array.Empty<IElement>();
+        var currentNodes = CreateElements(ElementType.StartEvent);
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidDataException>(() => 
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, _context));
+        Assert.Contains("elementsSrc", exception.Message);
+    }
+    
+    [Fact]
+    public void GetNextNode_WhenCurrentNodesIsEmpty_ThrowsInvalidDataException()
+    {
+        // Arrange
+        var elementsSrc = CreateElements(ElementType.ServiceTask);
+        var currentNodes = Array.Empty<IElement>();
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidDataException>(() => 
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, _context));
+        Assert.Contains("currentNodes", exception.Message);
+    }
+    
+    [Theory]
+    [InlineData(ElementType.StartEvent)]
+    [InlineData(ElementType.ServiceTask)]
+    [InlineData(ElementType.SendTask)]
+    [InlineData(ElementType.ReceiveTask)]
+    [InlineData(ElementType.SubProcess)]
+    [InlineData(ElementType.ExclusiveGateway)]
+    [InlineData(ElementType.ParallelGateway)]
+    public void GetNextNode_ForPathBasedElementTypes_ReturnsNextNodesBasedOnPath(ElementType elementType)
+    {
+        // Arrange
+        var idFlow = Guid.NewGuid().ToString();
+        var idExpectedNextNode = Guid.NewGuid().ToString();
+        var idCurrentNode = Guid.NewGuid().ToString();
+        var flow = CreateElement(ElementType.SequenceFlow,idFlow,[ idCurrentNode],[idExpectedNextNode]);
+        var currentNode = CreateElement(elementType, idCurrentNode,[ Guid.NewGuid().ToString()],[idFlow]);
+        var expectedNextNode = CreateElement(ElementType.ServiceTask, idExpectedNextNode,[idFlow],[ Guid.NewGuid().ToString()]);
+     
+        var elementsSrc = new[] 
+        { 
+            currentNode, 
+            expectedNextNode,
+            CreateElement(ElementType.EndEvent, "other_1",[ Guid.NewGuid().ToString()],[ Guid.NewGuid().ToString()]),
+            flow
+        };
+        
+        var currentNodes = new[] { currentNode };
+
+        // Act
+        var result = _pathFinder.GetNextNode(elementsSrc, currentNodes, _context);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(expectedNextNode, result[0]);
+    }
+    
+    [Fact]
+    public void GetNextNode_ForPathEndEvent_Empty()
+    {
+        // Arrange
+        var idFlow = Guid.NewGuid().ToString();
+        var idCurrentNode = Guid.NewGuid().ToString();
+        var currentNode = CreateElement(ElementType.EndEvent, idCurrentNode,[ Guid.NewGuid().ToString()],[idFlow]);
+        var elementsSrc = new[] 
+        { 
+            currentNode, 
+        };
+        var currentNodes = new[] { currentNode };
+
+        // Act
+        var result = _pathFinder.GetNextNode(elementsSrc,currentNodes, _context);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+     
+    }
 }
