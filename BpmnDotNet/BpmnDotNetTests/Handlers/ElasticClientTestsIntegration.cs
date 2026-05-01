@@ -29,7 +29,7 @@ public class ElasticClientTestsIntegration
     }
 
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task SetDataAsync_cheksLoadPlaneInDatabase_True()
     {
         var name = $"Name_{DateTime.Now.ToString("MM.dd.yyyy_HH:mm:ss", CultureInfo.InvariantCulture)}";
@@ -40,7 +40,7 @@ public class ElasticClientTestsIntegration
         Assert.True(res);
     }
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task GetConditionRouteWithExclusiveGateWay_CheckFalsePath_NotNull()
     {
         var getParams = new[] { nameof(BpmnPlane.IdBpmnProcess), nameof(BpmnPlane.Name) };
@@ -49,7 +49,7 @@ public class ElasticClientTestsIntegration
         Assert.NotEmpty(res);
     }
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task GetDataFromIdAsync_GetBpmnPlane_NotNull()
     {
         var dBpmnProcess = $"test_IdBpmnProcess";
@@ -64,7 +64,7 @@ public class ElasticClientTestsIntegration
         Assert.Equal(dBpmnProcess, res.IdBpmnProcess);
     }
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task GetCountHistoryNodeStateAsync_GetCount_NotNull()
     {
         var dBpmnProcess = $"test_IdBpmnProcess";
@@ -84,7 +84,7 @@ public class ElasticClientTestsIntegration
     }
 
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task GetHistoryNodeStateAsync_GetHistory_NotNull()
     {
         var dBpmnProcess = $"test_IdBpmnProcess";
@@ -103,7 +103,7 @@ public class ElasticClientTestsIntegration
         Assert.NotNull(res);
     }
 
-    [Fact]
+    [Fact(Skip = "Используется на реальной elastic")]
     public async Task GetHistoryNodeFromTokenMaskAsync_GetHistory_NotNull()
     {
         var dBpmnProcess = $"test_IdBpmnProcess";
