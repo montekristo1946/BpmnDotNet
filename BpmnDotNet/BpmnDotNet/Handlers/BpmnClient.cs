@@ -95,6 +95,17 @@ internal class BpmnClient : IBpmnClient
         foreach (THandler handler in handlersBpmn)
         {
             var taskDefinitionId = handler.TaskDefinitionId;
+            if (taskDefinitionId is null)
+            {
+                throw new InvalidOperationException(
+                    $"[RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
+            }
+
+            if (handler.Description is null)
+            {
+                throw new InvalidOperationException(
+                    $"[RegisterHandlers] {handler.GetType().Name} Description is null");
+            }
 
             var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
 
