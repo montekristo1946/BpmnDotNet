@@ -139,7 +139,11 @@ internal class BpmnClient : IBpmnClient
         ClearBpmnProcessesDictionary(true);
 
         _cts?.Cancel();
-        _cleanerTask.Wait();
+        if (!_cleanerTask.Wait(TimeSpan.FromSeconds(5)))
+        {
+            _logger?.LogWarning("Cleaner task timed out");
+        }
+
         _cleanerTask.Dispose();
         _cts?.Dispose();
     }
