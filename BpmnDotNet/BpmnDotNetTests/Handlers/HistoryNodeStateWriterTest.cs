@@ -156,7 +156,7 @@ public class HistoryNodeStateWriterTest
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
             _sut.SetStateProcessAsync(
                 idBpmnProcess,
-                tokenProcess,
+                tokenProcess!,
                 Array.Empty<NodeJobStatus>(),
                 Array.Empty<string>(),
                 false,
