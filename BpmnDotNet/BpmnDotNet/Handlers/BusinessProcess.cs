@@ -93,6 +93,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <inheritdoc/>
     public bool AddMessageToQueue(Type messageType, object message)
     {
+        ArgumentNullException.ThrowIfNull(messageType);
+        ArgumentNullException.ThrowIfNull(message);
         try
         {
             _messagesStore.AddOrUpdate(
