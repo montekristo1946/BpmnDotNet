@@ -44,8 +44,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private readonly ConcurrentDictionary<string, string> _errorsRegistry = new();
 
     private readonly IPathFinder _pathFinder;
-    private bool _idDispose;
-    private long _dateFromInitInstance;
+    private readonly long _dateFromInitInstance;
+    private volatile bool _idDispose;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusinessProcess"/> class.
@@ -54,7 +54,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <param name="logger">ILogger.</param>
     /// <param name="bpmnShema">BpmnProcessDto.</param>
     /// <param name="pathFinder">IPathFinder.</param>
-    /// <param name="handlers">Зарегестрированные handlers.</param>
+    /// <param name="handlers">Зарегистрированные handlers.</param>
     /// <param name="timeout">timeout.</param>
     /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
     public BusinessProcess(
