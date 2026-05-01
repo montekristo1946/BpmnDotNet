@@ -11,8 +11,8 @@ namespace BpmnDotNetTests.Handlers;
 
 public class ContextDatTest : IContextBpmnProcess
 {
-    public string IdBpmnProcess { get; init; }
-    public string TokenProcess { get; init; }
+    public string IdBpmnProcess { get; init; } = string.Empty;
+    public string TokenProcess { get; init; } = string.Empty;
     public ConcurrentDictionary<string, string> ConditionRoute { get; init; } = new();
     public ConcurrentDictionary<string, Type> RegistrationMessagesType { get; init; } = new();
     public ConcurrentDictionary<Type, object> ReceivedMessage { get; init; } = new();
@@ -69,7 +69,7 @@ public class PathFinderTests
     public void GetStartEvent_WithNullInput_ThrowsArgumentNullException()
     {
         // Arrange
-        IElement[] elementsSrc = null;
+        IElement[] elementsSrc = null!;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => _pathFinder.GetStartEvent(elementsSrc));
@@ -149,7 +149,7 @@ public class PathFinderTests
     public void GetNextNode_WhenElementsSrcIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        IElement[] elementsSrc = null;
+        IElement[] elementsSrc = null!;
         var currentNodes = CreateElements(ElementType.StartEvent);
 
         // Act & Assert
@@ -162,7 +162,7 @@ public class PathFinderTests
     {
         // Arrange
         var elementsSrc = CreateElements(ElementType.ServiceTask);
-        IElement[] currentNodes = null;
+        IElement[] currentNodes = null!;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => 
@@ -178,7 +178,7 @@ public class PathFinderTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => 
-            _pathFinder.GetNextNode(elementsSrc, currentNodes, null));
+            _pathFinder.GetNextNode(elementsSrc, currentNodes, null!));
     }
     
     [Fact]
