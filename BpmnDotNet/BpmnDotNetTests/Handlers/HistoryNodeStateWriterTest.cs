@@ -132,12 +132,12 @@ public class HistoryNodeStateWriterTest
     [InlineData("", "token")]
     [InlineData(" ", "token")]
     public async Task SetStateProcessAsync_WhenIdBpmnProcessInvalid_ShouldThrow(
-        string idBpmnProcess, string tokenProcess)
+        string? idBpmnProcess, string tokenProcess)
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
             _sut.SetStateProcessAsync(
-                idBpmnProcess,
+                idBpmnProcess!,
                 tokenProcess,
                 Array.Empty<NodeJobStatus>(),
                 Array.Empty<string>(),
@@ -150,8 +150,9 @@ public class HistoryNodeStateWriterTest
     [InlineData("id", "")]
     [InlineData("id", " ")]
     public async Task SetStateProcessAsync_WhenTokenProcessInvalid_ShouldThrow(
-        string idBpmnProcess, string tokenProcess)
+        string idBpmnProcess, string? tokenProcess)
     {
+        if (tokenProcess == null) throw new ArgumentNullException(nameof(tokenProcess));
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
             _sut.SetStateProcessAsync(

@@ -139,6 +139,7 @@ internal class BpmnClient : IBpmnClient
         ClearBpmnProcessesDictionary(true);
 
         _cts?.Cancel();
+
         try
         {
             if (!_cleanerTask.Wait(TimeSpan.FromSeconds(5)))
@@ -148,7 +149,12 @@ internal class BpmnClient : IBpmnClient
         }
         catch (OperationCanceledException)
         {
-            _logger?.LogWarning("[CleaningBpmnProcesses] get OperationCanceledException");
+            _logger?.LogWarning("[Dispose] Task was canceled (OperationCanceledException)");
+        }
+        catch (AggregateException agg)
+            when (agg.InnerExceptions.All(e => e is OperationCanceledException or TaskCanceledException))
+        {
+            _logger?.LogWarning("[Dispose] Task was canceled (AggregateException)");
         }
 
         _cleanerTask.Dispose();
