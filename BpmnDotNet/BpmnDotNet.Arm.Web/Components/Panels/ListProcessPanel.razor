@@ -54,7 +54,9 @@
                         {
                             var color = GetColorState(table.State);
                             var styleTr = string.Empty;
-                            if (table.IdBpmnProcess == _acitveTable.IdBpmnProcess && table.TokenProcess == _acitveTable.TokenProcess)
+                            if (_acitveTable!= null 
+                                && table.IdBpmnProcess == _acitveTable.IdBpmnProcess 
+                                && table.TokenProcess == _acitveTable.TokenProcess)
                             {
                                 styleTr = "check-tr";
                             }

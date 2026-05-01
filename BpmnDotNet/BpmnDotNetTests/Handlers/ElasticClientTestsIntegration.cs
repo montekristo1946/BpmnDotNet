@@ -11,10 +11,9 @@ namespace BpmnDotNetTests.Handlers;
 public class ElasticClientTestsIntegration
 {
     private readonly ElasticClient _elasticClient;
-    private readonly ILoggerFactory loggerFactory;
     private readonly Fixture _fixture;
 
-    private string[] _filtersProcessStatus =
+    private readonly string[] _filtersProcessStatus =
     [
         nameof(ProcessStatus.None), nameof(ProcessStatus.Works), nameof(ProcessStatus.Completed),
         nameof(ProcessStatus.Error)

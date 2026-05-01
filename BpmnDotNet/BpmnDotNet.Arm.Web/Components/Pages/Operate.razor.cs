@@ -5,14 +5,14 @@ namespace BpmnDotNet.Arm.Web.Components.Pages;
 
 public partial class Operate : ComponentBase
 {
-    private RenderFragment BpmnPlanePanelTemplate { get; set; }
-    private DrawingPlanePanel _drawingPlanePanel;
-    private RenderFragment MenuPanelTemplate { get; set; }
-    private MenuPanel _menuPanel;
-    private RenderFragment FilterPanelTemplate { get; set; }
-    private FilterPanel _filterPanel;
-    public RenderFragment ListProcessPanelTemplate { get; set; }
-    private ListProcessPanel _listProcessPanel;
+    private RenderFragment? BpmnPlanePanelTemplate { get; set; }
+    private DrawingPlanePanel? _drawingPlanePanel;
+    private RenderFragment? MenuPanelTemplate { get; set; }
+    private MenuPanel? _menuPanel;
+    private RenderFragment? FilterPanelTemplate { get; set; }
+    private FilterPanel? _filterPanel;
+    public RenderFragment? ListProcessPanelTemplate { get; set; }
+    private ListProcessPanel? _listProcessPanel;
 
 
     protected override Task OnInitializedAsync()
@@ -26,35 +26,60 @@ public partial class Operate : ComponentBase
 
     private async Task ChoseIdProcess(string idProcess)
     {
-        await _drawingPlanePanel.BaseUpdatePanel(idProcess);
-        await _listProcessPanel.SetIdProcess(idProcess);
+        if (_drawingPlanePanel != null)
+        {
+            await _drawingPlanePanel.BaseUpdatePanel(idProcess);
+        }
+
+        if (_listProcessPanel != null)
+        {
+            await _listProcessPanel.SetIdProcess(idProcess);
+        }
     }
     private async Task ChoseIdProcessCallingFilterPanel(string idProcess)
     {
-        await _listProcessPanel.ResetData();
-        await _listProcessPanel.SetIdProcess(idProcess);
-        await _drawingPlanePanel.BaseUpdatePanel(idProcess);
+        if (_listProcessPanel != null)
+        {
+            await _listProcessPanel.ResetData();
+            await _listProcessPanel.SetIdProcess(idProcess);
+        }
+
+        if (_drawingPlanePanel != null)
+        {
+            await _drawingPlanePanel.BaseUpdatePanel(idProcess);
+        }
     }
 
     private async Task SetStatusFilter(string[] filters)
     {
-        await _listProcessPanel.SetStatusFilter(filters);
+        if (_listProcessPanel != null)
+        {
+            await _listProcessPanel.SetStatusFilter(filters);
+        }
     }
 
     private async Task SetFilterToken(string filterToken)
     {
-        await _listProcessPanel.SetFilterToken(filterToken);
-
+        if (_listProcessPanel != null)
+        {
+            await _listProcessPanel.SetFilterToken(filterToken);
+        }
     }
     
     private async Task IsColorUpdateNodeJobStatus(string idUpdateNodeJobStatus)
     {
-        await _drawingPlanePanel.ColorUpdatePanel(idUpdateNodeJobStatus);
+        if (_drawingPlanePanel != null)
+        {
+            await _drawingPlanePanel.ColorUpdatePanel(idUpdateNodeJobStatus);
+        }
     }
 
     private async Task UpdateUpdatePanel()
     {
-        await _filterPanel.UpdatePanel();
+        if (_filterPanel != null)
+        {
+            await _filterPanel.UpdatePanel();
+        }
         _drawingPlanePanel?.BaseUpdatePanel();
         _listProcessPanel?.UpdatePanel();
 

@@ -8,7 +8,7 @@ public class MappersTest
     public void Map_WithNullInput_ThrowsArgumentNullException()
     {
         // Arrange
-        string x = null;
+        string x = null!;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => Mappers.Map(x));

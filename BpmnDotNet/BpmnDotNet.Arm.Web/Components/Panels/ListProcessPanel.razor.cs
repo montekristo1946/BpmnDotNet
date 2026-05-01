@@ -19,7 +19,7 @@ public partial class ListProcessPanel : ComponentBase
     private ListProcessPanelDto _acitveTable = new();
     private int _currentPage = 0;
 
-    private int _countLineOnePage = 10;
+    private readonly int _countLineOnePage = 10;
     private int _countAllPage = 0;
     private string[] _arrErrors = [];
 

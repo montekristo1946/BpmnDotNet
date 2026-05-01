@@ -5,7 +5,7 @@ namespace BpmnDotNetTests.Handlers;
 
 public class XmlSerializationBpmnDiagramSectionTests
 {
-    private readonly IXmlSerializationBpmnDiagramSection _xmlSerializationProcessSection;
+    private readonly XmlSerializationBpmnDiagramSection _xmlSerializationProcessSection;
 
     public XmlSerializationBpmnDiagramSectionTests()
     {
