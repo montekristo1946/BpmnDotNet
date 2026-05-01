@@ -152,7 +152,6 @@ public class HistoryNodeStateWriterTest
     public async Task SetStateProcessAsync_WhenTokenProcessInvalid_ShouldThrow(
         string idBpmnProcess, string? tokenProcess)
     {
-        if (tokenProcess == null) throw new ArgumentNullException(nameof(tokenProcess));
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
             _sut.SetStateProcessAsync(
