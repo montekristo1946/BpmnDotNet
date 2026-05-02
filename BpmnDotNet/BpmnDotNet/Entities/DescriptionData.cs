@@ -16,7 +16,7 @@ public class DescriptionData
     public string TaskDefinitionId { get; init; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets описание узал.
+    /// Gets описание узла.
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 }

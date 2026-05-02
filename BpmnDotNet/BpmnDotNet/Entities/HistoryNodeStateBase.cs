@@ -13,27 +13,27 @@ public class HistoryNodeStateBase
     public string Id => $"{IdBpmnProcess}_{TokenProcess}";
 
     /// <summary>
-    ///     Gets or sets iD Bpmn процесса из схемы bpmn.
+    ///     Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
-    public string IdBpmnProcess { get; set; } = string.Empty;
+    public string IdBpmnProcess { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets текущий Token процесса.
+    ///     Gets текущий Token процесса.
     /// </summary>
-    public string TokenProcess { get; set; } = string.Empty;
+    public string TokenProcess { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets время создания документа.
+    ///     Gets время создания документа.
     /// </summary>
-    public long DateCreated { get; set; } = DateTime.Now.Ticks;
+    public long DateCreated { get; init; } = DateTime.Now.Ticks;
 
     /// <summary>
-    ///     Gets or sets время последнего изменения.
+    ///     Gets время последнего изменения.
     /// </summary>
-    public long DateLastModified { get; set; } = DateTime.MaxValue.Ticks;
+    public long DateLastModified { get; init; } = DateTime.MaxValue.Ticks;
 
     /// <summary>
-    ///     Gets or sets состояние процесса.
+    ///     Gets состояние процесса.
     /// </summary>
-    public ProcessStatus ProcessStatus { get; set; } = ProcessStatus.None;
+    public ProcessStatus ProcessStatus { get; init; } = ProcessStatus.None;
 }
