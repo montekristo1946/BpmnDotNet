@@ -6,7 +6,7 @@ using Sample.ConsoleApp.Context;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class ServiceTaskSecondHandler : IBpmnHandler
+internal class ServiceTaskSecondHandler : IBpmnHandler
 {
     private readonly ILogger<ServiceTaskSecondHandler> _logger;
 

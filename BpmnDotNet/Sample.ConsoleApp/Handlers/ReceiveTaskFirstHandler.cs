@@ -6,7 +6,7 @@ using Sample.ConsoleApp.Messages;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class ReceiveTaskFirstHandle : IBpmnHandler
+internal class ReceiveTaskFirstHandle : IBpmnHandler
 {
     private readonly ILogger<ReceiveTaskFirstHandle> _logger;
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class GatewayFirstHandler : IBpmnHandler
+internal class GatewayFirstHandler : IBpmnHandler
 {
     private readonly ILogger<GatewayFirstHandler> _logger;
 
@@ -29,7 +29,7 @@ public class GatewayFirstHandler : IBpmnHandler
             throw new OperationCanceledException("Fail try Add key ConditionRoute");
 
         conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SendTaskFirstHandler");
-        // conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SubProcessFirstHandler");
+        // conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_ReceiveTaskFirstHandle");
         
         await Task.Delay(1, ctsToken);
     }

@@ -8,7 +8,7 @@ namespace Sample.ConsoleApp.Service;
 /// <summary>
 /// Регистрация Bpmn handlers.
 /// </summary>
-public class BpmnClientHost : IHostedService
+internal class BpmnClientHost : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<BpmnClientHost> _logger;

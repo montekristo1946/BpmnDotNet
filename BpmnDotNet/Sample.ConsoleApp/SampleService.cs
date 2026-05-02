@@ -7,7 +7,7 @@ using Sample.ConsoleApp.Messages;
 
 namespace Sample.ConsoleApp;
 
-public class SampleService
+internal class SampleService
 {
     private readonly IBpmnClient _bpmnClient;
 
@@ -16,10 +16,10 @@ public class SampleService
         _bpmnClient = bpmnClient;
     }
 
-    private ContextData CreateContextData(int tokenId)
+    private ContextData CreateContextData(int tokenId, DateTime dataTimeProcess)
     {
 
-        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{tokenId}";
+        var tokenProcess = $"Train_{dataTimeProcess.Ticks}_{tokenId}";
 
         var contextData = new ContextData
         {
@@ -45,7 +45,7 @@ public class SampleService
         };
     }
 
-    public void StartNewProcess()
+    public void StartNewProcess(DateTime dataTimeProcess)
     {
         var tasks = new List<Task>();
         var startID = 1;
@@ -64,12 +64,12 @@ public class SampleService
 
                 var tokenId = startID + j;
                 var timeout = TimeSpan.FromMinutes(10);
-                var contextData = CreateContextData(tokenId);
+                var contextData = CreateContextData(tokenId,dataTimeProcess);
                 var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
 
                 tasks.Add(taskNode.ProcessTask);
             }
-            Task.WaitAll(tasks.ToArray());
+            // Task.WaitAll(tasks.ToArray());
             Console.WriteLine($"  Элемент {i}");
         }
         sw.Stop();
@@ -77,13 +77,13 @@ public class SampleService
 
     }
 
-    public void SendMessage()
+    public void SendMessage(DateTime dataTimeProcess)
     {
         //Отправим тестовое сообщение
         var messageExampleFirst = CreateMessageExampleFirst();
         var idBpmnProcess = "IdBpmnProcessingMain";
-        var wagon = 1000;
-        var tokenProcess = $"Train_{DateTime.Now.Ticks}_{wagon}";
+        var tokenId = 1;
+        var tokenProcess = $"Train_{dataTimeProcess.Ticks}_{tokenId}";
 
         try
         {

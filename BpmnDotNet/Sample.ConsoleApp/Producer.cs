@@ -1,6 +1,6 @@
 ﻿namespace Sample.ConsoleApp;
 
-public class Producer
+internal class Producer
 {
     private readonly SampleService _sampleService;
 
@@ -12,6 +12,7 @@ public class Producer
     public void Produce()
     {
         var keepRunning = true;
+        var dataTimeProcess = DateTime.Now;
 
         while (keepRunning)
         {
@@ -21,10 +22,10 @@ public class Producer
             switch (key)
             {
                 case 'a':
-                    _sampleService.StartNewProcess();
+                    _sampleService.StartNewProcess(dataTimeProcess);
                     break;
                 case 's':
-                    _sampleService.SendMessage();
+                    _sampleService.SendMessage(dataTimeProcess);
                     break;
                 case 'q':
                     Console.WriteLine("Quitting");

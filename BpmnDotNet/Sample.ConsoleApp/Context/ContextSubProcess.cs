@@ -4,7 +4,7 @@ using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;
 
-public class ContextSubProcess : IContextBpmnProcess
+internal class ContextSubProcess : IContextBpmnProcess
 {
     public string ContextSubProcessValue { get; set; } = string.Empty;
     public string IdBpmnProcess { get; init; } = Constants.IdBpmnProcessingSub;

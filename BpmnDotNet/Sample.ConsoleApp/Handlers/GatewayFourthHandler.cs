@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class GatewayFourthHandler : IBpmnHandler
+internal class GatewayFourthHandler : IBpmnHandler
 {
     private readonly ILogger<GatewayFourthHandler> _logger;
 

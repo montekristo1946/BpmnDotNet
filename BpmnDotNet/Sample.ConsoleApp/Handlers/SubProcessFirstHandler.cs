@@ -6,7 +6,7 @@ using Sample.ConsoleApp.Context;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class SubProcessFirstHandler : IBpmnHandler
+internal class SubProcessFirstHandler : IBpmnHandler
 {
     private readonly IBpmnClient _bpmnClient;
 
