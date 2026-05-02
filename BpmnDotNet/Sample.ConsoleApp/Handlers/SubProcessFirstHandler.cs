@@ -1,12 +1,12 @@
 using System.Globalization;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class SubProcessFirstHandler : IBpmnHandler
+internal class SubProcessFirstHandler : IBpmnHandler
 {
     private readonly IBpmnClient _bpmnClient;
 

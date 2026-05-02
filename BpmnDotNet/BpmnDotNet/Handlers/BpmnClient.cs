@@ -1,7 +1,7 @@
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Dto;
@@ -95,6 +95,17 @@ internal class BpmnClient : IBpmnClient
         foreach (THandler handler in handlersBpmn)
         {
             var taskDefinitionId = handler.TaskDefinitionId;
+            if (taskDefinitionId is null)
+            {
+                throw new InvalidOperationException(
+                    $"[RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
+            }
+
+            if (handler.Description is null)
+            {
+                throw new InvalidOperationException(
+                    $"[RegisterHandlers] {handler.GetType().Name} Description is null");
+            }
 
             var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
 
@@ -112,6 +123,11 @@ internal class BpmnClient : IBpmnClient
     /// <inheritdoc />
     public void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(idBpmnProcess);
+        ArgumentException.ThrowIfNullOrWhiteSpace(tokenProcess);
+        ArgumentNullException.ThrowIfNull(messageType);
+        ArgumentNullException.ThrowIfNull(message);
+
         var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
         {

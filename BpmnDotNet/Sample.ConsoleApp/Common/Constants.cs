@@ -1,6 +1,6 @@
 namespace Sample.ConsoleApp.Common;
 
-public static class Constants
+internal static class Constants
 {
     public const string IdBpmnProcessingMain = nameof(IdBpmnProcessingMain);
     public const string IdBpmnProcessingSub = nameof(IdBpmnProcessingSub);

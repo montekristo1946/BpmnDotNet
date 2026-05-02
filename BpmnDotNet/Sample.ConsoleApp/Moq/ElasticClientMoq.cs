@@ -1,8 +1,8 @@
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 
 namespace Sample.ConsoleApp.Moq;
 
-public class ElasticClientMoq:IElasticClientSetDataAsync
+internal class ElasticClientMoq:IElasticClientSetDataAsync
 {
     public Task<bool> SetDataAsync<T>(T document, CancellationToken token = default) where T : class
     {

@@ -1,6 +1,6 @@
 namespace BpmnDotNet.Abstractions.Handlers;
 
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Dto;
 
 /// <summary>

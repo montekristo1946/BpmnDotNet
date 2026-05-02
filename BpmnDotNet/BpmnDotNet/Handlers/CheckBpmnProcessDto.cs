@@ -2,7 +2,7 @@ namespace BpmnDotNet.Handlers;
 
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Models;
+using BpmnDotNet.BPMNDiagram;
 
 /// <inheritdoc />
 internal class CheckBpmnProcessDto : ICheckBpmnProcessDto

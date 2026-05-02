@@ -1,9 +1,9 @@
 using System.Globalization;
 using AutoFixture;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain;
-using BpmnDotNet.Entities;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNetTests.Handlers;

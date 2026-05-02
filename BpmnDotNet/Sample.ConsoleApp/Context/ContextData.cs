@@ -1,11 +1,12 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;
 
-public class ContextData : IContextBpmnProcess, IExclusiveGateWayRoute, IMessageReceiveTask
+internal class ContextData : IContextBpmnProcess, IExclusiveGateWayRoute, IMessageReceiveTask
 {
+    
     public string IdBpmnProcess { get; init; } = Constants.IdBpmnProcessingMain;
 
     public string TokenProcess { get; init; } = Guid.NewGuid().ToString();

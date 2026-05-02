@@ -1,6 +1,6 @@
 namespace BpmnDotNet.Abstractions.Handlers;
 
-using BpmnDotNet.Entities;
+using BpmnDotNet.BPMNDiagram;
 
 /// <summary>
 /// Сериализатор визуальную часть диаграмм.

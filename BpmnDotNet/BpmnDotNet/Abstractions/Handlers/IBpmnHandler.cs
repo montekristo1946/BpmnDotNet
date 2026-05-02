@@ -1,0 +1,27 @@
+namespace BpmnDotNet.Abstractions.Handlers;
+
+using BpmnDotNet.Abstractions.Context;
+
+/// <summary>
+///     Интерфейс обработчиков блоков Bpmn.
+/// </summary>
+public interface IBpmnHandler
+{
+    /// <summary>
+    ///     Gets Id блочка в Bpmn нотации.
+    /// </summary>
+    string TaskDefinitionId { get; init; }
+
+    /// <summary>
+    ///     Gets описания блока. Например, детали правила реализуемые блоком.
+    /// </summary>
+    string Description { get; init; }
+
+    /// <summary>
+    ///     Метод, который вызовет Broker.
+    /// </summary>
+    /// <param name="context">IContextBpmnProcess.</param>
+    /// <param name="ctsToken">CancellationToken.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken = default);
+}

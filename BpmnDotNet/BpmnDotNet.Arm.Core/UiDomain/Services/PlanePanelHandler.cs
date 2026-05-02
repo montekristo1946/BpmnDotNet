@@ -1,11 +1,11 @@
 namespace BpmnDotNet.Arm.Core.UiDomain.Services;
 
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Entities;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

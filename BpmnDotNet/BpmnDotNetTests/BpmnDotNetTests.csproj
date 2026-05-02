@@ -57,6 +57,13 @@
         <None Update="BpmnDiagram\CheckError\LoadXmlBpmn_CheckFailGetNameProcess_Exception.bpmn">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="Handlers\BpmnClientIntegrationDomain\BpmnSource\diagram_1.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Handlers\BpmnClientIntegrationDomain\BpmnSource\" />
     </ItemGroup>
 
 

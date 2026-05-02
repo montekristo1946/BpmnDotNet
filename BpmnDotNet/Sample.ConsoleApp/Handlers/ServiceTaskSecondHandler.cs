@@ -1,11 +1,12 @@
 using System.Globalization;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
+using BpmnDotNet.Abstractions.Handlers;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class ServiceTaskSecondHandler : IBpmnHandler
+internal class ServiceTaskSecondHandler : IBpmnHandler
 {
     private readonly ILogger<ServiceTaskSecondHandler> _logger;
 

@@ -1,8 +1,8 @@
 namespace BpmnDotNet.Handlers;
 
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Dto;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

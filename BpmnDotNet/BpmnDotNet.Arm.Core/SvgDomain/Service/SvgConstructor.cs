@@ -4,8 +4,6 @@ using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Entities;
-using BpmnDotNet.Models;
 
 /// <inheritdoc />
 public class SvgConstructor : ISvgConstructor

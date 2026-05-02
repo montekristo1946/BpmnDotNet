@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;
 
-public class ContextSubProcess : IContextBpmnProcess
+internal class ContextSubProcess : IContextBpmnProcess
 {
     public string ContextSubProcessValue { get; set; } = string.Empty;
     public string IdBpmnProcess { get; init; } = Constants.IdBpmnProcessingSub;

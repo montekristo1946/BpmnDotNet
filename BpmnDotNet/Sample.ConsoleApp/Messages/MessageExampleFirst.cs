@@ -1,6 +1,6 @@
 namespace Sample.ConsoleApp.Messages;
 
-public class MessageExampleFirst
+internal class MessageExampleFirst
 {
     public string Name { get; set; } = string.Empty;
 

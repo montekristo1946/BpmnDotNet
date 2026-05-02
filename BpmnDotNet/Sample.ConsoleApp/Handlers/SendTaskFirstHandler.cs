@@ -1,10 +1,11 @@
 using System.Globalization;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
+using BpmnDotNet.Abstractions.Handlers;
 using Microsoft.Extensions.Logging;
 
 namespace Sample.ConsoleApp.Handlers;
 
-public class SendTaskFirstHandler : IBpmnHandler
+internal class SendTaskFirstHandler : IBpmnHandler
 {
     private readonly ILogger<SendTaskFirstHandler> _logger;
 

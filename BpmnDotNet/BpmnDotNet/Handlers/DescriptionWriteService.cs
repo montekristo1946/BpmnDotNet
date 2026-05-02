@@ -1,9 +1,9 @@
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Entities;
+using BpmnDotNet.Dto;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

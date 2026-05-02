@@ -1,15 +1,15 @@
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc cref="IBusinessProcess" />
-internal class BusinessProcess : IBusinessProcess, IDisposable
+internal class BusinessProcess : IBusinessProcess
 {
     private readonly BpmnProcessDto _bpmnShema;
 
@@ -44,8 +44,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     private readonly ConcurrentDictionary<string, string> _errorsRegistry = new();
 
     private readonly IPathFinder _pathFinder;
-    private bool _idDispose;
-    private long _dateFromInitInstance;
+    private readonly long _dateFromInitInstance;
+    private volatile bool _idDispose;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusinessProcess"/> class.
@@ -54,8 +54,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <param name="logger">ILogger.</param>
     /// <param name="bpmnShema">BpmnProcessDto.</param>
     /// <param name="pathFinder">IPathFinder.</param>
-    /// <param name="handlers">Зарегестрированные handlers.</param>
-    /// <param name="timeout">timeout.</param>
+    /// <param name="handlers">Зарегистрированные handlers.</param>
+    /// <param name="timeout">Максимальное время жизни процесса.</param>
     /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
     public BusinessProcess(
         IContextBpmnProcess contextBpmnProcess,
@@ -93,6 +93,8 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     /// <inheritdoc/>
     public bool AddMessageToQueue(Type messageType, object message)
     {
+        ArgumentNullException.ThrowIfNull(messageType);
+        ArgumentNullException.ThrowIfNull(message);
         try
         {
             _messagesStore.AddOrUpdate(
@@ -121,9 +123,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _idDispose = true;
     }
 
-    /// <summary>
-    /// Завершить работу.
-    /// </summary>
+    /// <inheritdoc/>
     public void ForceCancel()
     {
         _cts.Cancel();
@@ -196,7 +196,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
     }
 
     /// <summary>
-    /// Проверим наличие сообщения в локальном хрнанилище.
+    /// Проверим наличие сообщения в локальном хранилище.
     /// </summary>
     private void CheckMessagesStore()
     {

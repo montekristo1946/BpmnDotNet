@@ -1,5 +1,5 @@
-using BpmnDotNet.Abstractions.Common;
-using BpmnDotNet.Entities;
+using BpmnDotNet.Dto;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

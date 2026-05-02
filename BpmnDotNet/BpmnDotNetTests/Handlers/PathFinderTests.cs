@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Elements.BpmnNatation;
+using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.Handlers;
-using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 

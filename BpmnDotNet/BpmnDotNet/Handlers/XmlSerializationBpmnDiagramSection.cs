@@ -4,8 +4,6 @@ using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
-using BpmnDotNet.Entities;
-using BpmnDotNet.Models;
 using BpmnDotNet.Utils;
 
 /// <inheritdoc />
