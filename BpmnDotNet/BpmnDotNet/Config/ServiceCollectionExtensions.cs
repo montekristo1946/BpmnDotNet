@@ -35,6 +35,8 @@ public static class ServiceCollectionExtensions
 
             return new PathFinder(logger);
         });
+        services.AddSingleton<IXmlSerializationProcessSection, XmlSerializationProcessSection>();
+        services.AddSingleton<IXmlSerializationBpmnDiagramSection, XmlSerializationBpmnDiagramSection>();
 
         services.AddSingleton<IBpmnClient>(options =>
         {
@@ -43,6 +45,8 @@ public static class ServiceCollectionExtensions
             var elasticClient = options.GetRequiredService<IElasticClientSetDataAsync>();
             var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
             var descriptionWriteService = options.GetRequiredService<IDescriptionWriteService>();
+            var serializerProcessSection = options.GetRequiredService<IXmlSerializationProcessSection>();
+            var serializerDiagramSection = options.GetRequiredService<IXmlSerializationBpmnDiagramSection>();
 
             return BpmnClientBuilder.Build(
                 pathDiagram,
@@ -50,7 +54,9 @@ public static class ServiceCollectionExtensions
                 pathFinder,
                 elasticClient,
                 historyNodeStateWriter,
-                descriptionWriteService);
+                descriptionWriteService,
+                serializerProcessSection,
+                serializerDiagramSection);
         });
 
         return services;
