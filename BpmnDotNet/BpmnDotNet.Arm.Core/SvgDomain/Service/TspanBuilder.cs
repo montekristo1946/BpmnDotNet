@@ -25,6 +25,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     {
         var allLines = _childElements.SelectMany(SplitLinesFromWhiteSpace).ToArray();
         allLines = SplitLinesFromLongLine(allLines);
+        allLines = ClearSpaсeLine(allLines);
 
         for (var i = 0; i < allLines.Length; i++)
         {
@@ -143,5 +144,16 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
             .ToArray();
 
         return segments;
+    }
+
+    /// <summary>
+    /// Уберет пустые строки.
+    /// </summary>
+    /// <param name="src">Входной массив.</param>
+    /// <returns>Обработанный массив.</returns>
+    internal string[] ClearSpaсeLine(string[] src)
+    {
+        var reaArr = src.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+        return reaArr;
     }
 }
