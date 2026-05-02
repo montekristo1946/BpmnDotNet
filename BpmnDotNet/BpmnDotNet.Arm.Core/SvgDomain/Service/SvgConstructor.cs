@@ -189,7 +189,7 @@ public class SvgConstructor : ISvgConstructor
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(10)
+            .AddPaddingX(50)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -249,7 +249,7 @@ public class SvgConstructor : ISvgConstructor
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(10)
+            .AddPaddingX(50)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -279,7 +279,7 @@ public class SvgConstructor : ISvgConstructor
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(10)
+            .AddPaddingX(50)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -309,7 +309,7 @@ public class SvgConstructor : ISvgConstructor
             .AddChild(shape.Name)
             .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(10)
+            .AddPaddingX(50)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -336,6 +336,19 @@ public class SvgConstructor : ISvgConstructor
             return string.Empty;
         }
 
+        // var stringShape = shape.Type switch
+        // {
+        //     ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
+        //     ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
+        //     ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
+        //     ElementType.ServiceTask => CreateServiceTask(shape, color, title),
+        //     ElementType.SendTask => CreateSendTask(shape, color, title),
+        //     ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
+        //     ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
+        //     ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
+        //     ElementType.SubProcess => CreateSubProcess(shape, color, title),
+        //     _ => string.Empty,
+        // };
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
