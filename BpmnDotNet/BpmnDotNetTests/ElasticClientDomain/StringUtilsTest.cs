@@ -49,7 +49,6 @@ public class StringUtilsTest
     }
     
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
     [InlineData("  ")]

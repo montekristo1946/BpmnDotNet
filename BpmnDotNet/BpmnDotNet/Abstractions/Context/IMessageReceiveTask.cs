@@ -1,6 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.Abstractions.Context;
+
+using System.Collections.Concurrent;
 
 /// <summary>
 ///     Хранилище зарегистрированных сообщений.
