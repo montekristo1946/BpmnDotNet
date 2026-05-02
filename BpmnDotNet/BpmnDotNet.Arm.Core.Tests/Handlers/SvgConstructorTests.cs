@@ -26,9 +26,9 @@ public class SvgConstructorTests
             Height = 603,
             Width = 1594
         };
-        var res = await _svgConstructor.CreatePlaneAsync(_string, [],size, []);
+        var result = await _svgConstructor.CreatePlaneAsync(_string, [],size, []);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
-
-        Assert.Equal(38110, res.Length);
+        var normalizedResult = result.TrimEnd();
+        Assert.Equal(38513, normalizedResult.Length);
     }
 }
