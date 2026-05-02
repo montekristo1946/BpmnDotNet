@@ -5,7 +5,7 @@ using BpmnDotNet.Dto;
 /// <summary>
 /// BusinessProcess. Для внутреннего тестирования.
 /// </summary>
-internal interface IBusinessProcess
+internal interface IBusinessProcess : IDisposable
 {
     /// <summary>
     ///     Gets получить статус процесса.
@@ -19,4 +19,9 @@ internal interface IBusinessProcess
     /// <param name="message">Сообщение.</param>
     /// <returns>Результат.</returns>
     public bool AddMessageToQueue(Type messageType, object message);
+
+    /// <summary>
+    /// Завершить работу.
+    /// </summary>
+    public void ForceCancel();
 }

@@ -123,6 +123,11 @@ internal class BpmnClient : IBpmnClient
     /// <inheritdoc />
     public void SendMessage(string idBpmnProcess, string tokenProcess, Type messageType, object message)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(idBpmnProcess);
+        ArgumentException.ThrowIfNullOrWhiteSpace(tokenProcess);
+        ArgumentNullException.ThrowIfNull(messageType);
+        ArgumentNullException.ThrowIfNull(message);
+
         var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
         if (!resGet || bpmn is null || bpmn.Process is null)
         {

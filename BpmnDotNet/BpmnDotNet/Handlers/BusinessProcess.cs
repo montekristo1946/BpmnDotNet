@@ -9,7 +9,7 @@ using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc cref="IBusinessProcess" />
-internal class BusinessProcess : IBusinessProcess, IDisposable
+internal class BusinessProcess : IBusinessProcess
 {
     private readonly BpmnProcessDto _bpmnShema;
 
@@ -123,9 +123,7 @@ internal class BusinessProcess : IBusinessProcess, IDisposable
         _idDispose = true;
     }
 
-    /// <summary>
-    /// Завершить работу.
-    /// </summary>
+    /// <inheritdoc/>
     public void ForceCancel()
     {
         _cts.Cancel();
