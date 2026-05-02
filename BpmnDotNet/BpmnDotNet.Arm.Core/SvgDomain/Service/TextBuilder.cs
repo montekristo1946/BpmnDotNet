@@ -17,7 +17,7 @@ public class TextBuilder : IBpmnBuild<TextBuilder>, IColorBuilder<TextBuilder>
     public string BuildSvg()
     {
         var hider =
-            $"<text id=\"{_id}\" lineHeight=\"1.2\" class=\"djs-label\" style=\"font-family: Arial, sans-serif; font-size: 11px; font-weight: normal; fill: {_color};\">";
+            $"<text id=\"{_id}\" lineHeight=\"1.2\"  class=\"djs-label\" text-anchor=\"middle\"  style=\"font-family: Arial, sans-serif; font-size: 11px; font-weight: normal; fill: {_color};\">";
         var footer = "</text>";
 
         _svgStorage.AppendLine(hider);
