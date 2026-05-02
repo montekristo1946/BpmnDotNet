@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
-using BpmnDotNet.Abstractions.Common;
-using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("BpmnDotNetTests")]

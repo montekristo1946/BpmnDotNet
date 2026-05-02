@@ -1,7 +1,6 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
 /// Node в объектовом виде, EndEvent.

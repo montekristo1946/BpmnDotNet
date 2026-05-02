@@ -1,7 +1,5 @@
-namespace BpmnDotNet.Abstractions.Common;
+namespace BpmnDotNet.ElasticClientDomain.Abstractions;
 
-using System.Threading;
-using System.Threading.Tasks;
 using BpmnDotNet.Dto;
 
 /// <summary>

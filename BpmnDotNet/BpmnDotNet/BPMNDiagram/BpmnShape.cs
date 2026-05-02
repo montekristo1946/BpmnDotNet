@@ -1,7 +1,5 @@
 namespace BpmnDotNet.BPMNDiagram;
 
-using BpmnDotNet.Models;
-
 /// <summary>
 ///     В нотации секция: bpmndi:BPMNShape.
 /// </summary>

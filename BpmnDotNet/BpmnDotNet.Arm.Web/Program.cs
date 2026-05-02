@@ -1,4 +1,3 @@
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
 using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
@@ -7,6 +6,7 @@ using BpmnDotNet.Arm.Web.AppWeb;
 using BpmnDotNet.Arm.Web.Config;
 using BpmnDotNet.Arm.Web.Extensions;
 using BpmnDotNet.ElasticClientDomain;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

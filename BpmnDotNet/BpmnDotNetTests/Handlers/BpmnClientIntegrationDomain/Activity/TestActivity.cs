@@ -1,4 +1,5 @@
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
+using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Context;
 
 namespace BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Activity;

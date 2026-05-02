@@ -1,4 +1,4 @@
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 
 namespace Sample.ConsoleApp.Moq;
 

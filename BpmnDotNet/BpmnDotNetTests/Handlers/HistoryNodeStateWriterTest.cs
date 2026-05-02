@@ -1,6 +1,6 @@
 using AutoFixture;
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Dto;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
 using BpmnDotNetTests.Utils;
 using Microsoft.Extensions.Logging;

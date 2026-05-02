@@ -1,7 +1,7 @@
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Config;
+using BpmnDotNet.Configuration;
 using BpmnDotNet.ElasticClientDomain;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Activity;
 using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Context;
 using Microsoft.Extensions.DependencyInjection;

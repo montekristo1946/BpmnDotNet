@@ -1,15 +1,14 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
-/// Node в объектовом виде, ReceiveTask.
+/// Node в объектовом виде, ServiceTask.
 /// </summary>
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class ReceiveTaskComponent(string id, string[] incoming, string[] outgoing)
+public class ServiceTaskComponent(string id, string[] incoming, string[] outgoing)
     : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
@@ -20,7 +19,7 @@ public class ReceiveTaskComponent(string id, string[] incoming, string[] outgoin
     /// <summary>
     /// Gets elementType.
     /// </summary>
-    public ElementType ElementType { get; } = ElementType.ReceiveTask;
+    public ElementType ElementType { get; } = ElementType.ServiceTask;
 
     /// <summary>
     /// Gets входные Flow.

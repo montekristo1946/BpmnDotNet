@@ -1,15 +1,15 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
-/// Node в объектовом виде, SendTask.
+/// Node в объектовом виде, ParallelGateway.
 /// </summary>
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class SendTaskComponent(string id, string[] incoming, string[] outgoing) : IElement, IIncomingPath, IOutgoingPath
+public class ParallelGatewayComponent(string id, string[] incoming, string[] outgoing)
+    : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
     /// Gets iD.
@@ -19,7 +19,7 @@ public class SendTaskComponent(string id, string[] incoming, string[] outgoing) 
     /// <summary>
     /// Gets elementType.
     /// </summary>
-    public ElementType ElementType { get; } = ElementType.SendTask;
+    public ElementType ElementType { get; } = ElementType.ParallelGateway;
 
     /// <summary>
     /// Gets входные Flow.

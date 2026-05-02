@@ -1,6 +1,6 @@
-﻿using BpmnDotNet.Abstractions.Common;
-using BpmnDotNet.Config;
+﻿using BpmnDotNet.Configuration;
 using BpmnDotNet.ElasticClientDomain;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

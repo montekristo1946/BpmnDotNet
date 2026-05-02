@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 
 namespace BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Context;
 

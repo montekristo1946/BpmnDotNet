@@ -1,11 +1,11 @@
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Models;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc cref="IBusinessProcess" />
@@ -55,7 +55,7 @@ internal class BusinessProcess : IBusinessProcess
     /// <param name="bpmnShema">BpmnProcessDto.</param>
     /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="handlers">Зарегистрированные handlers.</param>
-    /// <param name="timeout">timeout.</param>
+    /// <param name="timeout">Максимальное время жизни процесса.</param>
     /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
     public BusinessProcess(
         IContextBpmnProcess contextBpmnProcess,
@@ -196,7 +196,7 @@ internal class BusinessProcess : IBusinessProcess
     }
 
     /// <summary>
-    /// Проверим наличие сообщения в локальном хрнанилище.
+    /// Проверим наличие сообщения в локальном хранилище.
     /// </summary>
     private void CheckMessagesStore()
     {

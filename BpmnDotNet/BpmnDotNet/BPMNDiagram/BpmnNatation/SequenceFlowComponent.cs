@@ -1,15 +1,14 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
-/// Node в объектовом виде, ExclusiveGateway.
+/// Node в объектовом виде, SequenceFlow.
 /// </summary>
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class ExclusiveGatewayComponent(string id, string[] incoming, string[] outgoing)
+public class SequenceFlowComponent(string id, string[] incoming, string[] outgoing)
     : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
@@ -20,7 +19,7 @@ public class ExclusiveGatewayComponent(string id, string[] incoming, string[] ou
     /// <summary>
     /// Gets elementType.
     /// </summary>
-    public ElementType ElementType { get; } = ElementType.ExclusiveGateway;
+    public ElementType ElementType { get; } = ElementType.SequenceFlow;
 
     /// <summary>
     /// Gets входные Flow.

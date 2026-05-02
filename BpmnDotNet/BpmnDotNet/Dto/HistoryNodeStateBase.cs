@@ -1,6 +1,4 @@
-namespace BpmnDotNet.Entities;
-
-using BpmnDotNet.Dto;
+namespace BpmnDotNet.Dto;
 
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.

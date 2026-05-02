@@ -1,15 +1,14 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
-/// Node в объектовом виде, ParallelGateway.
+/// Node в объектовом виде, ExclusiveGateway.
 /// </summary>
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class ParallelGatewayComponent(string id, string[] incoming, string[] outgoing)
+public class ExclusiveGatewayComponent(string id, string[] incoming, string[] outgoing)
     : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
@@ -20,7 +19,7 @@ public class ParallelGatewayComponent(string id, string[] incoming, string[] out
     /// <summary>
     /// Gets elementType.
     /// </summary>
-    public ElementType ElementType { get; } = ElementType.ParallelGateway;
+    public ElementType ElementType { get; } = ElementType.ExclusiveGateway;
 
     /// <summary>
     /// Gets входные Flow.

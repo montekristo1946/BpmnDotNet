@@ -1,7 +1,7 @@
 using AutoFixture;
 using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Handlers;
-using BpmnDotNet.Models;
 using NSubstitute;
 
 namespace BpmnDotNetTests.Handlers;

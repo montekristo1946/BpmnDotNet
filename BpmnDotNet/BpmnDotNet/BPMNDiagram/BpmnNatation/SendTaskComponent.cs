@@ -1,16 +1,14 @@
-namespace BpmnDotNet.Elements.BpmnNatation;
+namespace BpmnDotNet.BPMNDiagram.BpmnNatation;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.Models;
 
 /// <summary>
-/// Node в объектовом виде, SequenceFlow.
+/// Node в объектовом виде, SendTask.
 /// </summary>
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class SequenceFlowComponent(string id, string[] incoming, string[] outgoing)
-    : IElement, IIncomingPath, IOutgoingPath
+public class SendTaskComponent(string id, string[] incoming, string[] outgoing) : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
     /// Gets iD.
@@ -20,7 +18,7 @@ public class SequenceFlowComponent(string id, string[] incoming, string[] outgoi
     /// <summary>
     /// Gets elementType.
     /// </summary>
-    public ElementType ElementType { get; } = ElementType.SequenceFlow;
+    public ElementType ElementType { get; } = ElementType.SendTask;
 
     /// <summary>
     /// Gets входные Flow.

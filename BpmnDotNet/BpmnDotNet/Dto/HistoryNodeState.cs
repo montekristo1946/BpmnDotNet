@@ -1,19 +1,17 @@
 namespace BpmnDotNet.Dto;
 
-using BpmnDotNet.Entities;
-
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.
 /// </summary>
 public class HistoryNodeState : HistoryNodeStateBase
 {
     /// <summary>
-    ///     Gets or sets текущее состояние нод.
+    ///     Gets текущее состояние нод.
     /// </summary>
-    public NodeJobStatus[] NodeStaus { get; set; } = [];
+    public NodeJobStatus[] NodeStaus { get; init; } = [];
 
     /// <summary>
-    ///     Gets or sets сообщения об ошибках.
+    ///     Gets сообщения об ошибках.
     /// </summary>
-    public string[] ArrayMessageErrors { get; set; } = [];
+    public string[] ArrayMessageErrors { get; init; } = [];
 }

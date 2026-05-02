@@ -1,7 +1,4 @@
-namespace BpmnDotNet.Abstractions.Common;
-
-using System.Threading;
-using System.Threading.Tasks;
+namespace BpmnDotNet.ElasticClientDomain.Abstractions;
 
 /// <summary>
 /// Запись данных.

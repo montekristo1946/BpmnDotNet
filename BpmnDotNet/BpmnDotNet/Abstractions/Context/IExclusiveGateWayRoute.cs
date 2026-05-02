@@ -1,6 +1,6 @@
-namespace BpmnDotNet.Abstractions.Common;
-
 using System.Collections.Concurrent;
+
+namespace BpmnDotNet.Abstractions.Context;
 
 /// <summary>
 ///     Маршруты для эксклюзивных шлюзов.

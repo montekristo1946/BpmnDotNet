@@ -1,6 +1,4 @@
-namespace BpmnDotNet.Entities;
-
-using BpmnDotNet.BPMNDiagram;
+namespace BpmnDotNet.BPMNDiagram;
 
 /// <summary>
 ///     В нотации секция: bpmndi:BPMNPlane.

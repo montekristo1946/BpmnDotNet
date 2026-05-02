@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Abstractions.Common;
+namespace BpmnDotNet.Abstractions.Context;
 
 /// <summary>
 /// Интерфейс контекста процесса.

@@ -1,7 +1,6 @@
-namespace BpmnDotNet.Abstractions.Common;
+namespace BpmnDotNet.Abstractions.Handlers;
 
-using System.Threading;
-using System.Threading.Tasks;
+using BpmnDotNet.Abstractions.Context;
 
 /// <summary>
 ///     Интерфейс обработчиков блоков Bpmn.

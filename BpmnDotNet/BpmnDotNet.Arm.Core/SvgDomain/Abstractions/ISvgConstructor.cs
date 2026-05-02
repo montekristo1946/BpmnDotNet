@@ -1,8 +1,8 @@
 namespace BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 
 using BpmnDotNet.Arm.Core.Common;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
-using BpmnDotNet.Entities;
 
 /// <summary>
 /// Отрисовка svg.

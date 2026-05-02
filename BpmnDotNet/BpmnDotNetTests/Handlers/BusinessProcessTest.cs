@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using AutoFixture;
-using BpmnDotNet.Abstractions.Common;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Handlers;

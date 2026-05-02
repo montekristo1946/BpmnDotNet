@@ -1,9 +1,9 @@
 using AutoFixture.Kernel;
-using BpmnDotNet.Abstractions.Common;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
-using BpmnDotNet.Elements.BpmnNatation;
-using BpmnDotNet.Entities;
+using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram.BpmnNatation;
+using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
 using BpmnDotNetTests.Utils;
 
