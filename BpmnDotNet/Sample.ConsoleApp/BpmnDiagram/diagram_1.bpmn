@@ -8,11 +8,13 @@
     <bpmn:endEvent id="End_event" name="Процесс завершен">
       <bpmn:incoming>Flow_out_GatewayFourthHandler</bpmn:incoming>
     </bpmn:endEvent>
+    
     <bpmn:exclusiveGateway id="GatewayFirstHandler" name="Выбор типа вагона">
       <bpmn:incoming>Flow_out_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
       <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    
     <bpmn:sequenceFlow id="Flow_in_ReceiveTaskFirstHandle" name="Да&#10;" sourceRef="GatewayFirstHandler" targetRef="ReceiveTaskFirstHandle" />
     <bpmn:exclusiveGateway id="Gateway_Second" name="Обьединение результатов по типу вагона">
       <bpmn:incoming>Flow_out_SendTaskFirstHandler</bpmn:incoming>
@@ -76,12 +78,14 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessingMain">
+    
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="157" y="73" width="89" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Event_1tak4tf_di" bpmnElement="End_event">
         <dc:Bounds x="1462" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -115,7 +119,7 @@
       <bpmndi:BPMNShape id="Gateway_0k7arcx_di" bpmnElement="GatewayThirdHandler">
         <dc:Bounds x="875" y="95" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="861" y="50" width="77" height="40" />
+          <dc:Bounds x="871" y="50" width="77" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">

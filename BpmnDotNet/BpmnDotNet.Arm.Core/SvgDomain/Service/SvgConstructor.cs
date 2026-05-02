@@ -22,10 +22,7 @@ public class SvgConstructor : ISvgConstructor
             return Task.FromResult(string.Empty);
         }
 
-        var shapes = nodeJobStatus.Any()
-            ? CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows, descriptions)
-            : CreateShapes(plane.Shapes, widthWindows, heightWindows, descriptions);
-
+        var shapes = CreateColorShapes(plane.Shapes, nodeJobStatus, widthWindows, heightWindows, descriptions);
         return Task.FromResult(shapes);
     }
 
@@ -53,7 +50,12 @@ public class SvgConstructor : ISvgConstructor
         foreach (var shape in shapes)
         {
             var title = GetTitle(shape.BpmnElement, descriptions);
-            var color = GetColor(shape.BpmnElement, nodeJobStatus);
+            var color = "#22242a";
+            if (nodeJobStatus.Any())
+            {
+                color = GetColor(shape.BpmnElement, nodeJobStatus);
+            }
+
             var stringShape = shape.Type switch
             {
                 ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
@@ -105,50 +107,6 @@ public class SvgConstructor : ISvgConstructor
             StatusType.WaitingReceivedMessage => running,
             _ => throw new ArgumentOutOfRangeException(),
         };
-    }
-
-    private string CreateShapes(BpmnShape[] shapes, int widthWindows, int heightWindows, DescriptionData[] descriptions)
-    {
-        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
-
-        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-        var minScale = Math.Min(scalingX, scalingY);
-
-        var viewportBuilder = IBpmnBuild<ViewportBuilder>
-            .Create()
-            .AddScalingX(minScale)
-            .AddScalingY(minScale);
-
-        const int stokeWidthStart = 2;
-        const int stokeWidthEnd = 4;
-        var color = "#22242a";
-        foreach (var shape in shapes)
-        {
-            var title = GetTitle(shape.BpmnElement, descriptions);
-            var stringShape = shape.Type switch
-            {
-                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
-                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
-                ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
-                ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-                ElementType.SendTask => CreateSendTask(shape, color, title),
-                ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
-                ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
-                ElementType.SubProcess => CreateSubProcess(shape, color, title),
-                _ => string.Empty,
-            };
-
-            viewportBuilder.AddChild(stringShape);
-            var label = AddLabel(shape, color);
-            viewportBuilder.AddChild(label);
-        }
-
-        var viewportString = viewportBuilder.BuildSvg();
-        svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.BuildSvg();
-        return retStringSvg;
     }
 
     private double CalculateScalingViewportCoordinateY(BpmnShape[] shapes, int heightWindows)
@@ -336,24 +294,15 @@ public class SvgConstructor : ISvgConstructor
             return string.Empty;
         }
 
-        // var stringShape = shape.Type switch
-        // {
-        //     ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
-        //     ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
-        //     ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
-        //     ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-        //     ElementType.SendTask => CreateSendTask(shape, color, title),
-        //     ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
-        //     ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
-        //     ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
-        //     ElementType.SubProcess => CreateSubProcess(shape, color, title),
-        //     _ => string.Empty,
-        // };
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddChild(shape.Name)
-            .BuildSvg();
-
+        var tspan = shape.Type switch
+        {
+            ElementType.StartEvent => CreateTspanLabelFromStartEvent(shape.Name),
+            ElementType.EndEvent => CreateTspanLabelFromEndEvent(shape.Name),
+            ElementType.SequenceFlow => CreateTspanLabelFromSequenceFlow(shape.Name),
+            ElementType.ExclusiveGateway => CreateTspanLabelFromGateway(shape.Name),
+            ElementType.ParallelGateway => CreateTspanLabelFromGateway(shape.Name),
+            _ => string.Empty,
+        };
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
@@ -368,6 +317,50 @@ public class SvgConstructor : ISvgConstructor
             .BuildSvg();
 
         return label;
+    }
+
+    private string CreateTspanLabelFromGateway(string text)
+    {
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddPaddingX(30)
+            .AddChild(text)
+            .BuildSvg();
+
+        return tspan;
+    }
+
+    private string CreateTspanLabelFromSequenceFlow(string text)
+    {
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddPaddingX(35)
+            .AddChild(text)
+            .BuildSvg();
+
+        return tspan;
+    }
+
+    private string CreateTspanLabelFromEndEvent(string text)
+    {
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddPaddingX(25)
+            .AddChild(text)
+            .BuildSvg();
+
+        return tspan;
+    }
+
+    private string CreateTspanLabelFromStartEvent(string text)
+    {
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddPaddingX(50)
+            .AddChild(text)
+            .BuildSvg();
+
+        return tspan;
     }
 
     private string CreateSequenceFlow(BpmnShape shape, string color, string title)
