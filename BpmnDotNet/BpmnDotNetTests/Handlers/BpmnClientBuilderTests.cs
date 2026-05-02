@@ -168,7 +168,8 @@ public class BpmnClientBuilderTests : IDisposable
         // Не создаем файлы - директория пустая
         
         // Act
-        using var result = BpmnClientBuilder.Build(
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+             BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
             _pathFinder,
@@ -176,16 +177,9 @@ public class BpmnClientBuilderTests : IDisposable
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.IsType<BpmnClient>(result);
-    
-        // Проверяем, что методы не вызывались
-        _serializerDiagramSection.DidNotReceive().LoadXmlBpmnDiagram(Arg.Any<string>());
-        _serializerProcessSection.DidNotReceive().LoadXmlProcessSection(Arg.Any<string>());
-        _elasticClient.DidNotReceive().SetDataAsync(Arg.Any<BpmnPlane>());
+            _serializerDiagramSection));
+            
+        Assert.Contains($"[GetAllFiles] Not found files in diagram {_tempDirectory}:*.bpmn.", exception.Message);
     }
     
     [Fact]
