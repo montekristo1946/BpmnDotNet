@@ -19,7 +19,10 @@ var useUrls = builder.Configuration["UseUrls"] ?? "http://localhost:5002";
 builder.WebHost.UseUrls(useUrls);
 builder.Host.UseLogger();
 builder.Host.InitCulture();
-
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Куки без HTTPS
+});
 builder.Services
     .AddScoped<ISvgConstructor, SvgConstructor>()
     .AddScoped<ElasticClientConfig>(serviceProvider => new ElasticClientConfig()
