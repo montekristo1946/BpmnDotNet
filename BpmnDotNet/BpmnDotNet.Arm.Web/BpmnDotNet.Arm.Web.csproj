@@ -26,5 +26,9 @@
       <Folder Include="Components\Layout\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Config\SystemConfigure.json" />
+    </ItemGroup>
+
 
 </Project>

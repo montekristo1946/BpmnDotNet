@@ -6,6 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "http://*:5002",
+      "commandLineArgs": "--UseUrls \"http://*:5002\" --ElasticConnectionUrl \"http://localhost:9200\"",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
