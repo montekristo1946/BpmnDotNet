@@ -4,9 +4,11 @@ using BpmnDotNet.ElasticClientDomain;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Activity;
 using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Context;
+using BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Serilog;
 
 namespace BpmnDotNetTests.Handlers.BpmnClientIntegrationDomain;
 
@@ -20,7 +22,13 @@ public class BpmnClientIntegrationTests
         _elasticMoq
             .SetDataAsync(Arg.Any<object>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
+        
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .CreateLogger();
     }
+    
     [Fact]
     public async Task StartNewProcess_FullPass_FillContext()
     {
@@ -33,7 +41,8 @@ public class BpmnClientIntegrationTests
             }));
 
         services.AddBusinessProcess("./Handlers/BpmnClientIntegrationDomain/BpmnSource");
-        services.AutoRegisterHandlersFromAssemblyOf<TestActivity>();
+        // services.AutoRegisterHandlersFromAssemblyOf<TestActivity>();
+        services.AutoRegisterHandlersFromAssemblyNamespaceOf(typeof(TestActivity));
 
         services.AddTransient<ElasticClientConfig>();
         services.AddTransient<IElasticClientSetDataAsync>(_=>_elasticMoq);
@@ -57,5 +66,35 @@ public class BpmnClientIntegrationTests
         await taskNode.ProcessTask;
         
         Assert.Equal("Competed TestActivity", contextData.TestValue);
+    }
+    
+    [Fact]
+    public async Task StartNewProcess_CheckDuplicateRegistration_Exception()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ILoggerFactory>(option =>
+        {
+            return LoggerFactory.Create(builder => { builder.AddSerilog(Log.Logger); });
+        });
+
+        services.AddBusinessProcess("./Handlers/BpmnClientIntegrationDomain/BpmnSource");
+        services.AutoRegisterHandlersFromAssemblyOf<TestActivityInstance1>();
+
+        services.AddTransient<ElasticClientConfig>();
+        services.AddTransient<IElasticClientSetDataAsync>(_=>_elasticMoq);
+        services.AddLogging();
+   
+        
+        //  Run service
+        await using var provider = services.BuildServiceProvider();
+
+        var handlerTypes = provider.GetServices<IBpmnHandler>().ToArray();
+        var bpmnClient = provider.GetRequiredService<IBpmnClient>();
+        
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            bpmnClient.RegisterHandlers<IBpmnHandler>(handlerTypes));
+        
+        
+        Assert.Contains("[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: TestActivity is already registered", exception.Message);
     }
 }

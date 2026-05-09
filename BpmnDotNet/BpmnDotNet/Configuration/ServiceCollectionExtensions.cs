@@ -63,7 +63,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    ///     Регистрация по пространству имен.
+    ///     Регистрация handlers из всей сборки.
     /// </summary>
     /// <param name="services">Коллекция сервисов.</param>
     /// <typeparam name="THandler">Тип регистрируемых сервисов.</typeparam>
@@ -79,6 +79,29 @@ public static class ServiceCollectionExtensions
         var assemblyToRegister = GetAssembly<THandler>();
 
         RegisterAssembly(services, assemblyToRegister);
+
+        return services;
+    }
+
+    /// <summary>
+    ///     Регистрация handlers из конкретной сборки.
+    /// </summary>
+    /// <param name="services">Коллекция сервисов.</param>
+    /// <param name="handlerType">Type handler.</param>
+    /// <returns>IServiceCollection.</returns>
+    public static IServiceCollection AutoRegisterHandlersFromAssemblyNamespaceOf(this IServiceCollection services, Type handlerType)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        if (handlerType == null)
+        {
+            throw new ArgumentNullException(nameof(handlerType));
+        }
+
+        RegisterAssembly(services, handlerType.Assembly, handlerType.Namespace);
 
         return services;
     }

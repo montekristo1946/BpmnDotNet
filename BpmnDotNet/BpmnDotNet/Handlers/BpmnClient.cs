@@ -79,7 +79,7 @@ internal class BpmnClient : IBpmnClient
         if (resAdd is false)
         {
             throw new InvalidOperationException(
-                $"[StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
+                $"[BpmnClient:StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
         }
 
         return process.JobStatus;
@@ -98,23 +98,30 @@ internal class BpmnClient : IBpmnClient
             if (taskDefinitionId is null)
             {
                 throw new InvalidOperationException(
-                    $"[RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
+                    $"[BpmnClient:RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
             }
 
             if (handler.Description is null)
             {
                 throw new InvalidOperationException(
-                    $"[RegisterHandlers] {handler.GetType().Name} Description is null");
+                    $"[BpmnClient:RegisterHandlers] {handler.GetType().Name} Description is null");
+            }
+
+            if (_handlers.ContainsKey(taskDefinitionId))
+            {
+                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: {taskDefinitionId} is already registered");
             }
 
             var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
 
             if (resAdd is false)
             {
-                throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Fail Registration {taskDefinitionId} Handler:{handler.GetType().Name}");
             }
 
             _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
+            _logger?.LogInformation(
+                $"[BpmnClient:RegisterHandlers] Registration completed; Handler:{handler.GetType().Name}; TaskDefinitionId: {taskDefinitionId}");
         }
 
         _descriptionWriteService.CommitAsync();
