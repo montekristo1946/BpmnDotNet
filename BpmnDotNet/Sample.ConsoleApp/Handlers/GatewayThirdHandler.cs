@@ -18,7 +18,7 @@ internal class GatewayThirdHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(GatewayThirdHandler);
     public string Description { get; init; } =   "Gateway third handler";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[GatewayThirdHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} ");

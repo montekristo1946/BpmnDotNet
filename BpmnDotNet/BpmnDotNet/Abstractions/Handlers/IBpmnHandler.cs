@@ -23,5 +23,5 @@ public interface IBpmnHandler
     /// <param name="context">IContextBpmnProcess.</param>
     /// <param name="ctsToken">CancellationToken.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken = default);
+    Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken = default);
 }

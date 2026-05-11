@@ -19,7 +19,7 @@ internal class ServiceTaskThirdHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskThirdHandler);
     public string Description { get; init; } =   "Вагон по рельсам скользит, не сворачивай —\nбезопасность пассажиров всегда впереди маяк.";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         if (context is ContextData cont)
             _logger.LogDebug($"[ServiceTaskThirdHandler:AsyncJobHandler]  " +

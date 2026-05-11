@@ -9,7 +9,7 @@
  dotnet pack BpmnDotNet/ \
   --configuration Release \
   -o ./nupkgs \
-  -p:Version=1.0.29
+  -p:Version=1.0.30
 ~~~
 ## Опубликовать пакет
 ~~~

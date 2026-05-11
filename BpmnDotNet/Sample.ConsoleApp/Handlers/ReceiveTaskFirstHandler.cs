@@ -19,7 +19,7 @@ internal class ReceiveTaskFirstHandle : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(ReceiveTaskFirstHandle);
     public string Description { get; init; } =   "Осмоторщик обязан тщательно проверять сцепные устройства вагонов перед отправкой.\nНельзя принимать вагоны с признаками подтекания топлива или смазочных материалов.\nВсе замечания по техническому состоянию следует немедленно докладывать старшему мастеру.\nОсмотр должен проводиться согласно установленному регламенту и требованиям безопасности.\nПрофессионализм и внимательность — ключевые качества осмоторщика вагонов";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         var cont = context as IMessageReceiveTask;
         if (cont is null)

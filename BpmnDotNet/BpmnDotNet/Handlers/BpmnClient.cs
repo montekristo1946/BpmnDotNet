@@ -114,7 +114,7 @@ internal class BpmnClient : IBpmnClient
                 throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: {taskDefinitionId} is already registered");
             }
 
-            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.JobHandlerAsync);
 
             if (resAdd is false)
             {
