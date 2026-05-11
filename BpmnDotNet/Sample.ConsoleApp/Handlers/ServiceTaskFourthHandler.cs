@@ -19,7 +19,7 @@ internal class ServiceTaskFourthHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(ServiceTaskFourthHandler);
     public string Description { get; init; } =   "Осмоторщик обязан проверять тормозные системы на исправность перед каждым рейсом.\nВсе выявленные неисправности должны быть тщательно зафиксированы и немедленно исправлены.\nЗапрещается пропускать вагоны с поврежденными колесами или шинами.\nСледует соблюдать чистоту и порядок на рабочем месте во время осмотра.\nВнимательность и ответственность — залог безопасности подвижного состава";
 
-    public async Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         if (context is ContextData cont)
             _logger.LogDebug($"[ServiceTaskFourthHandler:AsyncJobHandler]  " +

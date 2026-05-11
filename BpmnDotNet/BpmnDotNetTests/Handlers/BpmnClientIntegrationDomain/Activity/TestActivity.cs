@@ -8,7 +8,7 @@ public class TestActivity : IBpmnHandler
 {
     public string TaskDefinitionId { get; init; } = "TestActivity";
     public string Description { get; init; } =  "Competed TestActivity";
-    public Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken = default)
+    public Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken = default)
     {
         var conditionRoute = context as ContextData ?? throw new InvalidOperationException();
 

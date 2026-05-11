@@ -18,7 +18,7 @@ internal class GatewaySecondHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(GatewaySecondHandler);
     public string Description { get; init; } =  "Gateway second handler";
 
-    public async Task JobHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[GatewaySecondHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} ");
