@@ -18,7 +18,7 @@ internal class GatewayFourthHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(GatewayFourthHandler);
     public string Description { get; init; } =  "Gateway fourth handler";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[GatewayFourthHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} ");

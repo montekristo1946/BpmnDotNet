@@ -26,7 +26,13 @@ public class BpmnClientTests
         _pathFinder = Substitute.For<IPathFinder>();
         _historyNodeStateWriter = Substitute.For<IHistoryNodeStateWriter>();
         _descriptionWriteService = Substitute.For<IDescriptionWriteService>();
-        _bpmnClient = new BpmnClient(_businessProcessDtos,_loggerFactory, _pathFinder, _historyNodeStateWriter, _descriptionWriteService,10000);
+        _bpmnClient = new BpmnClient(
+            _businessProcessDtos,
+            _loggerFactory,
+            _pathFinder,
+            _historyNodeStateWriter,
+            _descriptionWriteService,
+            TimeSpan.FromMilliseconds(1000));
         _fixture = new Fixture();
     }
 

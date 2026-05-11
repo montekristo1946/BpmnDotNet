@@ -18,7 +18,7 @@ internal class GatewayFirstHandler : IBpmnHandler
     public string TaskDefinitionId { get; init; } = nameof(GatewayFirstHandler);
     public string Description { get; init; } = "Gateway first handler";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[GatewayFirstHandler:AsyncJobHandler]  " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} ");

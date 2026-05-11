@@ -23,7 +23,7 @@ internal class ServiceTaskFifthHandler : IBpmnHandler
                                                 "Обеспечивать своевременное оформление актов осмотра и проверок.\n" +
                                                 "Безопасность и исправность вагонов — главная забота осмоторщика.";
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         var cont = context as ContextSubProcess;
         if (cont is null)

@@ -16,6 +16,13 @@
         <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualstudioVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingVersion)" />
+
+        <PackageReference Include="Serilog" Version="$(SerilogVersion)"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCoreVersion)"/>
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="$(SerilogEnrichersEnvironmentVersion)"/>
+        <PackageReference Include="Serilog.Enrichers.Process" Version="$(SerilogEnrichersProcessVersion)"/>
+        <PackageReference Include="Serilog.Exceptions" Version="$(SerilogExceptionsVersion)"/>
+        <PackageReference Include="Serilog.Sinks.RollingFileSizeLimit" Version="$(SerilogSinksRollingFileSizeLimitVersion)"/>
     </ItemGroup>
 
     <ItemGroup>

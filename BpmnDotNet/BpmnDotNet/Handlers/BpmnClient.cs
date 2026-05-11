@@ -25,6 +25,7 @@ internal class BpmnClient : IBpmnClient
     private readonly IPathFinder _pathFinder;
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private readonly IDescriptionWriteService _descriptionWriteService;
+    private readonly TimeSpan _delayClearOldProcess;
     private volatile bool _disposed;
 
     /// <summary>
@@ -34,15 +35,15 @@ internal class BpmnClient : IBpmnClient
     /// <param name="loggerFactory">ILoggerFactory.</param>
     /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
-    /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполенения.</param>
-    /// <param name="delayMs">Интервал очистки исполненных тасков. </param>
+    /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполнения.</param>
+    /// <param name="delayClearOldProcess">Интервал очистки исполненных тасков. </param>
     public BpmnClient(
         BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter,
         IDescriptionWriteService descriptionWriteService,
-        int delayMs = 1000)
+        TimeSpan delayClearOldProcess = default)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
@@ -56,7 +57,8 @@ internal class BpmnClient : IBpmnClient
 
         FillingBusinessProcessDtos(businessProcessDtos);
 
-        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, TimeSpan.FromMilliseconds(delayMs)), _cts.Token);
+        _delayClearOldProcess = delayClearOldProcess == TimeSpan.Zero ? TimeSpan.FromSeconds(1) : delayClearOldProcess;
+        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, _delayClearOldProcess), _cts.Token);
     }
 
     /// <inheritdoc/>
@@ -79,7 +81,7 @@ internal class BpmnClient : IBpmnClient
         if (resAdd is false)
         {
             throw new InvalidOperationException(
-                $"[StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
+                $"[BpmnClient:StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
         }
 
         return process.JobStatus;
@@ -98,23 +100,30 @@ internal class BpmnClient : IBpmnClient
             if (taskDefinitionId is null)
             {
                 throw new InvalidOperationException(
-                    $"[RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
+                    $"[BpmnClient:RegisterHandlers] {handler.GetType().Name} TaskDefinitionId is null");
             }
 
             if (handler.Description is null)
             {
                 throw new InvalidOperationException(
-                    $"[RegisterHandlers] {handler.GetType().Name} Description is null");
+                    $"[BpmnClient:RegisterHandlers] {handler.GetType().Name} Description is null");
             }
 
-            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.AsyncJobHandler);
+            if (_handlers.ContainsKey(taskDefinitionId))
+            {
+                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: {taskDefinitionId} is already registered");
+            }
+
+            var resAdd = _handlers.TryAdd(taskDefinitionId, handler.ActivityHandlerAsync);
 
             if (resAdd is false)
             {
-                throw new InvalidOperationException($"[RegisterHandlers] Fail Registration {taskDefinitionId}");
+                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Fail Registration {taskDefinitionId} Handler:{handler.GetType().Name}");
             }
 
             _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
+            _logger?.LogInformation(
+                $"[BpmnClient:RegisterHandlers] Registration completed; Handler:{handler.GetType().Name}; TaskDefinitionId: {taskDefinitionId}");
         }
 
         _descriptionWriteService.CommitAsync();
@@ -158,7 +167,7 @@ internal class BpmnClient : IBpmnClient
 
         try
         {
-            if (!_cleanerTask.Wait(TimeSpan.FromSeconds(5)))
+            if (!_cleanerTask.Wait(_delayClearOldProcess))
             {
                 _logger?.LogWarning("[Dispose] Cleaner task timed out");
             }

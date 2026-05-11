@@ -23,7 +23,7 @@ internal class SendTaskFirstHandler : IBpmnHandler
         "Отцепленные вагоны подлежат направлению в вагонное депо для диагностики, ремонта или таможенных процедур в установленном порядке.";
 
 
-    public async Task AsyncJobHandler(IContextBpmnProcess context, CancellationToken ctsToken)
+    public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
         _logger.LogDebug($"[SendTaskFirstHandler:AsyncJobHandler] " +
                          $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}", context);
