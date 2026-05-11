@@ -250,6 +250,6 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
             return string.Empty;
         }
 
-        return src.Replace("&#10;", " ");
+        return src.Replace("&#10;", " ").Replace("\n", " ");
     }
 }

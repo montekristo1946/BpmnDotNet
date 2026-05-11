@@ -50,6 +50,20 @@ public class TspanBuilderTest
         Assert.Contains("<tspan id=\"\" x=\"0\" y=\"55\">МЛ</tspan>", result);
     }
     
+    [Fact] 
+    public void BuildSvg_CheckCase3_CreateTspan()
+    {
+        _builder.AddChild("Репорт, без нарушений.\nAlarm.None");
+        _builder.AddChild("МЛ");
+        
+        var result = _builder.BuildSvg();
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">без</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"55\">МЛ</tspan>", result);
+    }
+    
     [Fact]
     public void SplitLinesFromWhiteSpace_ChekLargeName_splitName()
     {
