@@ -25,7 +25,9 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     public string BuildSvg()
     {
         var allLines = MergeAllChild(_childElements);
+        allLines = RemoveLineBreakEntity(allLines);
         var splitWords = allLines.Split(' ');
+
         var isNeedRemap = CheckRemapLines(splitWords);
         if (isNeedRemap)
         {
@@ -234,5 +236,20 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
 
             return s.TrimEnd();
         }).ToArray();
+    }
+
+    /// <summary>
+    /// Заменят спецсимвол перевода корректи html на пробел.
+    /// </summary>
+    /// <param name="src">Массив строк.</param>
+    /// <returns>Замененые строки.</returns>
+    internal string RemoveLineBreakEntity(string src)
+    {
+        if (string.IsNullOrWhiteSpace(src))
+        {
+            return string.Empty;
+        }
+
+        return src.Replace("&#10;", " ");
     }
 }

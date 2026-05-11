@@ -1,6 +1,6 @@
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
 
-namespace BpmnDotNet.Arm.Core.Tests.Service;
+namespace BpmnDotNet.Arm.Core.Tests.SvgDomain.Service;
 
 public class TspanBuilderTest
 {
@@ -23,6 +23,33 @@ public class TspanBuilderTest
         Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">от МЛ</tspan>", result);
     }
     
+    [Fact] 
+    public void BuildSvg_CheckSpliteCountLine_CreateTspan()
+    {
+        _builder.AddChild("Репорт, Ошибка измерения");
+        _builder.AddChild("МЛ");
+        
+        var result = _builder.BuildSvg();
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">Ошибка</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">измерения</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">МЛ</tspan>", result);
+    }
+    
+    [Fact] 
+    public void BuildSvg_CheckCase2_CreateTspan()
+    {
+        _builder.AddChild("Репорт, без нарушений.&#10;Alarm.None");
+        _builder.AddChild("МЛ");
+        
+        var result = _builder.BuildSvg();
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">без</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"55\">МЛ</tspan>", result);
+    }
+    
     [Fact]
     public void SplitLinesFromWhiteSpace_ChekLargeName_splitName()
     {
@@ -39,19 +66,6 @@ public class TspanBuilderTest
         var split = _builder.SplitLinesFromLongLine([name]);
 
         Assert.Equal(4, split.Length);
-    }
-    
-    [Fact] 
-    public void BuildSvg_CheckSpliteCountLine_CreateTspan()
-    {
-        _builder.AddChild("Репорт, Ошибка измерения");
-        _builder.AddChild("МЛ");
-        
-        var result = _builder.BuildSvg();
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт, </tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">Ошибка </tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">измерения </tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">МЛ </tspan>", result);
     }
 
     [Fact]
@@ -140,6 +154,28 @@ public class TspanBuilderTest
         // Assert
         Assert.Equal(expected, result);
     }
+    
+    [Theory]
+    [InlineData("нарушений.&#10;Ala", "нарушений. Ala")]
+    [InlineData("Hello&#10;World", "Hello World")]
+    [InlineData("Start&#10;Middle&#10;End", "Start Middle End")]
+    [InlineData("&#10;Leading", " Leading")]
+    [InlineData("Trailing&#10;", "Trailing ")]
+    [InlineData("NoEntity", "NoEntity")]
+    [InlineData("", "")]
+    [InlineData("   ", "")]
+    [InlineData("\t", "")]
+    [InlineData("\n", "")]
+    [InlineData(" &#10; ", "   ")] // Пробел + &#10; + пробел = 2 пробела
+    [InlineData("&#10;&#10;&#10;", "   ")] // Три сущности = три пробела
+    [InlineData("Text&#10;", "Text ")]
+    [InlineData("&#10;Text&#10;", " Text ")]
+    public void RemoveLineBreakEntity_VariousInputs_ReturnsExpected(string input, string expected)
+    {
+        // Act
+        var result = _builder.RemoveLineBreakEntity(input);
 
-
+        // Assert
+        Assert.Equal(expected, result);
+    }
 }
