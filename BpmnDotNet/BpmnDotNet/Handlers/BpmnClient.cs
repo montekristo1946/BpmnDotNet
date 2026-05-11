@@ -25,6 +25,7 @@ internal class BpmnClient : IBpmnClient
     private readonly IPathFinder _pathFinder;
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private readonly IDescriptionWriteService _descriptionWriteService;
+    private readonly TimeSpan _delayClearOldProcess;
     private volatile bool _disposed;
 
     /// <summary>
@@ -34,15 +35,15 @@ internal class BpmnClient : IBpmnClient
     /// <param name="loggerFactory">ILoggerFactory.</param>
     /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
-    /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполенения.</param>
-    /// <param name="delayMs">Интервал очистки исполненных тасков. </param>
+    /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполнения.</param>
+    /// <param name="delayClearOldProcess">Интервал очистки исполненных тасков. </param>
     public BpmnClient(
         BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter,
         IDescriptionWriteService descriptionWriteService,
-        int delayMs = 1000)
+        TimeSpan delayClearOldProcess = default)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
@@ -56,7 +57,8 @@ internal class BpmnClient : IBpmnClient
 
         FillingBusinessProcessDtos(businessProcessDtos);
 
-        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, TimeSpan.FromMilliseconds(delayMs)), _cts.Token);
+        _delayClearOldProcess = delayClearOldProcess == TimeSpan.Zero ? TimeSpan.FromSeconds(1) : delayClearOldProcess;
+        _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, _delayClearOldProcess), _cts.Token);
     }
 
     /// <inheritdoc/>
@@ -165,7 +167,7 @@ internal class BpmnClient : IBpmnClient
 
         try
         {
-            if (!_cleanerTask.Wait(TimeSpan.FromSeconds(5)))
+            if (!_cleanerTask.Wait(_delayClearOldProcess))
             {
                 _logger?.LogWarning("[Dispose] Cleaner task timed out");
             }

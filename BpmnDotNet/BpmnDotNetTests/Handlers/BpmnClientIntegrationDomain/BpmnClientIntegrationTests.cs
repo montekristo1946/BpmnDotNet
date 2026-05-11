@@ -84,6 +84,7 @@ public class BpmnClientIntegrationTests
         var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(5));
         await taskNode.ProcessTask;
         
+        bpmnClient.Dispose();
         Assert.Equal("Competed TestActivity", contextData.TestValue);
     }
     
@@ -109,6 +110,7 @@ public class BpmnClientIntegrationTests
         var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(5));
         await taskNode.ProcessTask;
         
+        bpmnClient.Dispose();
         Assert.Equal("Competed TestActivity", contextData.TestValue);
     }
     
