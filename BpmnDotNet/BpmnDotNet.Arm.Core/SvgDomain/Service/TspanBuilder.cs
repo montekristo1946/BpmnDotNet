@@ -13,6 +13,7 @@ namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 public class TspanBuilder : IBpmnBuild<TspanBuilder>
 {
     private const int FontSize = 11;
+    private const int OptimumLinesInActivityBloc = 5;
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
     private int _symbolInOneLine = 15;
@@ -23,17 +24,25 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     /// <inheritdoc />
     public string BuildSvg()
     {
-        var allLines = _childElements.SelectMany(SplitLinesFromWhiteSpace).ToArray();
-        allLines = SplitLinesFromLongLine(allLines);
-        allLines = ClearSpaсeLine(allLines);
-
-        for (var i = 0; i < allLines.Length; i++)
+        var allLines = MergeAllChild(_childElements);
+        var splitWords = allLines.Split(' ');
+        var isNeedRemap = CheckRemapLines(splitWords);
+        if (isNeedRemap)
         {
-            var body = allLines[i];
+            splitWords = RemapLines(splitWords);
+            splitWords = SplitLinesFromLongLine(splitWords);
+        }
+
+        splitWords = ClearSpaceLine(splitWords);
+        splitWords = RemoveTrailingSpaces(splitWords);
+
+        for (var i = 0; i < splitWords.Length; i++)
+        {
+            var body = splitWords[i];
             var y = (i * FontSize) + FontSize + _paddingY;
             var x = _paddingX;
             var hider = $"<tspan id=\"{_id}\" x=\"{x}\" y=\"{y}\">";
-            var footer = " </tspan>";
+            var footer = "</tspan>";
             _svgStorage.Append(hider);
             _svgStorage.Append(body);
             _svgStorage.Append(footer);
@@ -92,7 +101,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     /// <summary>
     /// Разделит строки по заданной длине.
     /// </summary>
-    /// <param name="allLines">Строки на разденеия.</param>
+    /// <param name="allLines">Строки на разделение.</param>
     /// <returns>Вернет строки.</returns>
     internal string[] SplitLinesFromLongLine(string[] allLines)
     {
@@ -116,16 +125,15 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     }
 
     /// <summary>
-    /// Разделит строку по пробелам.
+    /// Переразметим строки.
     /// </summary>
-    /// <param name="input">Входная строка.</param>
+    /// <param name="arrWord">Входная строка.</param>
     /// <returns>Новые строки.</returns>
-    internal string[] SplitLinesFromWhiteSpace(string input)
+    internal string[] RemapLines(string[] arrWord)
     {
-        var arrWord = input.Split(' ');
         var segments = arrWord.Aggregate(
-            new List<StringBuilder> { new() },
-            (list, str) =>
+                new List<StringBuilder> { new() },
+                (list, str) =>
                 {
                     var last = list.Last();
                     if (last.Length + str.Length <= _symbolInOneLine)
@@ -151,9 +159,80 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     /// </summary>
     /// <param name="src">Входной массив.</param>
     /// <returns>Обработанный массив.</returns>
-    internal string[] ClearSpaсeLine(string[] src)
+    internal string[] ClearSpaceLine(string[] src)
     {
         var reaArr = src.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
         return reaArr;
+    }
+
+    /// <summary>
+    /// Объединит все строки в единую через пробел.
+    /// </summary>
+    /// <param name="elements">массив подстрок.</param>
+    /// <returns>Единая строка.</returns>
+    internal string MergeAllChild(List<string> elements)
+    {
+        var sb = new StringBuilder();
+        for (int i = 0; i < elements.Count; i++)
+        {
+            var element = elements[i];
+            if (element is null)
+            {
+                continue;
+            }
+
+            sb.Append(element);
+            if (i < elements.Count - 1)
+            {
+                sb.Append(" ");
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Определит необходимость производить переразметку строк.
+    /// </summary>
+    /// <param name="splitWords">Массив строк.</param>
+    /// <returns>Результат работы.</returns>
+    internal bool CheckRemapLines(string[]? splitWords)
+    {
+        if (splitWords is null || splitWords.Length == 0)
+        {
+            return false;
+        }
+
+        if (splitWords.Length > OptimumLinesInActivityBloc)
+        {
+            return true;
+        }
+
+        var checkMaxLines = splitWords.Max(s => s.Length);
+
+        return checkMaxLines > _symbolInOneLine;
+    }
+
+    /// <summary>
+    /// Удалим пробелы в коцен строки.
+    /// </summary>
+    /// <param name="src">Исходные строки.</param>
+    /// <returns>Обработанные строки.</returns>
+    internal string[] RemoveTrailingSpaces(string[]? src)
+    {
+        if (src == null || src.Length == 0)
+        {
+            return [];
+        }
+
+        return src.Select(s =>
+        {
+            if (s is null)
+            {
+                return string.Empty;
+            }
+
+            return s.TrimEnd();
+        }).ToArray();
     }
 }
