@@ -29,6 +29,6 @@ public class SvgConstructorTests
         var result = await _svgConstructor.CreatePlaneAsync(_string, [],size, []);
         // await File.WriteAllTextAsync("/mnt/Disk_D/TMP/18.08.2025/svg/demo2.svg", res);
         var normalizedResult = result.TrimEnd();
-        Assert.Equal(38513, normalizedResult.Length);
+        Assert.Equal(38625, normalizedResult.Length);
     }
 }

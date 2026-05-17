@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_SolutionItems", "_Solution
 		Directory.Build.props = Directory.Build.props
 		..\README.md = ..\README.md
 		..\.github\workflows\dotnet-ci.yml = ..\.github\workflows\dotnet-ci.yml
+		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{062CAF72-15CF-47C4-8C38-432967E4C218}"
