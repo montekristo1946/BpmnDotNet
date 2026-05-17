@@ -16,7 +16,7 @@ internal class Producer
 
         while (keepRunning)
         {
-            Console.WriteLine(@"a) start process s) send received message q) Quit");
+            Console.WriteLine(@"a) start process; s) send received message;  m) StartMultiInput; q) Quit;");
             var key = char.ToLower(Console.ReadKey(true).KeyChar);
 
             switch (key)
@@ -26,6 +26,10 @@ internal class Producer
                     break;
                 case 's':
                     _sampleService.SendMessage(dataTimeProcess);
+                    break;
+                
+                case 'm':
+                    _sampleService.StartMultiInput();
                     break;
                 case 'q':
                     Console.WriteLine("Quitting");
