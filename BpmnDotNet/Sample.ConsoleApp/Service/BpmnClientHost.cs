@@ -13,6 +13,7 @@ internal class BpmnClientHost : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<BpmnClientHost> _logger;
     private readonly IBpmnClient _bpmnClient;
+    private IServiceScope? _scope;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BpmnClientHost"/> class.
@@ -30,9 +31,9 @@ internal class BpmnClientHost : IHostedService
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        using var scope = _serviceProvider.CreateScope();
+        _scope = _serviceProvider.CreateScope();
 
-        var handlerTypes = scope.ServiceProvider.GetServices<IBpmnHandler>()?.ToArray() ?? [];
+        var handlerTypes = _scope.ServiceProvider.GetServices<IBpmnHandler>()?.ToArray() ?? [];
         if (!handlerTypes.Any())
         {
             throw new InvalidOperationException("[BpmnClientHost] Bpmn handlers not found");
@@ -45,5 +46,9 @@ internal class BpmnClientHost : IHostedService
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _scope?.Dispose();
+        await Task.CompletedTask;
+    }
 }

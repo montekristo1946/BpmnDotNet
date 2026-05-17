@@ -1,4 +1,3 @@
-using AutoFixture;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain;
 
