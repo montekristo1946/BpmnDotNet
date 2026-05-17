@@ -4,6 +4,7 @@ using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Utils;
 
 /// <inheritdoc />
@@ -76,7 +77,7 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                throw new InvalidDataException($"Not Find Get Name Process from:{idBpmnPlane}");
     }
 
-    private BpmnShape[] FillTypeAndName(BpmnShape[] shapes, XmlNode processBlock)
+    private IBpmnShape[] FillTypeAndName(IBpmnShape[] shapes, XmlNode processBlock)
     {
         var bounds = processBlock.ChildNodes
             .Cast<XmlNode>()
@@ -88,11 +89,22 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                 return (id, type, name);
             }).ToArray();
 
-        var retArr = shapes.Select(shape =>
+        var retArr = shapes.Select(iBpmnShape =>
         {
-            var element = bounds.FirstOrDefault(p => p.id == shape.BpmnElement);
+            var element = bounds.FirstOrDefault(p => p.id == iBpmnShape.BpmnElement);
 
-            return shape with { Name = element.name, Type = element.type };
+            return iBpmnShape.TypeBpmnShape switch
+            {
+                BpmnShapeType.BpmnShape => (BpmnShape)iBpmnShape with
+                {
+                    Name = element.name, Type = element.type,
+                },
+                BpmnShapeType.BpmnEdge => (IBpmnShape)((BpmnEdge)iBpmnShape with
+                {
+                    Name = element.name, Type = element.type,
+                }),
+                _ => throw new ArgumentOutOfRangeException($"[FillTypeAndName] fail Type shape: {iBpmnShape.TypeBpmnShape}"),
+            };
         }).ToArray();
 
         return retArr;
@@ -111,13 +123,15 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
             Constants.BpmnReceiveTaskName => ElementType.ReceiveTask,
             Constants.BpmnServiceTaskName => ElementType.ServiceTask,
             Constants.BpmnSubProcess => ElementType.SubProcess,
+            Constants.TextAnnotation => ElementType.TextAnnotation,
+            Constants.Association => ElementType.Association,
             _ => throw new ArgumentOutOfRangeException($"[GetTypeNode] fail get: {shapeName}"),
         };
     }
 
-    private BpmnShape[] GetShapesFromPlane(XmlNode bpmnPlane, string idBpmnPlane)
+    private IBpmnShape[] GetShapesFromPlane(XmlNode bpmnPlane, string idBpmnPlane)
     {
-        var elements = new List<BpmnShape>();
+        var elements = new List<IBpmnShape>();
 
         foreach (XmlNode xmlNode in bpmnPlane.ChildNodes)
         {
@@ -140,62 +154,61 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         return elements.ToArray();
     }
 
-    private BpmnShape CreateBpmnEdgeName(XmlNode xmlNode)
+    private IBpmnShape CreateBpmnEdgeName(XmlNode xmlNode)
     {
         var id = GetId(xmlNode);
         var bpmnElement = GetBpmnElement(xmlNode);
-        var waypoint = GetWaypoint(xmlNode);
+        var waypoints = GetWaypoints(xmlNode);
         var labelBounds = GetBpmnLabelBound(xmlNode);
 
-        return new BpmnShape
+        return new BpmnEdge
         {
             Id = id,
             BpmnElement = bpmnElement,
-            Bounds = waypoint,
+            Waypoints = waypoints,
             BpmnLabel = labelBounds,
         };
     }
 
-    private Bound[] GetWaypoint(XmlNode node)
+    private Waypoint[] GetWaypoints(XmlNode node)
     {
-        var bounds = node.ChildNodes
+        var waypoints = node.ChildNodes
             .Cast<XmlNode>()
             .Where(p => p.Name == Constants.BpmnWaypointName)
             .Select(p =>
             {
                 var x = p.Attributes?[Constants.BpmnXName]?.Value;
                 var y = p.Attributes?[Constants.BpmnYName]?.Value;
-                return new Bound
+                return new Waypoint
                 {
                     X = Mappers.Map(x),
                     Y = Mappers.Map(y),
-                    Height = int.MinValue,
-                    Width = int.MinValue,
                 };
             }).ToArray();
 
-        if (bounds.Any() is false)
+        if (waypoints.Any() is false)
         {
-            throw new InvalidDataException($"Not Find GetBounds from:{node.Name}");
+            throw new InvalidDataException($"Not Find waypoints from:{node.Name}");
         }
 
-        return bounds;
+        return waypoints;
     }
 
-    private BpmnShape CreateBpmnShape(XmlNode xmlNode)
+    private IBpmnShape CreateBpmnShape(XmlNode xmlNode)
     {
         var id = GetId(xmlNode);
         var bpmnElement = GetBpmnElement(xmlNode);
 
-        var bounds = GetBounds(xmlNode);
+        var bound = GetBounds(xmlNode);
         var labelBounds = GetBpmnLabelBound(xmlNode);
 
         return new BpmnShape
         {
             Id = id,
-            Bounds = bounds,
+            Bounds = bound,
             BpmnElement = bpmnElement,
             BpmnLabel = labelBounds,
+            TypeBpmnShape = BpmnShapeType.BpmnShape,
         };
     }
 
@@ -223,9 +236,9 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
         return bounds.FirstOrDefault() ?? new Bound();
     }
 
-    private Bound[] GetBounds(XmlNode node)
+    private Bound GetBounds(XmlNode node)
     {
-        var bounds = node.ChildNodes
+        var bound = node.ChildNodes
             .Cast<XmlNode>()
             .Where(p => p.Name == Constants.BpmnBoundsName)
             .Select(p =>
@@ -241,14 +254,15 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
                     Width = Mappers.Map(width),
                     Height = Mappers.Map(height),
                 };
-            }).ToArray();
+            })
+            .FirstOrDefault();
 
-        if (bounds.Any() is false)
+        if (bound is null)
         {
             throw new InvalidDataException($"Not Find GetBounds from:{node.Name}");
         }
 
-        return bounds;
+        return bound;
     }
 
     private string GetBpmnElement(XmlNode node)

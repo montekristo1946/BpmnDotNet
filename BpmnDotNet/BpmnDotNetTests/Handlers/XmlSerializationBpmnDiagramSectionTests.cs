@@ -36,4 +36,13 @@ public class XmlSerializationBpmnDiagramSectionTests
         var message = "Not Find Get Name Process from:IdBpmnProcessingMain";
         Assert.Equal(message, exception.Message);
     }
+
+    [Fact]
+    public void LoadXmlBpmnDiagram_CheckLoadTextAnnotation_BpmnPlane()
+    {
+        var diagram = _xmlSerializationProcessSection.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_2.bpmn");
+        
+        Assert.Equal("Process_17.05.2026", diagram.Id);
+        Assert.Equal(8, diagram.Shapes.Length);
+    }
 }

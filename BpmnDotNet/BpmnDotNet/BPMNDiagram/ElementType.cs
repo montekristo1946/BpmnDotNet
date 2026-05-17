@@ -77,4 +77,18 @@ public enum ElementType
     [Display(Name = "subProcess")]
     [Description("subProcess")]
     SubProcess = 9,
+
+    /// <summary>
+    /// Анатационный блок.
+    /// </summary>
+    [Display(Name = "textAnnotation")]
+    [Description("textAnnotation")]
+    TextAnnotation = 10,
+
+    /// <summary>
+    /// Линя ассоциации.
+    /// </summary>
+    [Display(Name = "association")]
+    [Description("association")]
+    Association = 11,
 }

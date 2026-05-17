@@ -71,6 +71,16 @@ internal static class Constants
     public const string BpmnSubProcess = "bpmn:subProcess";
 
     /// <summary>
+    /// TextAnnotation.
+    /// </summary>
+    public const string TextAnnotation = "bpmn:textAnnotation";
+
+    /// <summary>
+    /// Association.
+    /// </summary>
+    public const string Association = "bpmn:association";
+
+    /// <summary>
     /// targetRef.
     /// </summary>
     public const string BpmnTargetRef = "targetRef";
