@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1lwrbrg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="ParallelGatewayMultiInputTest" name="ParallelGatewayMultiInputTest" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1teov36</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1teov36" sourceRef="StartEvent_1" targetRef="Gateway_2" />
+    <bpmn:sequenceFlow id="Flow_input_2_Gateway_3" name="Flow_input_2_Gateway_3" sourceRef="Gateway_2" targetRef="Gateway_3" />
+    <bpmn:parallelGateway id="Gateway_2" name="Gateway_2">
+      <bpmn:incoming>Flow_1teov36</bpmn:incoming>
+      <bpmn:outgoing>Flow_input_1_Gateway_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_input_2_Gateway_3</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_input_1_Gateway_3" name="Flow_input_1_Gateway_3" sourceRef="Gateway_2" targetRef="Gateway_3" />
+    <bpmn:parallelGateway id="Gateway_3" name="Gateway_3">
+      <bpmn:incoming>Flow_input_1_Gateway_3</bpmn:incoming>
+      <bpmn:incoming>Flow_input_2_Gateway_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_00lifqd</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="Event_03dd3uz">
+      <bpmn:incoming>Flow_00lifqd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_00lifqd" sourceRef="Gateway_3" targetRef="Event_03dd3uz" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ParallelGatewayMultiInputTest">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ee0psg_di" bpmnElement="Gateway_2">
+        <dc:Bounds x="515" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="65" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_02b5f2h_di" bpmnElement="Gateway_3">
+        <dc:Bounds x="735" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="732" y="71" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03dd3uz_di" bpmnElement="Event_03dd3uz">
+        <dc:Bounds x="962" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1teov36_di" bpmnElement="Flow_1teov36">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="515" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11inn3r_di" bpmnElement="Flow_input_2_Gateway_3">
+        <di:waypoint x="540" y="150" />
+        <di:waypoint x="540" y="220" />
+        <di:waypoint x="760" y="220" />
+        <di:waypoint x="760" y="145" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="166" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gakzr5_di" bpmnElement="Flow_input_1_Gateway_3">
+        <di:waypoint x="565" y="120" />
+        <di:waypoint x="735" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="86" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00lifqd_di" bpmnElement="Flow_00lifqd">
+        <di:waypoint x="785" y="120" />
+        <di:waypoint x="962" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
