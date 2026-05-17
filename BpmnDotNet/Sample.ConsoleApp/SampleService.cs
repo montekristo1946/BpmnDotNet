@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using BpmnDotNet.Abstractions.Handlers;
 using Sample.ConsoleApp.Common;
 using Sample.ConsoleApp.Context;
@@ -102,5 +103,26 @@ internal class SampleService
     public void Stop()
     {
         _bpmnClient.Dispose();
+    }
+
+    public void StartMultiInput()
+    {
+        var dataTimeProcess = DateTime.Now;
+        Console.WriteLine($"Start Multi input: {dataTimeProcess:yyyy-MM-dd HH:mm:ss.fff} ms");
+        var timeout = TimeSpan.FromMinutes(10);
+        var tokenProcess = $"Train_{dataTimeProcess.Ticks}_{dataTimeProcess.ToString(CultureInfo.InvariantCulture)}";
+
+        var contextData = new ContextData
+        {
+            IdBpmnProcess = Constants.TestMultiInputProcess,
+            TokenProcess = tokenProcess,
+            TestValue = 0,
+            TestValue2 = "Call from StartNewProcess"
+        };
+        var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
+        
+        taskNode.ProcessTask.Wait();
+        
+        Console.WriteLine($"End Multi input: {dataTimeProcess:yyyy-MM-dd HH:mm:ss.fff} ms");
     }
 }

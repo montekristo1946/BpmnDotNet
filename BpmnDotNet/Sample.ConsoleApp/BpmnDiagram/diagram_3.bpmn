@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1lwrbrg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="TestMultiInputProcess" name="TestMultiInputProcess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1teov36</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
+      <bpmn:incoming>Flow_1teov36</bpmn:incoming>
+      <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
+      <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1teov36" sourceRef="StartEvent_1" targetRef="GatewayFirstHandler" />
+    <bpmn:sequenceFlow id="Flow_in_SendTaskFirstHandler" name="Flow_in_SendTaskFirstHandler" sourceRef="GatewayFirstHandler" targetRef="ServiceTaskSecondHandler" />
+    <bpmn:endEvent id="Event_0eidb3m">
+      <bpmn:incoming>Flow_0e63cnv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_in_ReceiveTaskFirstHandle" name="Flow_in_ReceiveTaskFirstHandle" sourceRef="GatewayFirstHandler" targetRef="ServiceTaskSecondHandler" />
+    <bpmn:sequenceFlow id="Flow_0e63cnv" sourceRef="ServiceTaskSecondHandler" targetRef="Event_0eidb3m" />
+    <bpmn:serviceTask id="ServiceTaskSecondHandler" name="ServiceTaskSecondHandler">
+      <bpmn:incoming>Flow_in_SendTaskFirstHandler</bpmn:incoming>
+      <bpmn:incoming>Flow_in_ReceiveTaskFirstHandle</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e63cnv</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestMultiInputProcess">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0tkcfij_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
+        <dc:Bounds x="295" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="278" y="65" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0eidb3m_di" bpmnElement="Event_0eidb3m">
+        <dc:Bounds x="682" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ym4zdu_di" bpmnElement="ServiceTaskSecondHandler">
+        <dc:Bounds x="460" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1teov36_di" bpmnElement="Flow_1teov36">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="295" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0i5rp6s_di" bpmnElement="Flow_in_SendTaskFirstHandler">
+        <di:waypoint x="345" y="120" />
+        <di:waypoint x="460" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="346" y="86" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11inn3r_di" bpmnElement="Flow_in_ReceiveTaskFirstHandle">
+        <di:waypoint x="320" y="145" />
+        <di:waypoint x="320" y="240" />
+        <di:waypoint x="510" y="240" />
+        <di:waypoint x="510" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="358" y="196" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e63cnv_di" bpmnElement="Flow_0e63cnv">
+        <di:waypoint x="560" y="120" />
+        <di:waypoint x="682" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
