@@ -14,14 +14,14 @@ using Serilog;
 
 namespace BpmnDotNetIntegrationTests;
 
-public class ServiceTaskMultiInputTest: IDisposable
+public class SendTaskMultiInputTest: IDisposable
 {
     private readonly IHost _host;
     private readonly IElasticClientSetDataAsync _elasticSetDataAsync;
     private IServiceScope? _scope;
     private readonly IBpmnHandler  _gatewayFirstHandler;
     
-    public ServiceTaskMultiInputTest()
+    public SendTaskMultiInputTest()
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -45,7 +45,7 @@ public class ServiceTaskMultiInputTest: IDisposable
                 if (conditionRoute is null)
                     throw new OperationCanceledException("Fail try Add key ConditionRoute");
 
-                conditionRoute.ConditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_SendTaskFirstHandler");
+                conditionRoute.ConditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_ReceiveTaskFirstHandle");
                 
                 return Task.CompletedTask;
             });
@@ -84,11 +84,11 @@ public class ServiceTaskMultiInputTest: IDisposable
     }
     
     [Fact]
-    public async Task StartNewProcess_CheckServiceTaskMultiInput_Completed()
+    public async Task StartNewProcess_CheckSendTaskMultiInput_Completed()
     {
         var contextData = new ContextData()
         {
-            IdBpmnProcess = "ServiceTaskMultiInputTest",
+            IdBpmnProcess = "SendTaskMultiInputTest",
             TokenProcess = Guid.NewGuid().ToString(),
         };
         
@@ -99,6 +99,4 @@ public class ServiceTaskMultiInputTest: IDisposable
         
         Assert.Equal(StatusType.Completed,taskNode.StatusType);
     }
-
-  
 }

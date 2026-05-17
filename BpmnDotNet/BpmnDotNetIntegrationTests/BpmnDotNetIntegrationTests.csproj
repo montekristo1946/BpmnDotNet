@@ -34,6 +34,9 @@
       <None Update="BpmnDiagram\diagram_1.bpmn">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="BpmnDiagram\diagram_2.bpmn">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

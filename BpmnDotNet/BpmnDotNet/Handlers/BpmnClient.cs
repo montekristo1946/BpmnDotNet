@@ -247,6 +247,17 @@ internal class BpmnClient : IBpmnClient
     {
         foreach (var businessProcessDto in businessProcessDtos)
         {
+            if (_bpmnProcessDtos.TryGetValue(businessProcessDto.IdBpmnProcess, out var existingProcess))
+            {
+                _logger.LogError(
+                    "Failed to load process with ID {IdBpmnProcess}. A process with this ID already exists. " +
+                    "Existing process: {ExistingProcessDescription}, New process: {NewProcessDescription}.",
+                    businessProcessDto.IdBpmnProcess,
+                    existingProcess.IdBpmnProcess ?? "Empty IdBpmnProcess",
+                    businessProcessDto.IdBpmnProcess ?? "Empty IdBpmnProcess");
+                throw new InvalidOperationException($"Fail, duplicate key load {businessProcessDto.IdBpmnProcess}");
+            }
+
             var resAdd = _bpmnProcessDtos.TryAdd(businessProcessDto.IdBpmnProcess, businessProcessDto);
             if (resAdd is false)
             {
