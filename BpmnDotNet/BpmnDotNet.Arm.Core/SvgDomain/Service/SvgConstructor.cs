@@ -3,6 +3,7 @@ namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Dto;
 
 /// <inheritdoc />
@@ -27,7 +28,7 @@ public class SvgConstructor : ISvgConstructor
     }
 
     private string CreateColorShapes(
-        BpmnShape[] shapes,
+        IBpmnShape[] shapes,
         NodeJobStatus[] nodeJobStatus,
         int widthWindows,
         int heightWindows,
@@ -36,51 +37,103 @@ public class SvgConstructor : ISvgConstructor
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-        var minScale = Math.Min(scalingX, scalingY);
-
-        var viewportBuilder = IBpmnBuild<ViewportBuilder>
-            .Create()
-            .AddScalingX(minScale)
-            .AddScalingY(minScale);
-
-        const int stokeWidthStart = 2;
-        const int stokeWidthEnd = 4;
-
-        foreach (var shape in shapes)
-        {
-            var title = GetTitle(shape.BpmnElement, descriptions);
-            var color = "#22242a";
-            if (nodeJobStatus.Any())
-            {
-                color = GetColor(shape.BpmnElement, nodeJobStatus);
-            }
-
-            var stringShape = shape.Type switch
-            {
-                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
-                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
-                ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
-                ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-                ElementType.SendTask => CreateSendTask(shape, color, title),
-                ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
-                ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
-                ElementType.SubProcess => CreateSubProcess(shape, color, title),
-                _ => string.Empty,
-            };
-
-            viewportBuilder.AddChild(stringShape);
-            var label = AddLabel(shape, color);
-            viewportBuilder.AddChild(label);
-        }
-
-        var viewportString = viewportBuilder.BuildSvg();
-        svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.BuildSvg();
-        return retStringSvg;
+        // var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+        // var minScale = Math.Min(scalingX, scalingY);
+        //
+        // var viewportBuilder = IBpmnBuild<ViewportBuilder>
+        //     .Create()
+        //     .AddScalingX(minScale)
+        //     .AddScalingY(minScale);
+        //
+        // const int stokeWidthStart = 2;
+        // const int stokeWidthEnd = 4;
+        //
+        // foreach (var shape in shapes)
+        // {
+        //     var title = GetTitle(shape.BpmnElement, descriptions);
+        //     var color = "#22242a";
+        //     if (nodeJobStatus.Any())
+        //     {
+        //         color = GetColor(shape.BpmnElement, nodeJobStatus);
+        //     }
+        //
+        //     var stringShape = shape.Type switch
+        //     {
+        //         ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
+        //         ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
+        //         ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
+        //         ElementType.ServiceTask => CreateServiceTask(shape, color, title),
+        //         ElementType.SendTask => CreateSendTask(shape, color, title),
+        //         ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
+        //         ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
+        //         ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
+        //         ElementType.SubProcess => CreateSubProcess(shape, color, title),
+        //         _ => string.Empty,
+        //     };
+        //
+        //     viewportBuilder.AddChild(stringShape);
+        //     var label = AddLabel(shape, color);
+        //     viewportBuilder.AddChild(label);
+        // }
+        //
+        // var viewportString = viewportBuilder.BuildSvg();
+        // svgRootBuilder.AddChild(viewportString);
+        // var retStringSvg = svgRootBuilder.BuildSvg();
+        // return retStringSvg;
+        throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Рассчитать коэффициент масштабирования по оси Х.
+    /// </summary>
+    /// <param name="shapes">IBpmnShape.</param>
+    /// <param name="widthWindows">Ширина текущего окна.</param>
+    /// <returns>Масштаб.</returns>
+    internal double CalculateScalingViewportCoordinateX(IBpmnShape[] shapes, int widthWindows)
+    {
+        var maxX = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.X,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MaxBy(p => p.X)?.X ?? 0,
+                _ => 0,
+            };
+        }).Max();
+
+        var minX = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.X,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MinBy(p => p.X)?.X ?? 0,
+                _ => 0,
+            };
+        }).Min();
+
+
+        var contentWidth = maxX + minX;
+
+        return contentWidth < widthWindows
+            ? 1
+            : (double)widthWindows / contentWidth;
+    }
+    
+    // private double CalculateScalingViewportCoordinateY(BpmnShape[] shapes, int heightWindows)
+    // {
+    //     var maxY = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.Y)?.Y ?? 0;
+    //     var minY = shapes.SelectMany(p => p.Bounds).MinBy(p => p.Y)?.Y ?? 0;
+    //     maxY += minY;
+    //     if (maxY < heightWindows)
+    //     {
+    //         return 1;
+    //     }
+    //
+    //     var retValue = (double)heightWindows / maxY;
+    //     return retValue;
+    // }
+
+/*
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
     {
         var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shapeBpmnElement)?.Description ??
@@ -109,33 +162,8 @@ public class SvgConstructor : ISvgConstructor
         };
     }
 
-    private double CalculateScalingViewportCoordinateY(BpmnShape[] shapes, int heightWindows)
-    {
-        var maxY = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.Y)?.Y ?? 0;
-        var minY = shapes.SelectMany(p => p.Bounds).MinBy(p => p.Y)?.Y ?? 0;
-        maxY += minY;
-        if (maxY < heightWindows)
-        {
-            return 1;
-        }
 
-        var retValue = (double)heightWindows / maxY;
-        return retValue;
-    }
 
-    private double CalculateScalingViewportCoordinateX(BpmnShape[] shapes, int widthWindows)
-    {
-        var maxX = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.X)?.X ?? 0;
-        var minX = shapes.SelectMany(p => p.Bounds).MinBy(p => p.X)?.X ?? 0;
-        maxX += minX;
-        if (maxX < widthWindows)
-        {
-            return 1;
-        }
-
-        var retValue = (double)widthWindows / maxX;
-        return retValue;
-    }
 
     private string CreateSubProcess(BpmnShape shape, string color, string titleText)
     {
@@ -405,4 +433,5 @@ public class SvgConstructor : ISvgConstructor
 
         return startEvent;
     }
+    */
 }
