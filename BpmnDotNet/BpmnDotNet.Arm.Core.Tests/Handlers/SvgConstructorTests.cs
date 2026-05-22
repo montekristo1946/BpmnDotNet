@@ -97,4 +97,68 @@ public class SvgConstructorTests
         // Assert
         Assert.Equal(expected, result, 10);
     }
+    
+    [Theory]
+    [InlineData(100, 10, 50, 1)]
+    [InlineData(100, 20, 120, 0.7142857142857143)]
+    [InlineData(200, 50, 150, 1)]
+    [InlineData(100, 40, 200, 0.4166666666666667)]
+    public void CalculateScalingViewportCoordinateY_ShouldReturn_ExpectedScale(
+        int heightWindows,
+        int minY,
+        int maxY,
+        double expectedScale)
+    {
+        // Arrange
+        var shapes = new IBpmnShape[]
+        {
+            new BpmnShape
+            {
+                Bounds = new Bound { Y = minY }
+            },
+            new BpmnShape
+            {
+                Bounds = new Bound { Y = maxY }
+            }
+        };
+
+        // Act
+        var result = _svgConstructor.CalculateScalingViewportCoordinateY(shapes, heightWindows);
+
+        // Assert
+        Assert.Equal(expectedScale, result, precision: 10);
+    }
+    
+    [Theory]
+    [InlineData(100, 10, 150, 100d / 160)]
+    [InlineData(200, 10, 150, 1)]
+    public void CalculateScalingViewportCoordinateY_UsesWaypointCoordinatesForBpmnEdge(
+        int heightWindows,
+        int minWaypointY,
+        int maxWaypointY,
+        double expected)
+    {
+        // Arrange
+        var edge = new BpmnEdge
+        {
+            Waypoints =
+            [
+                new Waypoint { Y = 50 },
+                new Waypoint { Y = minWaypointY },
+                new Waypoint { Y = maxWaypointY },
+                new Waypoint { Y = 100 }
+            ]
+        };
+
+        var shapes = new IBpmnShape[]
+        {
+            edge
+        };
+
+        // Act
+        var result = _svgConstructor.CalculateScalingViewportCoordinateY(shapes, heightWindows);
+
+        // Assert
+        Assert.Equal(expected, result, 10);
+    }
 }

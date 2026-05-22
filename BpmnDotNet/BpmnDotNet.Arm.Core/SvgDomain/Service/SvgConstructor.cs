@@ -37,7 +37,7 @@ public class SvgConstructor : ISvgConstructor
         var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
-        // var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
         // var minScale = Math.Min(scalingX, scalingY);
         //
         // var viewportBuilder = IBpmnBuild<ViewportBuilder>
@@ -118,20 +118,41 @@ public class SvgConstructor : ISvgConstructor
             ? 1
             : (double)widthWindows / contentWidth;
     }
-    
-    // private double CalculateScalingViewportCoordinateY(BpmnShape[] shapes, int heightWindows)
-    // {
-    //     var maxY = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.Y)?.Y ?? 0;
-    //     var minY = shapes.SelectMany(p => p.Bounds).MinBy(p => p.Y)?.Y ?? 0;
-    //     maxY += minY;
-    //     if (maxY < heightWindows)
-    //     {
-    //         return 1;
-    //     }
-    //
-    //     var retValue = (double)heightWindows / maxY;
-    //     return retValue;
-    // }
+
+    /// <summary>
+    /// Рассчитать коэффициент масштабирования по оси Y.
+    /// </summary>
+    /// <param name="shapes">IBpmnShape.</param>
+    /// <param name="heightWindows">Высота текущего окна.</param>
+    /// <returns>Масштаб.</returns>
+    internal double CalculateScalingViewportCoordinateY(IBpmnShape[] shapes, int heightWindows)
+    {
+        var maxY = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.Y,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MaxBy(p => p.Y)?.Y ?? 0,
+                _ => 0,
+            };
+        }).Max();
+
+        var minY = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.Y,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MinBy(p => p.Y)?.Y ?? 0,
+                _ => 0,
+            };
+        }).Min();
+
+        var contentHeight = maxY + minY;
+
+        return contentHeight < heightWindows
+            ? 1
+            : (double)heightWindows / contentHeight;
+    }
 
 /*
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
