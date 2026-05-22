@@ -38,43 +38,52 @@ public class SvgConstructor : ISvgConstructor
 
         var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
         var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-        // var minScale = Math.Min(scalingX, scalingY);
-        //
-        // var viewportBuilder = IBpmnBuild<ViewportBuilder>
-        //     .Create()
-        //     .AddScalingX(minScale)
-        //     .AddScalingY(minScale);
-        //
-        // const int stokeWidthStart = 2;
-        // const int stokeWidthEnd = 4;
-        //
-        // foreach (var shape in shapes)
-        // {
-        //     var title = GetTitle(shape.BpmnElement, descriptions);
-        //     var color = "#22242a";
-        //     if (nodeJobStatus.Any())
-        //     {
-        //         color = GetColor(shape.BpmnElement, nodeJobStatus);
-        //     }
-        //
-        //     var stringShape = shape.Type switch
-        //     {
-        //         ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
-        //         ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
-        //         ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
-        //         ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-        //         ElementType.SendTask => CreateSendTask(shape, color, title),
-        //         ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
-        //         ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
-        //         ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
-        //         ElementType.SubProcess => CreateSubProcess(shape, color, title),
-        //         _ => string.Empty,
-        //     };
-        //
-        //     viewportBuilder.AddChild(stringShape);
-        //     var label = AddLabel(shape, color);
-        //     viewportBuilder.AddChild(label);
-        // }
+        var minScale = Math.Min(scalingX, scalingY);
+
+        var viewportBuilder = IBpmnBuild<ViewportBuilder>
+            .Create()
+            .AddScalingX(minScale)
+            .AddScalingY(minScale);
+
+        const int stokeWidthStart = 2;
+        const int stokeWidthEnd = 4;
+
+        foreach (var shape in shapes)
+        {
+            var title = GetTitle(shape.BpmnElement, descriptions);
+            var color = "#22242a";
+            if (nodeJobStatus.Any())
+            {
+                color = GetColor(shape.BpmnElement, nodeJobStatus);
+            }
+
+            var typeShape = shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Type,
+                BpmnEdge bpmnEdge => bpmnEdge.Type,
+                _ => throw new InvalidOperationException(
+                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
+            };
+
+            var stringShape = typeShape switch
+            {
+                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
+                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
+                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
+                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
+                //TODO: добавить  TextAnnotation Association.
+                _ => string.Empty,
+            };
+        
+            viewportBuilder.AddChild(stringShape);
+            var label = AddLabel(shape, color);
+            viewportBuilder.AddChild(label);
+        }
         //
         // var viewportString = viewportBuilder.BuildSvg();
         // svgRootBuilder.AddChild(viewportString);
@@ -154,7 +163,7 @@ public class SvgConstructor : ISvgConstructor
             : (double)heightWindows / contentHeight;
     }
 
-/*
+
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
     {
         var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shapeBpmnElement)?.Description ??
@@ -412,7 +421,7 @@ public class SvgConstructor : ISvgConstructor
         return tspan;
     }
 
-    private string CreateSequenceFlow(BpmnShape shape, string color, string title)
+    private string CreateSequenceFlow(BpmnEdge shape, string color, string title)
     {
         if (shape.Bounds.Length < 2)
         {
@@ -434,7 +443,7 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
     {
-        var boundCircle = shape.Bounds.FirstOrDefault()
+        var boundCircle = shape.Bounds
                           ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var radius = boundCircle.Width / 2;
@@ -454,5 +463,5 @@ public class SvgConstructor : ISvgConstructor
 
         return startEvent;
     }
-    */
+    
 }
