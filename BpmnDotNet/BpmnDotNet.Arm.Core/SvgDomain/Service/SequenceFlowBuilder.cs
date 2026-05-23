@@ -11,7 +11,7 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
 {
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
-    private Bound[] _bounds = [];
+    private Waypoint[] _waypoints = [];
     private string _color = string.Empty;
     private string _id = string.Empty;
     private string _titleText = string.Empty;
@@ -21,7 +21,7 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
     {
         var firstLine = $"<g data-element-id=\"{_id}\" style=\"display: block;\">";
         var marker = Guid.NewGuid();
-        var arrPoints = _bounds.Select(p => $"{p.X},{p.Y}L").ToArray();
+        var arrPoints = _waypoints.Select(p => $"{p.X},{p.Y}L").ToArray();
         var pathPoints = string.Join(string.Empty, arrPoints);
 
         var defs =
@@ -61,13 +61,13 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
     }
 
     /// <summary>
-    /// Добавить гоацины.
+    /// Добавить точки flow.
     /// </summary>
-    /// <param name="bounds">Bound.</param>
+    /// <param name="waypoints">Waypoint.</param>
     /// <returns>Собираемая фигура.</returns>
-    public SequenceFlowBuilder AddBound(Bound[] bounds)
+    public SequenceFlowBuilder AddBound(Waypoint[] waypoints)
     {
-        _bounds = bounds;
+        _waypoints = waypoints;
         return this;
     }
 
