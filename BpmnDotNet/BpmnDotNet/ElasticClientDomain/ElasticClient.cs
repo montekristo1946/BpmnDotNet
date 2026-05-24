@@ -1,4 +1,9 @@
-﻿namespace BpmnDotNet.ElasticClientDomain;
+﻿using System.Text.Json;
+using BpmnDotNet.Utils;
+using Elastic.Clients.Elasticsearch.Serialization;
+using Elastic.Transport;
+
+namespace BpmnDotNet.ElasticClientDomain;
 
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
@@ -33,17 +38,31 @@ public class ElasticClient : IElasticClient
         _maxRetryCount = maxRetryCount;
         _retryDelay = retryDelay ?? TimeSpan.FromSeconds(5);
 
-        _settings = new ElasticsearchClientSettings(new Uri(config.ConnectionString))
-                .DefaultMappingFor<HistoryNodeState>(m => m
-                    .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
-                    .IdProperty(d => d.Id))
-                .DefaultMappingFor<BpmnPlane>(m => m
-                    .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
-                    .IdProperty(d => d.Id))
-                .DefaultMappingFor<DescriptionData>(m => m
-                    .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
-                    .IdProperty(d => d.Id))
-            ;
+        // _settings = new ElasticsearchClientSettings(new Uri(config.ConnectionString))
+        //         .DefaultMappingFor<HistoryNodeState>(m => m
+        //             .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
+        //             .IdProperty(d => d.Id))
+        //         .DefaultMappingFor<BpmnPlane>(m => m
+        //             .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
+        //             .IdProperty(d => d.Id))
+        //         .DefaultMappingFor<DescriptionData>(m => m
+        //             .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
+        //             .IdProperty(d => d.Id));
+
+        var pool = new SingleNodePool(new Uri(config.ConnectionString));
+        _settings = new ElasticsearchClientSettings(
+                pool,
+                sourceSerializer: (defaultSerializer, settings) =>
+                    new DefaultSourceSerializer(settings, ConfigureJsonOptions))
+            .DefaultMappingFor<HistoryNodeState>(m => m
+                .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
+                .IdProperty(d => d.Id))
+            .DefaultMappingFor<BpmnPlane>(m => m
+                .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
+                .IdProperty(d => d.Id))
+            .DefaultMappingFor<DescriptionData>(m => m
+                .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
+                .IdProperty(d => d.Id));
     }
 
     /// <inheritdoc />
@@ -75,16 +94,20 @@ public class ElasticClient : IElasticClient
     {
         try
         {
-            var excludes = Array.Empty<string>();
-            if (sourceExcludes is not null)
+            if (sourceExcludes is null)
             {
-                excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
+                sourceExcludes = [];
             }
+            // var excludes = Array.Empty<string>();
+            // if (sourceExcludes is not null)
+            // {
+            //     excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
+            // }
 
             var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(T));
             var response = await client
-                .GetAsync<T>(index, id, g => g.SourceExcludes(excludes), token);
+                .GetAsync<T>(index, id, g => g.SourceExcludes(sourceExcludes), token);
 
             if (!response.IsValidResponse || !response.Found)
             {
@@ -115,14 +138,15 @@ public class ElasticClient : IElasticClient
         {
             var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(TIndex));
-            var fieldList = searchFields.Select(f => new Field(f.ToElasticsearchFieldName())).ToArray();
+            // var index = typeof(TIndex).Name;
+            // var fieldList = searchFields.Select(f => new Field(f.ToElasticsearchFieldName())).ToArray();
 
             var response = await client.SearchAsync<TIndex>(
                 s => s
-                .Indices(index)
-                .Size(maxCountElements)
-                .Source(src => src.Filter(f => f.Includes(fieldList)))
-                .Query(q => q.MatchAll()),
+                    .Indices(index)
+                    .Size(maxCountElements)
+                    .Source(src => src.Filter(f => f.Includes(searchFields)))
+                    .Query(q => q.MatchAll()),
                 token);
 
             if (!response.IsValidResponse)
@@ -159,23 +183,23 @@ public class ElasticClient : IElasticClient
 
             var searchRequest = await client.SearchAsync<HistoryNodeState>(
                 s => s
-                .Size(sizeSample)
-                .Query(q => q
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t
-                                .Field(f => f.IdBpmnProcess.Suffix("keyword"))
-                                .Value(idBpmnProcess)),
-                            m => m.Terms(t => t
-                                .Field(f => f.ProcessStatus.Suffix("keyword"))
-                                .Terms(teams => teams.Value(fieldsValue))))))
-                .Sort(s => s
-                    .Field(f => f
-                        .Field("dateCreated")
-                        .Order(SortOrder.Desc)))
-                .Source(src => src
-                    .Filter(f => f
-                        .Includes(new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName())))),
+                    .Size(sizeSample)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.Term(t => t
+                                    .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+                                    .Value(idBpmnProcess)),
+                                m => m.Terms(t => t
+                                    .Field(f => f.ProcessStatus.Suffix("keyword"))
+                                    .Terms(teams => teams.Value(fieldsValue))))))
+                    .Sort(s => s
+                        .Field(f => f
+                            .Field("dateCreated")
+                            .Order(SortOrder.Desc)))
+                    .Source(src => src
+                        .Filter(f => f
+                            .Includes(new Field(nameof(HistoryNodeState.Id))))),
                 token);
 
             var retValue = searchRequest.Hits.Count;
@@ -205,32 +229,32 @@ public class ElasticClient : IElasticClient
 
             var searchRequest = await client.SearchAsync<HistoryNodeState>(
                 s => s
-                .From(skip)
-                .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t
-                                .Field(f => f.IdBpmnProcess.Suffix("keyword"))
-                                .Value(idBpmnProcess)),
-                            m => m.Terms(t => t
-                                .Field(f => f.ProcessStatus.Suffix("keyword"))
-                                .Terms(teams => teams.Value(fieldsValue))))))
-                .Sort(s => s
-                    .Field(f => f
-                        .Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName())
-                        .Order(SortOrder.Desc)))
-                .Source(src => src
-                    .Filter(f => f
-                        .Includes(new Field[]
-                        {
-                            new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.TokenProcess).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName()),
-                        }))),
+                    .From(skip)
+                    .Size(take)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.Term(t => t
+                                    .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+                                    .Value(idBpmnProcess)),
+                                m => m.Terms(t => t
+                                    .Field(f => f.ProcessStatus.Suffix("keyword"))
+                                    .Terms(teams => teams.Value(fieldsValue))))))
+                    .Sort(s => s
+                        .Field(f => f
+                            .Field(nameof(HistoryNodeState.DateCreated))
+                            .Order(SortOrder.Desc)))
+                    .Source(src => src
+                        .Filter(f => f
+                            .Includes(new Field[]
+                            {
+                                new Field(nameof(HistoryNodeState.Id)),
+                                new Field(nameof(HistoryNodeState.IdBpmnProcess)),
+                                new Field(nameof(HistoryNodeState.TokenProcess)),
+                                new Field(nameof(HistoryNodeState.DateCreated)),
+                                new Field(nameof(HistoryNodeState.DateLastModified)),
+                                new Field(nameof(HistoryNodeState.ProcessStatus)),
+                            }))),
                 token);
 
             var retArr = searchRequest?.Hits
@@ -260,32 +284,32 @@ public class ElasticClient : IElasticClient
             var client = await GetClientAsync(token);
             var searchRequest = await client.SearchAsync<HistoryNodeState>(
                 s => s
-                .Size(sizeSample)
-                .Query(q => q
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t
-                                .Field(f => f.IdBpmnProcess.Suffix("keyword"))
-                                .Value(idBpmnProcess)),
-                            m => m.Wildcard(t => t
-                                .Field(f => f.TokenProcess.Suffix("keyword"))
-                                .Value(mask)
-                                .CaseInsensitive(true)))))
-                .Sort(s => s
-                    .Field(f => f
-                        .Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName())
-                        .Order(SortOrder.Desc)))
-                .Source(src => src
-                    .Filter(f => f
-                        .Includes(new Field[]
-                        {
-                            new Field(nameof(HistoryNodeState.Id).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.IdBpmnProcess).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.TokenProcess).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.DateCreated).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.DateLastModified).ToElasticsearchFieldName()),
-                            new Field(nameof(HistoryNodeState.ProcessStatus).ToElasticsearchFieldName()),
-                        }))),
+                    .Size(sizeSample)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.Term(t => t
+                                    .Field(f => f.IdBpmnProcess.Suffix("keyword"))
+                                    .Value(idBpmnProcess)),
+                                m => m.Wildcard(t => t
+                                    .Field(f => f.TokenProcess.Suffix("keyword"))
+                                    .Value(mask)
+                                    .CaseInsensitive(true)))))
+                    .Sort(s => s
+                        .Field(f => f
+                            .Field(nameof(HistoryNodeState.DateCreated))
+                            .Order(SortOrder.Desc)))
+                    .Source(src => src
+                        .Filter(f => f
+                            .Includes(new Field[]
+                            {
+                                new Field(nameof(HistoryNodeState.Id)),
+                                new Field(nameof(HistoryNodeState.IdBpmnProcess)),
+                                new Field(nameof(HistoryNodeState.TokenProcess)),
+                                new Field(nameof(HistoryNodeState.DateCreated)),
+                                new Field(nameof(HistoryNodeState.DateLastModified)),
+                                new Field(nameof(HistoryNodeState.ProcessStatus)),
+                            }))),
                 token);
 
             var retArr = searchRequest?.Hits
@@ -301,6 +325,13 @@ public class ElasticClient : IElasticClient
         }
 
         return [];
+    }
+
+    private void ConfigureJsonOptions(JsonSerializerOptions options)
+    {
+        options.PropertyNamingPolicy = null;
+        options.PropertyNameCaseInsensitive = true;
+        options.Converters.Add(new BpmnShapeArrayConverter());
     }
 
     private async Task<ElasticsearchClient> GetClientAsync(CancellationToken token = default)

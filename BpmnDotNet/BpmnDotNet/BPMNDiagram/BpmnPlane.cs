@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using BpmnDotNet.Utils;
+
 namespace BpmnDotNet.BPMNDiagram;
 
 using BpmnDotNet.BPMNDiagram.Abstractions;
@@ -20,6 +23,7 @@ public record BpmnPlane
     /// <summary>
     ///     Gets массив фигур для отрисовки.
     /// </summary>
+    [JsonConverter(typeof(BpmnShapeArrayConverter))]
     public IBpmnShape[] Shapes { get; init; } = [];
 
     /// <summary>
