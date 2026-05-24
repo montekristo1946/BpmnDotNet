@@ -76,7 +76,8 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
                 ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
                 ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
-                //TODO: добавить  TextAnnotation Association.
+                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
+                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color, title),
                 _ => string.Empty,
             };
 
@@ -89,6 +90,55 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.BuildSvg();
         return retStringSvg;
+    }
+
+    private string CreateTextAnnotation(BpmnShape shape, string color, string titleText)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddMaxLenLine(14)
+            .AddPaddingY(20)
+            .AddPaddingX(50)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<ServiceTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(titleText)
+            .BuildSvg();
+        return task;
+    }
+
+    private string CreateAssociation(BpmnEdge shape, string color, string title)
+    {
+        if (shape.Waypoints.Length < 2)
+        {
+            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
+        }
+
+        var id = shape.Id;
+        var waypoints = shape.Waypoints;
+
+        var association = IBpmnBuild<AssociationBuilder>
+            .Create()
+            .AddWayPoint(waypoints)
+            .AddColor(color)
+            .AddId(id)
+            .BuildSvg();
+        return association;
     }
 
     /// <summary>
@@ -451,7 +501,7 @@ public class SvgConstructor : ISvgConstructor
         var sequenceFlow = IBpmnBuild<SequenceFlowBuilder>
             .Create()
             .AddColor(color)
-            .AddBound(waypoints)
+            .AddWayPoint(waypoints)
             .AddId(id)
             .AddTitle(title)
             .BuildSvg();

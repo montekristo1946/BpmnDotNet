@@ -7,7 +7,11 @@ using BpmnDotNet.BPMNDiagram;
 /// <summary>
 /// Строитель стрелочек на SVG.
 /// </summary>
-public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBuilder<SequenceFlowBuilder>, IBpmnBuild<SequenceFlowBuilder>
+public class SequenceFlowBuilder : 
+    IColorBuilder<SequenceFlowBuilder>,
+    ITitleBuilder<SequenceFlowBuilder>,
+    IBpmnBuild<SequenceFlowBuilder>,
+    IWayPointPosition<SequenceFlowBuilder>
 {
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
@@ -24,16 +28,18 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
         var arrPoints = _waypoints.Select(p => $"{p.X},{p.Y}L").ToArray();
         var pathPoints = string.Join(string.Empty, arrPoints);
 
-        var defs =
-            $"\t<defs>\n" +
-            $"\t\t<marker id=\"{marker}\" viewBox=\"0 0 20 20\" refX=\"11\" refY=\"10\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto\">\n" +
-            $"\t\t<path d=\"M 1 5 L 11 10 L 1 15 Z\" style=\"stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; stroke-width: 1px; fill: {_color};\"></path>\n" +
-            "\t\t</marker>\n" +
-            "\t</defs>";
+        var defs = $$"""
+                     <defs>
+                         <marker id="{{marker}}" viewBox="0 0 20 20" refX="11" refY="10" markerWidth="10" markerHeight="10" orient="auto">
+                             <path d="M 1 5 L 11 10 L 1 15 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: {{_color}}; stroke-width: 1px; fill: {{_color}};"></path>
+                         </marker>
+                     </defs>
+                     """;
 
-        var path =
-            $"<path data-corner-radius=\"5\" style=\"fill: none; stroke-linecap: round; stroke-linejoin: round; stroke: {_color}; stroke-width: 2px; marker-end: url(&quot;#{marker}&quot;);\" " +
-            $"d=\"M{pathPoints}\"></path>";
+        var path = $$"""
+                     <path data-corner-radius="5" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke: {{_color}}; stroke-width: 2px; marker-end: url(&quot;#{{marker}}&quot;);" 
+                         d="M{{pathPoints}}"></path>
+                     """;
         var footer = "</g>";
 
         _svgStorage.AppendLine(firstLine);
@@ -60,12 +66,8 @@ public class SequenceFlowBuilder : IColorBuilder<SequenceFlowBuilder>, ITitleBui
         return this;
     }
 
-    /// <summary>
-    /// Добавить точки flow.
-    /// </summary>
-    /// <param name="waypoints">Waypoint.</param>
-    /// <returns>Собираемая фигура.</returns>
-    public SequenceFlowBuilder AddBound(Waypoint[] waypoints)
+    /// <inheritdoc />
+    public SequenceFlowBuilder AddWayPoint(Waypoint[] waypoints)
     {
         _waypoints = waypoints;
         return this;

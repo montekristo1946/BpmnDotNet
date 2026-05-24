@@ -8,13 +8,11 @@
     <bpmn:endEvent id="End_event" name="Процесс завершен">
       <bpmn:incoming>Flow_out_GatewayFourthHandler</bpmn:incoming>
     </bpmn:endEvent>
-    
     <bpmn:exclusiveGateway id="GatewayFirstHandler" name="Выбор типа вагона">
       <bpmn:incoming>Flow_out_BlockFirstHandler</bpmn:incoming>
       <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
       <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    
     <bpmn:sequenceFlow id="Flow_in_ReceiveTaskFirstHandle" name="Да&#10;" sourceRef="GatewayFirstHandler" targetRef="ReceiveTaskFirstHandle" />
     <bpmn:exclusiveGateway id="Gateway_Second" name="Обьединение результатов по типу вагона">
       <bpmn:incoming>Flow_out_SendTaskFirstHandler</bpmn:incoming>
@@ -75,147 +73,159 @@
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_in_SubProcessFirstHandler" sourceRef="ServiceTaskFourthHandler" targetRef="SubProcessFirstHandler" />
     <bpmn:sequenceFlow id="Flow_out_SubProcessFirstHandler" sourceRef="SubProcessFirstHandler" targetRef="GatewayFourthHandler" />
+    <bpmn:textAnnotation id="TextAnnotation_0mhzy78">
+      <bpmn:text>Описание блока длинный текст
+
+Выше пробел...</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1rj97am" associationDirection="None" sourceRef="ServiceTaskFirstHandler" targetRef="TextAnnotation_0mhzy78" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessingMain">
-    
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="182" y="102" width="36" height="36" />
+        <dc:Bounds x="182" y="182" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="157" y="73" width="89" height="14" />
+          <dc:Bounds x="157" y="153" width="90" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      
       <bpmndi:BPMNShape id="Event_1tak4tf_di" bpmnElement="End_event">
-        <dc:Bounds x="1462" y="102" width="36" height="36" />
+        <dc:Bounds x="1462" y="182" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1455" y="56" width="51" height="27" />
+          <dc:Bounds x="1455" y="136" width="51" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_05f6p1w_di" bpmnElement="GatewayFirstHandler" isMarkerVisible="true">
-        <dc:Bounds x="475" y="95" width="50" height="50" />
+        <dc:Bounds x="475" y="175" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="469" y="56" width="61" height="27" />
+          <dc:Bounds x="469" y="136" width="61" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0oqklk1_di" bpmnElement="Gateway_Second" isMarkerVisible="true">
-        <dc:Bounds x="765" y="95" width="50" height="50" />
+        <dc:Bounds x="765" y="175" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="752" y="56" width="77" height="40" />
+          <dc:Bounds x="752" y="136" width="77" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_11bw6xs_di" bpmnElement="ServiceTaskFirstHandler">
-        <dc:Bounds x="290" y="80" width="100" height="80" />
+        <dc:Bounds x="290" y="160" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_01c0426_di" bpmnElement="SendTaskFirstHandler">
-        <dc:Bounds x="590" y="80" width="100" height="80" />
+        <dc:Bounds x="590" y="160" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1b8jtzd_di" bpmnElement="ReceiveTaskFirstHandle">
-        <dc:Bounds x="590" y="270" width="100" height="80" />
+        <dc:Bounds x="590" y="350" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0k7arcx_di" bpmnElement="GatewayThirdHandler">
-        <dc:Bounds x="875" y="95" width="50" height="50" />
+        <dc:Bounds x="875" y="175" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="871" y="50" width="77" height="40" />
+          <dc:Bounds x="871" y="130" width="77" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">
-        <dc:Bounds x="1375" y="95" width="50" height="50" />
+        <dc:Bounds x="1375" y="175" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1374" y="56" width="54" height="27" />
+          <dc:Bounds x="1374" y="136" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1004tiz_di" bpmnElement="ServiceTaskSecondHandler">
-        <dc:Bounds x="990" y="80" width="100" height="80" />
+        <dc:Bounds x="990" y="160" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1gke426_di" bpmnElement="ServiceTaskThirdHandler">
-        <dc:Bounds x="990" y="190" width="100" height="80" />
+        <dc:Bounds x="990" y="270" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0079oio_di" bpmnElement="ServiceTaskFourthHandler">
-        <dc:Bounds x="990" y="300" width="100" height="80" />
+        <dc:Bounds x="990" y="380" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1k2itzl_di" bpmnElement="SubProcessFirstHandler" isExpanded="false">
-        <dc:Bounds x="1150" y="300" width="100" height="80" />
+        <dc:Bounds x="1150" y="380" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1rj97am_di" bpmnElement="Association_1rj97am">
+        <di:waypoint x="363" y="160" />
+        <di:waypoint x="407" y="85" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1y5xzzh_di" bpmnElement="Flow_to_BlockFirstHandler">
-        <di:waypoint x="218" y="120" />
-        <di:waypoint x="290" y="120" />
+        <di:waypoint x="218" y="200" />
+        <di:waypoint x="290" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0bcpggf_di" bpmnElement="Flow_in_ReceiveTaskFirstHandle">
-        <di:waypoint x="500" y="145" />
-        <di:waypoint x="500" y="310" />
-        <di:waypoint x="590" y="310" />
+        <di:waypoint x="500" y="225" />
+        <di:waypoint x="500" y="390" />
+        <di:waypoint x="590" y="390" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="508" y="225" width="14" height="27" />
+          <dc:Bounds x="508" y="305" width="15" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13w2ndl_di" bpmnElement="Flow_out_SendTaskFirstHandler">
-        <di:waypoint x="690" y="120" />
-        <di:waypoint x="765" y="120" />
+        <di:waypoint x="690" y="200" />
+        <di:waypoint x="765" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1n3z011_di" bpmnElement="Flow_out_ReceiveTaskFirstHandle">
-        <di:waypoint x="690" y="310" />
-        <di:waypoint x="790" y="310" />
-        <di:waypoint x="790" y="145" />
+        <di:waypoint x="690" y="390" />
+        <di:waypoint x="790" y="390" />
+        <di:waypoint x="790" y="225" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1k3namo_di" bpmnElement="Flow_out_BlockFirstHandler">
-        <di:waypoint x="390" y="120" />
-        <di:waypoint x="475" y="120" />
+        <di:waypoint x="390" y="200" />
+        <di:waypoint x="475" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0adg8di_di" bpmnElement="Flow_in_SendTaskFirstHandler">
-        <di:waypoint x="525" y="120" />
-        <di:waypoint x="590" y="120" />
+        <di:waypoint x="525" y="200" />
+        <di:waypoint x="590" y="200" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="549" y="102" width="19" height="14" />
+          <dc:Bounds x="549" y="182" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0tq0i1g_di" bpmnElement="Flow_out_Gateway_Second">
-        <di:waypoint x="815" y="120" />
-        <di:waypoint x="875" y="120" />
+        <di:waypoint x="815" y="200" />
+        <di:waypoint x="875" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_17wy6h0_di" bpmnElement="Flow_in_ServiceTaskSecondHandler">
-        <di:waypoint x="925" y="120" />
-        <di:waypoint x="990" y="120" />
+        <di:waypoint x="925" y="200" />
+        <di:waypoint x="990" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0bxk6pg_di" bpmnElement="Flow_out_ServiceTaskSecondHandler">
-        <di:waypoint x="1090" y="120" />
-        <di:waypoint x="1375" y="120" />
+        <di:waypoint x="1090" y="200" />
+        <di:waypoint x="1375" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1fwx50r_di" bpmnElement="Flow_in_ServiceTaskThirdHandler">
-        <di:waypoint x="900" y="145" />
-        <di:waypoint x="900" y="230" />
-        <di:waypoint x="990" y="230" />
+        <di:waypoint x="900" y="225" />
+        <di:waypoint x="900" y="310" />
+        <di:waypoint x="990" y="310" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0j1kojf_di" bpmnElement="Flow_out_ServiceTaskThirdHandler">
-        <di:waypoint x="1090" y="230" />
-        <di:waypoint x="1400" y="230" />
-        <di:waypoint x="1400" y="145" />
+        <di:waypoint x="1090" y="310" />
+        <di:waypoint x="1400" y="310" />
+        <di:waypoint x="1400" y="225" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06gqg94_di" bpmnElement="Flow_out_GatewayFourthHandler">
-        <di:waypoint x="1425" y="120" />
-        <di:waypoint x="1462" y="120" />
+        <di:waypoint x="1425" y="200" />
+        <di:waypoint x="1462" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1pwgzjc_di" bpmnElement="Flow_in_ServiceTaskFourthHandler">
-        <di:waypoint x="900" y="145" />
-        <di:waypoint x="900" y="340" />
-        <di:waypoint x="990" y="340" />
+        <di:waypoint x="900" y="225" />
+        <di:waypoint x="900" y="420" />
+        <di:waypoint x="990" y="420" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0chktuk_di" bpmnElement="Flow_in_SubProcessFirstHandler">
-        <di:waypoint x="1090" y="340" />
-        <di:waypoint x="1150" y="340" />
+        <di:waypoint x="1090" y="420" />
+        <di:waypoint x="1150" y="420" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0qb0ody_di" bpmnElement="Flow_out_SubProcessFirstHandler">
-        <di:waypoint x="1250" y="340" />
-        <di:waypoint x="1400" y="340" />
-        <di:waypoint x="1400" y="145" />
+        <di:waypoint x="1250" y="420" />
+        <di:waypoint x="1400" y="420" />
+        <di:waypoint x="1400" y="225" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0mhzy78_di" bpmnElement="TextAnnotation_0mhzy78">
+        <dc:Bounds x="380" y="30" width="199.99193201376937" height="55.07745266781412" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1nb9obd">
