@@ -42,13 +42,14 @@ internal class BpmnShapeArrayConverter : JsonConverter<IBpmnShape[]>
             }
 
 #pragma warning disable IL2026
-            IBpmnShape shape = typeBpmnShape switch
+            IBpmnShape? shape = typeBpmnShape switch
             {
                 BpmnShapeType.BpmnEdge => Deserialize<BpmnEdge>(root.GetRawText(), options),
                 BpmnShapeType.BpmnShape => Deserialize<BpmnShape>(root.GetRawText(), options),
                 _ => throw new NotSupportedException($"Unknown shape type: {typeBpmnShape}"),
             };
 #pragma warning restore IL2026
+
             if (shape is null)
             {
                 throw new JsonException("[IBpmnShapeArrayConverter:Read] Failed deserialize BpmnShape or BpmnEdge");

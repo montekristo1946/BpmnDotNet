@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace BpmnDotNet.BPMNDiagram;
 
 using BpmnDotNet.BPMNDiagram.Abstractions;
@@ -37,4 +35,9 @@ public record BpmnShape : IBpmnShape
     ///     Gets координаты текста. На схеме это bpmndi:BPMNLabel.
     /// </summary>
     public Bound BpmnLabel { get; init; } = new();
+
+    /// <summary>
+    /// Gets текст в блоках textAnnotation, На схеме это bpmn:text.
+    /// </summary>
+    public string BpmnText { get; init; } = string.Empty;
 }

@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0q53yf7" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
   <bpmn:process id="Process_17.05.2026" name="Name_Process_17.05.2026" isExecutable="true">
+   
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:endEvent id="Event_1mrey13">
+    
+    <bpmn:endEvent id="EndEvent_2">
       <bpmn:incoming>Flow_2</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_2" name="text flow 2" sourceRef="ServiceTask" targetRef="Event_1mrey13" />
+    <bpmn:sequenceFlow id="Flow_2" name="text flow 2" sourceRef="ServiceTask" targetRef="EndEvent_2" />
     <bpmn:sequenceFlow id="Flow_1" name="Flow_1 text" sourceRef="StartEvent_1" targetRef="ServiceTask" />
     <bpmn:serviceTask id="ServiceTask" name="ServiceTask">
       <bpmn:incoming>Flow_1</bpmn:incoming>
       <bpmn:outgoing>Flow_2</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:textAnnotation id="TextAnnotation_0cb0t1w">
-      <bpmn:text>ServiceTask text</bpmn:text>
+    <bpmn:textAnnotation id="TextAnnotation_2">
+      <bpmn:text>TextAnnotation text 2</bpmn:text>
     </bpmn:textAnnotation>
-    <bpmn:association id="Association_0x65ucj" associationDirection="None" sourceRef="ServiceTask" targetRef="TextAnnotation_0cb0t1w" />
-    <bpmn:textAnnotation id="TextAnnotation_1tu7ixb">
-      <bpmn:text>Test Text</bpmn:text>
+    <bpmn:association id="Association_0x65ucj" associationDirection="None" sourceRef="ServiceTask" targetRef="TextAnnotation_2" />
+   
+    <bpmn:textAnnotation id="TextAnnotation_1">
+      <bpmn:text>TextAnnotation text 1</bpmn:text>
     </bpmn:textAnnotation>
+    
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_17.05.2026">
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="182" y="162" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1mrey13_di" bpmnElement="Event_1mrey13">
+      <bpmndi:BPMNShape id="Event_1mrey13_di" bpmnElement="EndEvent_2">
         <dc:Bounds x="512" y="162" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0c2bzvv_di" bpmnElement="ServiceTask">
         <dc:Bounds x="310" y="140" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0cb0t1w_di" bpmnElement="TextAnnotation_0cb0t1w">
-        <dc:Bounds x="410" y="60" width="100" height="41" />
+      <bpmndi:BPMNShape id="TextAnnotation_0cb0t1w_di" bpmnElement="TextAnnotation_2">
+        <dc:Bounds x="410" y="60" width="100" height="39" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_08cgq7z" bpmnElement="TextAnnotation_1tu7ixb">
-        <dc:Bounds x="280" y="60" width="100" height="26" />
+      <bpmndi:BPMNShape id="BPMNShape_08cgq7z" bpmnElement="TextAnnotation_1">
+        <dc:Bounds x="280" y="60" width="100" height="39" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0e4lmdz_di" bpmnElement="Flow_2">
@@ -57,7 +61,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Association_0x65ucj_di" bpmnElement="Association_0x65ucj">
         <di:waypoint x="398" y="140" />
-        <di:waypoint x="435" y="101" />
+        <di:waypoint x="437" y="99" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

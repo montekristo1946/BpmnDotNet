@@ -76,6 +76,11 @@ internal static class Constants
     public const string TextAnnotation = "bpmn:textAnnotation";
 
     /// <summary>
+    /// Text.
+    /// </summary>
+    public const string Text = "bpmn:text";
+
+    /// <summary>
     /// Association.
     /// </summary>
     public const string Association = "bpmn:association";

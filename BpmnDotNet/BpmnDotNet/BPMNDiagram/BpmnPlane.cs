@@ -1,9 +1,8 @@
-using System.Text.Json.Serialization;
-using BpmnDotNet.Utils;
-
 namespace BpmnDotNet.BPMNDiagram;
 
+using System.Text.Json.Serialization;
 using BpmnDotNet.BPMNDiagram.Abstractions;
+using BpmnDotNet.Utils;
 
 /// <summary>
 ///     В нотации секция: bpmndi:BPMNPlane.

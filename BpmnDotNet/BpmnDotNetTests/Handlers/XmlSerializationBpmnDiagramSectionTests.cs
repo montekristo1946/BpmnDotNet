@@ -1,4 +1,5 @@
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Handlers;
 
 namespace BpmnDotNetTests.Handlers;
@@ -44,5 +45,16 @@ public class XmlSerializationBpmnDiagramSectionTests
         
         Assert.Equal("Process_17.05.2026", diagram.Id);
         Assert.Equal(8, diagram.Shapes.Length);
+    }
+
+    [Fact]
+    public void LoadXmlBpmnDiagram_CheckFillTextAnnotation_BpmnDiagram()
+    {
+        var diagram = _xmlSerializationProcessSection.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_2.bpmn");
+
+        var bpmnShape = diagram.Shapes.FirstOrDefault(p=>p.Id == "TextAnnotation_0cb0t1w_di");
+        Assert.NotNull(bpmnShape);
+        var textAnnotation = (BpmnShape)bpmnShape;
+        Assert.Equal("TextAnnotation text 2", textAnnotation.BpmnText);
     }
 }

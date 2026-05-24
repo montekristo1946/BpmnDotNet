@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_191qv1h" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
   <bpmn:process id="IdBpmnProcessingMain" name="Сканирования лидаров" isExecutable="true">
+    
     <bpmn:startEvent id="StartEvent_1" name="Начало процесса">
       <bpmn:outgoing>Flow_to_BlockFirstHandler</bpmn:outgoing>
     </bpmn:startEvent>
@@ -82,6 +83,7 @@
     
     <bpmn:association id="Association_1rj97am" associationDirection="None" sourceRef="ServiceTaskFirstHandler" targetRef="TextAnnotation_0mhzy78" />
   </bpmn:process>
+  
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IdBpmnProcessingMain">
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
@@ -126,12 +128,14 @@
           <dc:Bounds x="871" y="130" width="77" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+     
       <bpmndi:BPMNShape id="Gateway_1orbrjr_di" bpmnElement="GatewayFourthHandler">
         <dc:Bounds x="1375" y="175" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1374" y="136" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      
       <bpmndi:BPMNShape id="Activity_1004tiz_di" bpmnElement="ServiceTaskSecondHandler">
         <dc:Bounds x="990" y="160" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -224,10 +228,12 @@
         <di:waypoint x="1400" y="420" />
         <di:waypoint x="1400" y="225" />
       </bpmndi:BPMNEdge>
+      
       <bpmndi:BPMNShape id="TextAnnotation_0mhzy78_di" bpmnElement="TextAnnotation_0mhzy78">
         <dc:Bounds x="380" y="30" width="199.99193201376937" height="55.07745266781412" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1nb9obd">

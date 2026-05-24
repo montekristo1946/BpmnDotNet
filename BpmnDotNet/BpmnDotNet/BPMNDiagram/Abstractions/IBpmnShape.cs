@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace BpmnDotNet.BPMNDiagram.Abstractions;
 
 /// <summary>

@@ -1,14 +1,13 @@
-﻿using System.Text.Json;
-using BpmnDotNet.Utils;
-using Elastic.Clients.Elasticsearch.Serialization;
-using Elastic.Transport;
+﻿namespace BpmnDotNet.ElasticClientDomain;
 
-namespace BpmnDotNet.ElasticClientDomain;
-
+using System.Text.Json;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.Utils;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Serialization;
+using Elastic.Transport;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />
@@ -37,17 +36,6 @@ public class ElasticClient : IElasticClient
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _maxRetryCount = maxRetryCount;
         _retryDelay = retryDelay ?? TimeSpan.FromSeconds(5);
-
-        // _settings = new ElasticsearchClientSettings(new Uri(config.ConnectionString))
-        //         .DefaultMappingFor<HistoryNodeState>(m => m
-        //             .IndexName(StringUtils.CreateIndexName(typeof(HistoryNodeState)))
-        //             .IdProperty(d => d.Id))
-        //         .DefaultMappingFor<BpmnPlane>(m => m
-        //             .IndexName(StringUtils.CreateIndexName(typeof(BpmnPlane)))
-        //             .IdProperty(d => d.Id))
-        //         .DefaultMappingFor<DescriptionData>(m => m
-        //             .IndexName(StringUtils.CreateIndexName(typeof(DescriptionData)))
-        //             .IdProperty(d => d.Id));
 
         var pool = new SingleNodePool(new Uri(config.ConnectionString));
         _settings = new ElasticsearchClientSettings(
@@ -94,15 +82,7 @@ public class ElasticClient : IElasticClient
     {
         try
         {
-            if (sourceExcludes is null)
-            {
-                sourceExcludes = [];
-            }
-            // var excludes = Array.Empty<string>();
-            // if (sourceExcludes is not null)
-            // {
-            //     excludes = sourceExcludes.Select(p => p.ToElasticsearchFieldName()).ToArray();
-            // }
+            sourceExcludes ??= [];
 
             var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(T));
@@ -138,8 +118,6 @@ public class ElasticClient : IElasticClient
         {
             var client = await GetClientAsync(token);
             var index = StringUtils.CreateIndexName(typeof(TIndex));
-            // var index = typeof(TIndex).Name;
-            // var fieldList = searchFields.Select(f => new Field(f.ToElasticsearchFieldName())).ToArray();
 
             var response = await client.SearchAsync<TIndex>(
                 s => s

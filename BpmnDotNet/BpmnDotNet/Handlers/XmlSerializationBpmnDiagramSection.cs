@@ -59,14 +59,46 @@ public class XmlSerializationBpmnDiagramSection : IXmlSerializationBpmnDiagramSe
 
         var shapes = GetShapesFromPlane(bpmnPlane, idBpmnPlane);
         shapes = FillTypeAndName(shapes, processBlock);
-
+        shapes = FillBpmnText(shapes, processBlock);
         var namePrecess = GetNameProcess(processBlock, bpmnElementPlane);
+
         return new BpmnPlane
         {
             IdBpmnProcess = bpmnElementPlane,
             Shapes = shapes,
             Name = namePrecess,
         };
+    }
+
+    private IBpmnShape[] FillBpmnText(IBpmnShape[] shapes, XmlNode processBlock)
+    {
+        var bounds = processBlock.ChildNodes
+            .Cast<XmlNode>()
+            .Select(p =>
+            {
+                var id = GetId(p);
+                var text = p.ChildNodes.Cast<XmlNode>().FirstOrDefault(p => p.Name == Constants.Text)?.InnerText;
+                return (id, text);
+            })
+            .Where(p => !string.IsNullOrWhiteSpace(p.text))
+            .ToArray();
+
+        var retArr = shapes.Select(iBpmnShape =>
+        {
+            var element = bounds.FirstOrDefault(p => p.id == iBpmnShape.BpmnElement);
+
+            return iBpmnShape.TypeBpmnShape switch
+            {
+                BpmnShapeType.BpmnShape => (BpmnShape)iBpmnShape with
+                {
+                    BpmnText = element.text!,
+                },
+                BpmnShapeType.BpmnEdge => iBpmnShape,
+                _ => throw new ArgumentOutOfRangeException($"[FillTypeAndName] fail Type shape: {iBpmnShape.TypeBpmnShape}"),
+            };
+        }).ToArray();
+
+        return retArr;
     }
 
     private string GetNameProcess(XmlNode? processBlock, string idBpmnPlane)
