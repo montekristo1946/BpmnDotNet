@@ -77,7 +77,7 @@ public class SvgConstructor : ISvgConstructor
                 ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
                 ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
                 ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
-                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color, title),
+                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
                 _ => string.Empty,
             };
 
@@ -92,9 +92,9 @@ public class SvgConstructor : ISvgConstructor
         return retStringSvg;
     }
 
-    private string CreateTextAnnotation(BpmnShape shape, string color, string titleText)
+    private string CreateTextAnnotation(BpmnShape shape, string color)
     {
-        var boundServiceTask = shape.Bounds
+        var bound = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
@@ -111,13 +111,12 @@ public class SvgConstructor : ISvgConstructor
             .AddColor(color)
             .BuildSvg();
 
-        var task = IBpmnBuild<ServiceTaskBuilder>
+        var task = IBpmnBuild<TextAnnotationBuilder>
             .Create()
             .AddColor(color)
             .AddId(shape.Id)
             .AddChild(textBuilder)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
+            .AddBounds(bound)
             .BuildSvg();
         return task;
     }

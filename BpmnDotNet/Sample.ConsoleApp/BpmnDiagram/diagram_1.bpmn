@@ -73,11 +73,13 @@
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_in_SubProcessFirstHandler" sourceRef="ServiceTaskFourthHandler" targetRef="SubProcessFirstHandler" />
     <bpmn:sequenceFlow id="Flow_out_SubProcessFirstHandler" sourceRef="SubProcessFirstHandler" targetRef="GatewayFourthHandler" />
+   
     <bpmn:textAnnotation id="TextAnnotation_0mhzy78">
       <bpmn:text>Описание блока длинный текст
 
 Выше пробел...</bpmn:text>
     </bpmn:textAnnotation>
+    
     <bpmn:association id="Association_1rj97am" associationDirection="None" sourceRef="ServiceTaskFirstHandler" targetRef="TextAnnotation_0mhzy78" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
