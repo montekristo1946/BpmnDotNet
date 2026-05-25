@@ -97,12 +97,10 @@ public class SvgConstructor : ISvgConstructor
         var bound = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
-        var tspan = IBpmnBuild<TspanBuilder>
+        var tspan = IBpmnBuild<TspanAnnotationBuilder>
             .Create()
-            .AddChild(shape.Name)
-            .AddMaxLenLine(14)
-            .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddChild(shape.BpmnText)
+            .AddWidthBlock(shape.Bounds.Width)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -246,9 +244,8 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -306,9 +303,8 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -336,9 +332,8 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -366,9 +361,8 @@ public class SvgConstructor : ISvgConstructor
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -403,13 +397,6 @@ public class SvgConstructor : ISvgConstructor
             return string.Empty;
         }
 
-        var typeShape = shape switch
-        {
-            BpmnShape bpmnShape => bpmnShape.Type,
-            BpmnEdge bpmnEdge => bpmnEdge.Type,
-            _ => throw new InvalidOperationException(
-                $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
-        };
         var name = shape switch
         {
             BpmnShape bpmnShape => bpmnShape.Name,
@@ -418,15 +405,12 @@ public class SvgConstructor : ISvgConstructor
                 $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
         };
 
-        var tspan = typeShape switch
-        {
-            ElementType.StartEvent => CreateTspanLabelFromStartEvent(name),
-            ElementType.EndEvent => CreateTspanLabelFromEndEvent(name),
-            ElementType.SequenceFlow => CreateTspanLabelFromSequenceFlow(name),
-            ElementType.ExclusiveGateway => CreateTspanLabelFromGateway(name),
-            ElementType.ParallelGateway => CreateTspanLabelFromGateway(name),
-            _ => string.Empty,
-        };
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddBoundBlock(labelShape)
+            .AddChild(name)
+            .BuildSvg();
+
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
@@ -441,50 +425,6 @@ public class SvgConstructor : ISvgConstructor
             .BuildSvg();
 
         return label;
-    }
-
-    private string CreateTspanLabelFromGateway(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(30)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromSequenceFlow(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(35)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromEndEvent(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(25)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromStartEvent(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(50)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
     }
 
     private string CreateSequenceFlow(BpmnEdge shape, string color, string title)

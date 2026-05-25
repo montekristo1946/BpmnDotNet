@@ -8,6 +8,7 @@ using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 /// </summary>
 public class TextBuilder : IBpmnBuild<TextBuilder>, IColorBuilder<TextBuilder>
 {
+    private const int FontSize = 11;
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
     private string _color = string.Empty;
@@ -17,7 +18,7 @@ public class TextBuilder : IBpmnBuild<TextBuilder>, IColorBuilder<TextBuilder>
     public string BuildSvg()
     {
         var hider =
-            $"<text id=\"{_id}\" lineHeight=\"1.2\"  class=\"djs-label\" text-anchor=\"middle\"  style=\"font-family: Arial, sans-serif; font-size: 11px; font-weight: normal; fill: {_color};\">";
+            $"<text id=\"{_id}\" lineHeight=\"1.2\"  class=\"djs-label\" text-anchor=\"start\"  style=\"font-family: Arial, sans-serif; font-size: {FontSize}px; font-weight: normal; fill: {_color};\">";
         var footer = "</text>";
 
         _svgStorage.AppendLine(hider);

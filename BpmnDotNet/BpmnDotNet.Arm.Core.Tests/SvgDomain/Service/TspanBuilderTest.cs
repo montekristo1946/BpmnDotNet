@@ -1,4 +1,6 @@
+using System.Reflection;
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
+using BpmnDotNet.BPMNDiagram;
 
 namespace BpmnDotNet.Arm.Core.Tests.SvgDomain.Service;
 
@@ -16,11 +18,16 @@ public class TspanBuilderTest
         var text = "Поиск саморегуляторов на результатах от МЛ";
         _builder.AddChild(text);
         
-        var result = _builder.BuildSvg();
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Поиск</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">саморегуляторов</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">на результатах</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">от МЛ</tspan>", result);
+        var result = _builder
+            .AddBoundBlock(new Bound(){Height = 80,Width = 100})
+            .BuildSvg();
+        
+        Assert.Contains("<tspan id=\"\" x=\"35\" y=\"11\">Поиск</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"5,0000000000000036\" y=\"22\">саморегуляторов</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"33\">на</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"17,000000000000004\" y=\"44\">результатах</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">от</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"66\">МЛ</tspan>", result);
     }
     
     [Fact] 
@@ -29,11 +36,14 @@ public class TspanBuilderTest
         _builder.AddChild("Репорт, Ошибка измерения");
         _builder.AddChild("МЛ");
         
-        var result = _builder.BuildSvg();
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">Ошибка</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">измерения</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">МЛ</tspan>", result);
+        var result = _builder
+            .AddBoundBlock(new Bound(){Height = 80,Width = 100})
+            .BuildSvg();
+        
+        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"32\" y=\"22\">Ошибка</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"23,000000000000004\" y=\"33\">измерения</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"44\">МЛ</tspan>", result);
     }
     
     [Fact] 
@@ -42,12 +52,15 @@ public class TspanBuilderTest
         _builder.AddChild("Репорт, без нарушений.&#10;Alarm.None");
         _builder.AddChild("МЛ");
         
-        var result = _builder.BuildSvg();
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">без</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">нарушений.</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">Alarm.None</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"55\">МЛ</tspan>", result);
+        var result = _builder
+            .AddBoundBlock(new Bound(){Height = 80,Width = 100})
+            .BuildSvg();
+        
+        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"41\" y=\"22\">без</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">МЛ</tspan>", result);
     }
     
     [Fact] 
@@ -56,12 +69,15 @@ public class TspanBuilderTest
         _builder.AddChild("Репорт, без нарушений.\nAlarm.None");
         _builder.AddChild("МЛ");
         
-        var result = _builder.BuildSvg();
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"11\">Репорт,</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"22\">без</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"33\">нарушений.</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"44\">Alarm.None</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"0\" y=\"55\">МЛ</tspan>", result);
+        var result = _builder
+            .AddBoundBlock(new Bound(){Height = 80,Width = 100})
+            .BuildSvg();
+        
+        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"41\" y=\"22\">без</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">МЛ</tspan>", result);
     }
     
     [Fact]
@@ -77,9 +93,15 @@ public class TspanBuilderTest
     public void SplitLinesFromLongLine_ChekLargeName_splitName()
     {
         var name = "SplitLinesFromLongLine_ChekLargeName_splitName";
+        
+        var fieldInfo = typeof(TspanBuilder).GetField("_symbolInOneLine", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+       
+        fieldInfo?.SetValue(_builder, 10); 
+        
         var split = _builder.SplitLinesFromLongLine([name]);
 
-        Assert.Equal(4, split.Length);
+        Assert.Equal(5, split.Length);
     }
 
     [Fact]
@@ -148,6 +170,14 @@ public class TspanBuilderTest
         bool expected)
     {
         // Act
+        var fieldInfoOptimalLines = typeof(TspanBuilder).GetField("_optimumLinesInActivityBloc", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        fieldInfoOptimalLines?.SetValue(_builder, 5); 
+        
+        var fieldInfoSymbolInOneLine = typeof(TspanBuilder).GetField("_symbolInOneLine", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        fieldInfoSymbolInOneLine?.SetValue(_builder, 15);
+            
         var result = _builder.CheckRemapLines(splitWords);
 
         // Assert

@@ -24,19 +24,22 @@ internal class TextAnnotationBuilder :
     {
         var markerId = Guid.NewGuid();
 
-        var start = (_bound.X + 10, _bound.Y);
-        var topLeft = (_bound.X, _bound.Y);
-        var bottomLeft = (_bound.X, _bound.Y + _bound.Height);
-        var bottomRight = (_bound.X + 10, _bound.Y + _bound.Height);
+        var start = (10, 0);
+        var topLeft = (0, 0);
+        var bottomLeft = (0, _bound.Height);
+        var bottomRight = (10, _bound.Height);
 
         var pathData =
-            $"M{start.Item1},{start.Y} " +
-            $"L{topLeft.X},{topLeft.Y} " +
-            $"L{bottomLeft.X},{bottomLeft.Item2} " +
-            $"L{bottomRight.Item1},{bottomRight.Item2}";
+            $"M{start.Item1},{start.Item2} " +
+            $"L{topLeft.Item1},{topLeft.Item2} " +
+            $"L{bottomLeft.Item1},{bottomLeft.Height} " +
+            $"L{bottomRight.Item1},{bottomRight.Height}";
 
         var svg = $$"""
-                    <g data-element-id="{{_id}}" style="display: block;">
+                    <g
+                        data-element-id="{{_id}}"
+                        style="display: block;"
+                        transform="matrix(1 0 0 1 {{_bound.X}} {{_bound.Y}})">
                         <path
                             d="{{pathData}}"
                             fill="none"
@@ -47,7 +50,7 @@ internal class TextAnnotationBuilder :
                     """;
 
         _svgStorage.AppendLine(svg);
-        _childElements.ForEach(p =>_svgStorage.AppendLine(p));
+        _childElements.ForEach(p => _svgStorage.AppendLine(p));
         _svgStorage.AppendLine("</g>");
 
         return _svgStorage.ToString();

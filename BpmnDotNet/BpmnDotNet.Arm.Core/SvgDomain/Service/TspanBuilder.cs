@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
+using BpmnDotNet.BPMNDiagram;
 
 [assembly: InternalsVisibleTo("BpmnDotNet.Arm.Core.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -10,20 +11,30 @@ namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 /// <summary>
 /// Создаст многострочный текст.
 /// </summary>
-public class TspanBuilder : IBpmnBuild<TspanBuilder>
+public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
 {
     private const int FontSize = 11;
-    private const int OptimumLinesInActivityBloc = 5;
+    private const int PixelOneSymbol = 6;
+
+    /// <summary>
+    /// Межстрочный отступ.
+    /// </summary>
+    private const int LineSpacing= 6; 
+
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
-    private int _symbolInOneLine = 15;
+    private int _symbolInOneLine = 0;
+    private int _optimumLinesInActivityBloc = 0;
     private int _paddingY = 0;
-    private int _paddingX = 0;
+    private Bound _boundBlock = new Bound();
     private string _id = string.Empty;
+
 
     /// <inheritdoc />
     public string BuildSvg()
     {
+        _symbolInOneLine = _boundBlock.Width / PixelOneSymbol;
+        _optimumLinesInActivityBloc = (_boundBlock.Height-_paddingY) / (PixelOneSymbol+LineSpacing);
         var allLines = MergeAllChild(_childElements);
         allLines = RemoveLineBreakEntity(allLines);
         var splitWords = allLines.Split(' ');
@@ -37,12 +48,12 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
 
         splitWords = ClearSpaceLine(splitWords);
         splitWords = RemoveTrailingSpaces(splitWords);
-
+        var centerBlock = (double)_boundBlock.Width / PixelOneSymbol / 2;
         for (var i = 0; i < splitWords.Length; i++)
         {
             var body = splitWords[i];
             var y = (i * FontSize) + FontSize + _paddingY;
-            var x = _paddingX;
+            var x = (centerBlock - (body.Length / 2.0)) * PixelOneSymbol;
             var hider = $"<tspan id=\"{_id}\" x=\"{x}\" y=\"{y}\">";
             var footer = "</tspan>";
             _svgStorage.Append(hider);
@@ -67,36 +78,17 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
         return this;
     }
 
-    /// <summary>
-    /// Максимальная длинна строки.
-    /// </summary>
-    /// <param name="len">Длинна.</param>
-    /// <returns>Обьект создания.</returns>
-    public TspanBuilder AddMaxLenLine(int len)
-    {
-        _symbolInOneLine = len;
-        return this;
-    }
-
-    /// <summary>
-    /// Смещение по оси Y.
-    /// </summary>
-    /// <param name="value">value.</param>
-    /// <returns>Обьект создания.</returns>
+    /// <inheritdoc />
     public TspanBuilder AddPaddingY(int value)
     {
         _paddingY = value;
         return this;
     }
 
-    /// <summary>
-    /// Смещение по оси X.
-    /// </summary>
-    /// <param name="value">value.</param>
-    /// <returns>Обьект создания.</returns>
-    public TspanBuilder AddPaddingX(int value)
+    /// <inheritdoc />
+    public TspanBuilder AddBoundBlock(Bound value)
     {
-        _paddingX = value;
+        _boundBlock = value;
         return this;
     }
 
@@ -107,6 +99,15 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
     /// <returns>Вернет строки.</returns>
     internal string[] SplitLinesFromLongLine(string[] allLines)
     {
+
+        if (_symbolInOneLine <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(_symbolInOneLine),
+                _symbolInOneLine,
+                "Value must be greater than zero.");
+        }
+
         var retArr = new List<string>();
         foreach (var line in allLines)
         {
@@ -205,7 +206,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>
             return false;
         }
 
-        if (splitWords.Length > OptimumLinesInActivityBloc)
+        if (splitWords.Length > _optimumLinesInActivityBloc)
         {
             return true;
         }
