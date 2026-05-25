@@ -46,7 +46,7 @@ internal static class BpmnClientBuilder
 
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = allBpmnFiles.Select(serializerProcessSection.LoadXmlProcessSection).ToArray();
-        LoadBpmnInElastic(allBpmnFiles, elasticClient, serializerDiagramSection);
+        WriteBpmnInElastic(allBpmnFiles, elasticClient, serializerDiagramSection);
         return new BpmnClient(
             businessProcessDtos,
             loggerFactory,
@@ -58,7 +58,7 @@ internal static class BpmnClientBuilder
     /// <summary>
     /// Получить файлы bpmn.
     /// </summary>
-    /// <param name="pathDiagram">Путь до диаграм.</param>
+    /// <param name="pathDiagram">Путь до диаграмм.</param>
     /// <returns>Диаграммы в формате string[].</returns>
     internal static string[] GetAllFiles(string pathDiagram)
     {
@@ -81,7 +81,7 @@ internal static class BpmnClientBuilder
             : files;
     }
 
-    private static void LoadBpmnInElastic(
+    private static void WriteBpmnInElastic(
         string[] allBpmnFiles,
         IElasticClientSetDataAsync elasticClient,
         IXmlSerializationBpmnDiagramSection serializer)

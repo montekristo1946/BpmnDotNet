@@ -1,5 +1,9 @@
 namespace BpmnDotNet.BPMNDiagram;
 
+using System.Text.Json.Serialization;
+using BpmnDotNet.BPMNDiagram.Abstractions;
+using BpmnDotNet.Utils;
+
 /// <summary>
 ///     В нотации секция: bpmndi:BPMNPlane.
 /// </summary>
@@ -18,7 +22,8 @@ public record BpmnPlane
     /// <summary>
     ///     Gets массив фигур для отрисовки.
     /// </summary>
-    public BpmnShape[] Shapes { get; init; } = [];
+    [JsonConverter(typeof(BpmnShapeArrayConverter))]
+    public IBpmnShape[] Shapes { get; init; } = [];
 
     /// <summary>
     ///     Gets текст в элементах. Описывает name.

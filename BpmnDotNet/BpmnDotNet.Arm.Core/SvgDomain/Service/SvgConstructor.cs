@@ -3,6 +3,7 @@ namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Dto;
 
 /// <inheritdoc />
@@ -26,8 +27,78 @@ public class SvgConstructor : ISvgConstructor
         return Task.FromResult(shapes);
     }
 
+    /// <summary>
+    /// Рассчитать коэффициент масштабирования по оси Х.
+    /// </summary>
+    /// <param name="shapes">IBpmnShape.</param>
+    /// <param name="widthWindows">Ширина текущего окна.</param>
+    /// <returns>Масштаб.</returns>
+    internal double CalculateScalingViewportCoordinateX(IBpmnShape[] shapes, int widthWindows)
+    {
+        var maxX = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.X,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MaxBy(p => p.X)?.X ?? 0,
+                _ => 0,
+            };
+        }).Max();
+
+        var minX = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.X,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MinBy(p => p.X)?.X ?? 0,
+                _ => 0,
+            };
+        }).Min();
+
+        var contentWidth = maxX + minX;
+
+        return contentWidth < widthWindows
+            ? 1
+            : (double)widthWindows / contentWidth;
+    }
+
+    /// <summary>
+    /// Рассчитать коэффициент масштабирования по оси Y.
+    /// </summary>
+    /// <param name="shapes">IBpmnShape.</param>
+    /// <param name="heightWindows">Высота текущего окна.</param>
+    /// <returns>Масштаб.</returns>
+    internal double CalculateScalingViewportCoordinateY(IBpmnShape[] shapes, int heightWindows)
+    {
+        var maxY = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.Y,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MaxBy(p => p.Y)?.Y ?? 0,
+                _ => 0,
+            };
+        }).Max();
+
+        var minY = shapes.Select(shape =>
+        {
+            return shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Bounds.Y,
+                BpmnEdge bpmnEdge => bpmnEdge.Waypoints.MinBy(p => p.Y)?.Y ?? 0,
+                _ => 0,
+            };
+        }).Min();
+
+        var contentHeight = maxY + minY;
+
+        return contentHeight < heightWindows
+            ? 1
+            : (double)heightWindows / contentHeight;
+    }
+
     private string CreateColorShapes(
-        BpmnShape[] shapes,
+        IBpmnShape[] shapes,
         NodeJobStatus[] nodeJobStatus,
         int widthWindows,
         int heightWindows,
@@ -56,17 +127,27 @@ public class SvgConstructor : ISvgConstructor
                 color = GetColor(shape.BpmnElement, nodeJobStatus);
             }
 
-            var stringShape = shape.Type switch
+            var typeShape = shape switch
             {
-                ElementType.StartEvent => CreateStartEvent(shape, color, stokeWidthStart, title),
-                ElementType.EndEvent => CreateStartEvent(shape, color, stokeWidthEnd, title),
-                ElementType.SequenceFlow => CreateSequenceFlow(shape, color, title),
-                ElementType.ServiceTask => CreateServiceTask(shape, color, title),
-                ElementType.SendTask => CreateSendTask(shape, color, title),
-                ElementType.ReceiveTask => CreateReceiveTask(shape, color, title),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway(shape, color, title),
-                ElementType.ParallelGateway => CreateParallelGateway(shape, color, title),
-                ElementType.SubProcess => CreateSubProcess(shape, color, title),
+                BpmnShape bpmnShape => bpmnShape.Type,
+                BpmnEdge bpmnEdge => bpmnEdge.Type,
+                _ => throw new InvalidOperationException(
+                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
+            };
+
+            var stringShape = typeShape switch
+            {
+                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
+                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
+                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
+                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
+                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
+                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
                 _ => string.Empty,
             };
 
@@ -79,6 +160,52 @@ public class SvgConstructor : ISvgConstructor
         svgRootBuilder.AddChild(viewportString);
         var retStringSvg = svgRootBuilder.BuildSvg();
         return retStringSvg;
+    }
+
+    private string CreateTextAnnotation(BpmnShape shape, string color)
+    {
+        var bound = shape.Bounds
+                    ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanAnnotationBuilder>
+            .Create()
+            .AddChild(shape.BpmnText)
+            .AddWidthBlock(shape.Bounds.Width)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<TextAnnotationBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddBounds(bound)
+            .BuildSvg();
+        return task;
+    }
+
+    private string CreateAssociation(BpmnEdge shape, string color, string title)
+    {
+        if (shape.Waypoints.Length < 2)
+        {
+            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
+        }
+
+        var id = shape.Id;
+        var waypoints = shape.Waypoints;
+
+        var association = IBpmnBuild<AssociationBuilder>
+            .Create()
+            .AddWayPoint(waypoints)
+            .AddColor(color)
+            .AddId(id)
+            .BuildSvg();
+        return association;
     }
 
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
@@ -109,45 +236,16 @@ public class SvgConstructor : ISvgConstructor
         };
     }
 
-    private double CalculateScalingViewportCoordinateY(BpmnShape[] shapes, int heightWindows)
-    {
-        var maxY = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.Y)?.Y ?? 0;
-        var minY = shapes.SelectMany(p => p.Bounds).MinBy(p => p.Y)?.Y ?? 0;
-        maxY += minY;
-        if (maxY < heightWindows)
-        {
-            return 1;
-        }
-
-        var retValue = (double)heightWindows / maxY;
-        return retValue;
-    }
-
-    private double CalculateScalingViewportCoordinateX(BpmnShape[] shapes, int widthWindows)
-    {
-        var maxX = shapes.SelectMany(p => p.Bounds).MaxBy(p => p.X)?.X ?? 0;
-        var minX = shapes.SelectMany(p => p.Bounds).MinBy(p => p.X)?.X ?? 0;
-        maxX += minX;
-        if (maxX < widthWindows)
-        {
-            return 1;
-        }
-
-        var retValue = (double)widthWindows / maxX;
-        return retValue;
-    }
-
     private string CreateSubProcess(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(25)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -169,7 +267,7 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateParallelGateway(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var gateway = IBpmnBuild<ParallelGatewayBuilder>
@@ -184,7 +282,7 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateExclusiveGateway(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var gateway = IBpmnBuild<ExlusiveGatewayBuilder>
@@ -199,15 +297,14 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateReceiveTask(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -229,15 +326,14 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateSendTask(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -259,15 +355,14 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateServiceTask(BpmnShape shape, string color, string titleText)
     {
-        var boundServiceTask = shape.Bounds.FirstOrDefault()
+        var boundServiceTask = shape.Bounds
                                ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
             .AddChild(shape.Name)
-            .AddMaxLenLine(14)
             .AddPaddingY(20)
-            .AddPaddingX(50)
+            .AddBoundBlock(shape.Bounds)
             .BuildSvg();
 
         var textBuilder = IBpmnBuild<TextBuilder>
@@ -287,22 +382,35 @@ public class SvgConstructor : ISvgConstructor
         return task;
     }
 
-    private string AddLabel(BpmnShape shape, string color)
+    private string AddLabel(IBpmnShape shape, string color)
     {
-        if (shape.BpmnLabel.X < 0 || shape.BpmnLabel.Y < 0)
+        var labelShape = shape switch
+        {
+            BpmnShape bpmnShape => bpmnShape.BpmnLabel,
+            BpmnEdge bpmnEdge => bpmnEdge.BpmnLabel,
+            _ => throw new InvalidOperationException(
+                $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
+        };
+
+        if (labelShape.X < 0 || labelShape.Y < 0)
         {
             return string.Empty;
         }
 
-        var tspan = shape.Type switch
+        var name = shape switch
         {
-            ElementType.StartEvent => CreateTspanLabelFromStartEvent(shape.Name),
-            ElementType.EndEvent => CreateTspanLabelFromEndEvent(shape.Name),
-            ElementType.SequenceFlow => CreateTspanLabelFromSequenceFlow(shape.Name),
-            ElementType.ExclusiveGateway => CreateTspanLabelFromGateway(shape.Name),
-            ElementType.ParallelGateway => CreateTspanLabelFromGateway(shape.Name),
-            _ => string.Empty,
+            BpmnShape bpmnShape => bpmnShape.Name,
+            BpmnEdge bpmnEdge => bpmnEdge.Name,
+            _ => throw new InvalidOperationException(
+                $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
         };
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddBoundBlock(labelShape)
+            .AddChild(name)
+            .BuildSvg();
+
         var textBuilder = IBpmnBuild<TextBuilder>
             .Create()
             .AddChild(tspan)
@@ -311,7 +419,7 @@ public class SvgConstructor : ISvgConstructor
 
         var label = IBpmnBuild<LabelBuilder>
             .Create()
-            .AddPositionOffsets(shape.BpmnLabel.X, shape.BpmnLabel.Y)
+            .AddPositionOffsets(labelShape.X, labelShape.Y)
             .AddChild(textBuilder)
             .AddId($"Label_{shape.Id}")
             .BuildSvg();
@@ -319,64 +427,20 @@ public class SvgConstructor : ISvgConstructor
         return label;
     }
 
-    private string CreateTspanLabelFromGateway(string text)
+    private string CreateSequenceFlow(BpmnEdge shape, string color, string title)
     {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(30)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromSequenceFlow(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(35)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromEndEvent(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(25)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateTspanLabelFromStartEvent(string text)
-    {
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddPaddingX(50)
-            .AddChild(text)
-            .BuildSvg();
-
-        return tspan;
-    }
-
-    private string CreateSequenceFlow(BpmnShape shape, string color, string title)
-    {
-        if (shape.Bounds.Length < 2)
+        if (shape.Waypoints.Length < 2)
         {
             throw new ArgumentException("Shape must have at least 2 bounds");
         }
 
         var id = shape.Id;
-        var bounds = shape.Bounds;
+        var waypoints = shape.Waypoints;
 
         var sequenceFlow = IBpmnBuild<SequenceFlowBuilder>
             .Create()
             .AddColor(color)
-            .AddBound(bounds)
+            .AddWayPoint(waypoints)
             .AddId(id)
             .AddTitle(title)
             .BuildSvg();
@@ -385,7 +449,7 @@ public class SvgConstructor : ISvgConstructor
 
     private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
     {
-        var boundCircle = shape.Bounds.FirstOrDefault()
+        var boundCircle = shape.Bounds
                           ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
 
         var radius = boundCircle.Width / 2;

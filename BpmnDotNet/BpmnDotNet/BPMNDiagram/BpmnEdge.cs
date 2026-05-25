@@ -3,28 +3,23 @@ namespace BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.Abstractions;
 
 /// <summary>
-///     В нотации секция: bpmndi:BPMNShape.
+///     В нотации секция: bpmndi:BPMNEdge.
 /// </summary>
-public record BpmnShape : IBpmnShape
+public record BpmnEdge : IBpmnShape
 {
     /// <inheritdoc />
     public string Id { get; init; } = string.Empty;
 
     /// <inheritdoc/>
-    public BpmnShapeType TypeBpmnShape { get; init; } = BpmnShapeType.BpmnShape;
+    public BpmnShapeType TypeBpmnShape { get; init; } = BpmnShapeType.BpmnEdge;
 
     /// <inheritdoc/>
     public string BpmnElement { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Gets тип фигуры.
+    ///     Gets переменная описывающая координаты левого угла фигуры, (массив например для Flow).
     /// </summary>
-    public ElementType Type { get; init; } = ElementType.None;
-
-    /// <summary>
-    ///     Gets переменная описывающая координаты левого угла фигуры.
-    /// </summary>
-    public Bound Bounds { get; init; } = new Bound();
+    public Waypoint[] Waypoints { get; init; } = [];
 
     /// <summary>
     ///     Gets текст в элементах. Описывает name (в разметке хранится в bpmn:process: name).
@@ -37,7 +32,7 @@ public record BpmnShape : IBpmnShape
     public Bound BpmnLabel { get; init; } = new();
 
     /// <summary>
-    /// Gets текст в блоках textAnnotation, На схеме это bpmn:text.
+    ///     Gets тип фигуры.
     /// </summary>
-    public string BpmnText { get; init; } = string.Empty;
+    public ElementType Type { get; init; } = ElementType.None;
 }

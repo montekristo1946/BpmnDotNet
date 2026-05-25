@@ -55,10 +55,15 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
                 Constants.BpmnReceiveTaskName => CreateReceiveTask(xmlNode),
                 Constants.BpmnServiceTaskName => CreateServiceTask(xmlNode),
                 Constants.BpmnSubProcess => CreateSubProcess(xmlNode),
+                Constants.TextAnnotation => null,
+                Constants.Association => null,
                 _ => throw new ArgumentOutOfRangeException($"{idProcess} {xmlNode.Name}"),
 
             };
-            elements.Add(element);
+            if (element is not null)
+            {
+                elements.Add(element);
+            }
         }
 
         if (elements.Any() is false)

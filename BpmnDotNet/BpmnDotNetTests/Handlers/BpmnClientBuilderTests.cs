@@ -71,7 +71,10 @@ public class BpmnClientBuilderTests : IDisposable
         var bpmnPlanes = new List<BpmnPlane>();
         for (int i = 0; i < fileCount; i++)
         {
-            bpmnPlanes.Add(_fixture.Create<BpmnPlane>());
+            bpmnPlanes.Add(_fixture.Build<BpmnPlane>()
+                .With(p=>p.Shapes,
+                    _fixture.CreateMany<BpmnShape>().ToArray)
+                .Create());
         }
     
         var diagramCallCount = 0;
@@ -127,7 +130,10 @@ public class BpmnClientBuilderTests : IDisposable
     
         for (int i = 0; i < fileCount; i++)
         {
-            bpmnPlanes.Add(_fixture.Create<BpmnPlane>());
+            bpmnPlanes.Add(_fixture.Build<BpmnPlane>()
+                .With(p=>p.Shapes,
+                    _fixture.CreateMany<BpmnShape>().ToArray)
+                .Create());
             processDtos.Add(_fixture.Create<BpmnProcessDto>());
         }
     
@@ -197,7 +203,10 @@ public class BpmnClientBuilderTests : IDisposable
     
         for (int i = 0; i < bpmnFileCount; i++)
         {
-            bpmnPlanes.Add(_fixture.Create<BpmnPlane>());
+            bpmnPlanes.Add(_fixture.Build<BpmnPlane>()
+                .With(p=>p.Shapes,
+                    _fixture.CreateMany<BpmnShape>().ToArray)
+                .Create());
             processDtos.Add(_fixture.Create<BpmnProcessDto>());
         }
     
@@ -244,7 +253,10 @@ public class BpmnClientBuilderTests : IDisposable
     
         for (int i = 0; i < fileCount; i++)
         {
-            bpmnPlanes.Add(_fixture.Create<BpmnPlane>());
+            bpmnPlanes.Add(_fixture.Build<BpmnPlane>()
+                .With(p=>p.Shapes,
+                    _fixture.CreateMany<BpmnShape>().ToArray)
+                .Create());
             processDtos.Add(_fixture.Create<BpmnProcessDto>());
         }
     

@@ -67,6 +67,9 @@
         <None Update="Handlers\BpmnClientIntegrationDomain\BpmnSource\diagram_1.bpmn">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="BpmnDiagram\diagram_2.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
