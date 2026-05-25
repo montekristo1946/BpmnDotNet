@@ -65,13 +65,27 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
         return this;
     }
 
-    private string[] SplitLongLine(string[] lines, int maxSymbol)
+    /// <summary>
+    /// Разделит длинные строки.
+    /// </summary>
+    /// <param name="lines">Массив строк.</param>
+    /// <param name="maxCountSymbol">Максимальная длинно символов в строке.</param>
+    /// <returns>Строки после реформации.</returns>
+    internal string[] SplitLongLine(string[] lines, int maxCountSymbol)
     {
+        if (maxCountSymbol <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(maxCountSymbol),
+                maxCountSymbol,
+                "Value must be greater than zero.");
+        }
+
         var retArray = new List<string>();
 
         foreach (var line in lines)
         {
-            if (string.IsNullOrWhiteSpace(line) || line.Length <= maxSymbol)
+            if (string.IsNullOrWhiteSpace(line) || line.Length <= maxCountSymbol)
             {
                 retArray.Add(line);
                 continue;
@@ -83,21 +97,21 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
             {
                 var remainingLength = line.Length - currentPosition;
 
-                if (remainingLength <= maxSymbol)
+                if (remainingLength <= maxCountSymbol)
                 {
                     retArray.Add(line.Substring(currentPosition));
                     break;
                 }
 
                 // Ищем последний пробел в пределах maxSymbol
-                var endPosition = currentPosition + maxSymbol;
+                var endPosition = currentPosition + maxCountSymbol;
                 var lastSpaceIndex = line.LastIndexOf(' ', endPosition);
 
                 if (lastSpaceIndex <= currentPosition)
                 {
                     // Нет подходящего пробела - режем по maxSymbol
-                    retArray.Add(line.Substring(currentPosition, maxSymbol));
-                    currentPosition += maxSymbol;
+                    retArray.Add(line.Substring(currentPosition, maxCountSymbol));
+                    currentPosition += maxCountSymbol;
                 }
                 else
                 {
