@@ -7,7 +7,7 @@ using BpmnDotNet.BPMNDiagram;
 /// <summary>
 /// Строитель стрелочек на SVG.
 /// </summary>
-public class SequenceFlowBuilder : 
+public class SequenceFlowBuilder :
     IColorBuilder<SequenceFlowBuilder>,
     ITitleBuilder<SequenceFlowBuilder>,
     IBpmnBuild<SequenceFlowBuilder>,

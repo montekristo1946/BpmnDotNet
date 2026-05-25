@@ -27,117 +27,6 @@ public class SvgConstructor : ISvgConstructor
         return Task.FromResult(shapes);
     }
 
-    private string CreateColorShapes(
-        IBpmnShape[] shapes,
-        NodeJobStatus[] nodeJobStatus,
-        int widthWindows,
-        int heightWindows,
-        DescriptionData[] descriptions)
-    {
-        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
-
-        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-        var minScale = Math.Min(scalingX, scalingY);
-
-        var viewportBuilder = IBpmnBuild<ViewportBuilder>
-            .Create()
-            .AddScalingX(minScale)
-            .AddScalingY(minScale);
-
-        const int stokeWidthStart = 2;
-        const int stokeWidthEnd = 4;
-
-        foreach (var shape in shapes)
-        {
-            var title = GetTitle(shape.BpmnElement, descriptions);
-            var color = "#22242a";
-            if (nodeJobStatus.Any())
-            {
-                color = GetColor(shape.BpmnElement, nodeJobStatus);
-            }
-
-            var typeShape = shape switch
-            {
-                BpmnShape bpmnShape => bpmnShape.Type,
-                BpmnEdge bpmnEdge => bpmnEdge.Type,
-                _ => throw new InvalidOperationException(
-                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
-            };
-
-            var stringShape = typeShape switch
-            {
-                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
-                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
-                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
-                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
-                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
-                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
-                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
-                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
-                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
-                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
-                _ => string.Empty,
-            };
-
-            viewportBuilder.AddChild(stringShape);
-            var label = AddLabel(shape, color);
-            viewportBuilder.AddChild(label);
-        }
-
-        var viewportString = viewportBuilder.BuildSvg();
-        svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.BuildSvg();
-        return retStringSvg;
-    }
-
-    private string CreateTextAnnotation(BpmnShape shape, string color)
-    {
-        var bound = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanAnnotationBuilder>
-            .Create()
-            .AddChild(shape.BpmnText)
-            .AddWidthBlock(shape.Bounds.Width)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<TextAnnotationBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddBounds(bound)
-            .BuildSvg();
-        return task;
-    }
-
-    private string CreateAssociation(BpmnEdge shape, string color, string title)
-    {
-        if (shape.Waypoints.Length < 2)
-        {
-            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
-        }
-
-        var id = shape.Id;
-        var waypoints = shape.Waypoints;
-
-        var association = IBpmnBuild<AssociationBuilder>
-            .Create()
-            .AddWayPoint(waypoints)
-            .AddColor(color)
-            .AddId(id)
-            .BuildSvg();
-        return association;
-    }
-
     /// <summary>
     /// Рассчитать коэффициент масштабирования по оси Х.
     /// </summary>
@@ -206,6 +95,117 @@ public class SvgConstructor : ISvgConstructor
         return contentHeight < heightWindows
             ? 1
             : (double)heightWindows / contentHeight;
+    }
+
+    private string CreateColorShapes(
+        IBpmnShape[] shapes,
+        NodeJobStatus[] nodeJobStatus,
+        int widthWindows,
+        int heightWindows,
+        DescriptionData[] descriptions)
+    {
+        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
+
+        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+        var minScale = Math.Min(scalingX, scalingY);
+
+        var viewportBuilder = IBpmnBuild<ViewportBuilder>
+            .Create()
+            .AddScalingX(minScale)
+            .AddScalingY(minScale);
+
+        const int stokeWidthStart = 2;
+        const int stokeWidthEnd = 4;
+
+        foreach (var shape in shapes)
+        {
+            var title = GetTitle(shape.BpmnElement, descriptions);
+            var color = "#22242a";
+            if (nodeJobStatus.Any())
+            {
+                color = GetColor(shape.BpmnElement, nodeJobStatus);
+            }
+
+            var typeShape = shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Type,
+                BpmnEdge bpmnEdge => bpmnEdge.Type,
+                _ => throw new InvalidOperationException(
+                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
+            };
+
+            var stringShape = typeShape switch
+            {
+                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
+                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
+                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
+                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
+                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
+                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
+                _ => string.Empty,
+            };
+
+            viewportBuilder.AddChild(stringShape);
+            var label = AddLabel(shape, color);
+            viewportBuilder.AddChild(label);
+        }
+
+        var viewportString = viewportBuilder.BuildSvg();
+        svgRootBuilder.AddChild(viewportString);
+        var retStringSvg = svgRootBuilder.BuildSvg();
+        return retStringSvg;
+    }
+
+    private string CreateTextAnnotation(BpmnShape shape, string color)
+    {
+        var bound = shape.Bounds
+                    ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanAnnotationBuilder>
+            .Create()
+            .AddChild(shape.BpmnText)
+            .AddWidthBlock(shape.Bounds.Width)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<TextAnnotationBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddBounds(bound)
+            .BuildSvg();
+        return task;
+    }
+
+    private string CreateAssociation(BpmnEdge shape, string color, string title)
+    {
+        if (shape.Waypoints.Length < 2)
+        {
+            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
+        }
+
+        var id = shape.Id;
+        var waypoints = shape.Waypoints;
+
+        var association = IBpmnBuild<AssociationBuilder>
+            .Create()
+            .AddWayPoint(waypoints)
+            .AddColor(color)
+            .AddId(id)
+            .BuildSvg();
+        return association;
     }
 
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)

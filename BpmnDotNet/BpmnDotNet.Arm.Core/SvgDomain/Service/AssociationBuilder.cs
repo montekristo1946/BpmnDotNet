@@ -47,7 +47,6 @@ internal class AssociationBuilder :
         return this;
     }
 
-
     /// <inheritdoc />
     public AssociationBuilder AddChild(string childElement)
     {

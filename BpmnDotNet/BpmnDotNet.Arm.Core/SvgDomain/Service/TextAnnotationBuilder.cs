@@ -1,9 +1,8 @@
-using System.Text;
-using BpmnDotNet.BPMNDiagram;
-
 namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 
+using System.Text;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
+using BpmnDotNet.BPMNDiagram;
 
 /// <summary>
 /// Соберет TextAnnotation блок.

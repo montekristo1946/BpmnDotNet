@@ -22,7 +22,6 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
     private string _id = string.Empty;
     private int _symbolInOneLine = 0;
 
-
     /// <inheritdoc />
     public string BuildSvg()
     {
@@ -34,7 +33,7 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
         {
             var body = lines[i];
             var y = (i * FontSize) + FontSize;
-            var x = IndentSymbol*PixelOneSymbol;
+            var x = IndentSymbol * PixelOneSymbol;
             var hider = $"<tspan id=\"{_id}\" x=\"{x}\" y=\"{y}\">";
             var footer = "</tspan>";
             _svgStorage.Append(hider);
@@ -45,19 +44,34 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
         return _svgStorage.ToString();
     }
 
+    /// <inheritdoc />
+    public TspanAnnotationBuilder AddChild(string childElement)
+    {
+        _childElements.Add(childElement);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public TspanAnnotationBuilder AddId(string id)
+    {
+        _id = id;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public TspanAnnotationBuilder AddWidthBlock(int value)
+    {
+        _widthBlock = value;
+        return this;
+    }
+
     private string[] SplitLongLine(string[] lines, int maxSymbol)
     {
         var retArray = new List<string>();
 
         foreach (var line in lines)
         {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                retArray.Add(line);
-                continue;
-            }
-
-            if (line.Length <= maxSymbol)
+            if (string.IsNullOrWhiteSpace(line) || line.Length <= maxSymbol)
             {
                 retArray.Add(line);
                 continue;
@@ -95,27 +109,5 @@ public class TspanAnnotationBuilder : IBpmnBuild<TspanAnnotationBuilder>, ITspan
         }
 
         return retArray.ToArray();
-    }
-
-    /// <inheritdoc />
-    public TspanAnnotationBuilder AddChild(string childElement)
-    {
-        _childElements.Add(childElement);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public TspanAnnotationBuilder AddId(string id)
-    {
-        _id = id;
-        return this;
-    }
-
-
-    /// <inheritdoc />
-    public TspanAnnotationBuilder AddWidthBlock(int value)
-    {
-        _widthBlock = value;
-        return this;
     }
 }

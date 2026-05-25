@@ -29,7 +29,6 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
     private Bound _boundBlock = new();
     private string _id = string.Empty;
 
-
     /// <inheritdoc />
     public string BuildSvg()
     {
