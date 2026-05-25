@@ -23,9 +23,9 @@ public class TspanBuilderTest
             .BuildSvg();
         
         Assert.Contains("<tspan id=\"\" x=\"35\" y=\"11\">Поиск</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"5,0000000000000036\" y=\"22\">саморегуляторов</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"5\" y=\"22\">саморегуляторов</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"33\">на</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"17,000000000000004\" y=\"44\">результатах</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"17\" y=\"44\">результатах</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">от</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"66\">МЛ</tspan>", result);
     }
@@ -40,9 +40,9 @@ public class TspanBuilderTest
             .AddBoundBlock(new Bound(){Height = 80,Width = 100})
             .BuildSvg();
         
-        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"29\" y=\"11\">Репорт,</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"32\" y=\"22\">Ошибка</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"23,000000000000004\" y=\"33\">измерения</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"23\" y=\"33\">измерения</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"44\">МЛ</tspan>", result);
     }
     
@@ -56,10 +56,10 @@ public class TspanBuilderTest
             .AddBoundBlock(new Bound(){Height = 80,Width = 100})
             .BuildSvg();
         
-        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"29\" y=\"11\">Репорт,</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"41\" y=\"22\">без</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"33\">нарушений.</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20\" y=\"44\">Alarm.None</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">МЛ</tspan>", result);
     }
     
@@ -73,10 +73,10 @@ public class TspanBuilderTest
             .AddBoundBlock(new Bound(){Height = 80,Width = 100})
             .BuildSvg();
         
-        Assert.Contains("<tspan id=\"\" x=\"29,000000000000004\" y=\"11\">Репорт,</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"29\" y=\"11\">Репорт,</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"41\" y=\"22\">без</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"33\">нарушений.</tspan>", result);
-        Assert.Contains("<tspan id=\"\" x=\"20,000000000000004\" y=\"44\">Alarm.None</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20\" y=\"33\">нарушений.</tspan>", result);
+        Assert.Contains("<tspan id=\"\" x=\"20\" y=\"44\">Alarm.None</tspan>", result);
         Assert.Contains("<tspan id=\"\" x=\"44\" y=\"55\">МЛ</tspan>", result);
     }
     

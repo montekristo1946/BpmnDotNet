@@ -19,14 +19,14 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
     /// <summary>
     /// Межстрочный отступ.
     /// </summary>
-    private const int LineSpacing= 6; 
+    private const int LineSpacing = 6;
 
     private readonly StringBuilder _svgStorage = new();
     private readonly List<string> _childElements = new();
     private int _symbolInOneLine = 0;
     private int _optimumLinesInActivityBloc = 0;
     private int _paddingY = 0;
-    private Bound _boundBlock = new Bound();
+    private Bound _boundBlock = new();
     private string _id = string.Empty;
 
 
@@ -34,7 +34,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
     public string BuildSvg()
     {
         _symbolInOneLine = _boundBlock.Width / PixelOneSymbol;
-        _optimumLinesInActivityBloc = (_boundBlock.Height-_paddingY) / (PixelOneSymbol+LineSpacing);
+        _optimumLinesInActivityBloc = (_boundBlock.Height - _paddingY) / (PixelOneSymbol + LineSpacing);
         var allLines = MergeAllChild(_childElements);
         allLines = RemoveLineBreakEntity(allLines);
         var splitWords = allLines.Split(' ');
@@ -53,7 +53,7 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
         {
             var body = splitWords[i];
             var y = (i * FontSize) + FontSize + _paddingY;
-            var x = (centerBlock - (body.Length / 2.0)) * PixelOneSymbol;
+            var x = (int)((centerBlock - (body.Length / 2.0)) * PixelOneSymbol);
             var hider = $"<tspan id=\"{_id}\" x=\"{x}\" y=\"{y}\">";
             var footer = "</tspan>";
             _svgStorage.Append(hider);
@@ -99,7 +99,6 @@ public class TspanBuilder : IBpmnBuild<TspanBuilder>, ITspan<TspanBuilder>
     /// <returns>Вернет строки.</returns>
     internal string[] SplitLinesFromLongLine(string[] allLines)
     {
-
         if (_symbolInOneLine <= 0)
         {
             throw new ArgumentOutOfRangeException(
