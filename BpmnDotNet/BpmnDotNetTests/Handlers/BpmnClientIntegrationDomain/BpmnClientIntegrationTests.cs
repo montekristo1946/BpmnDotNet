@@ -43,7 +43,7 @@ public class BpmnClientIntegrationTests
     [Fact]
     public async Task StartNewProcess_FullPass_FillContext()
     {
-        _serviceCollection.AutoRegisterHandlersFromAssemblyNamespaceOf(typeof(TestActivity));
+        _serviceCollection.AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(typeof(TestActivity));
         await using var provider = _serviceCollection.BuildServiceProvider();
 
         var handlerTypes = provider.GetServices<IBpmnHandler>().ToArray();
@@ -66,7 +66,7 @@ public class BpmnClientIntegrationTests
     [Fact]
     public async Task AutoRegisterHandlersFromAssemblyNamespaceOf_FullPass_FillContext()
     {
-        _serviceCollection.AutoRegisterHandlersFromAssemblyNamespaceOf(typeof(TestActivity));
+        _serviceCollection.AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(typeof(TestActivity));
         
         await using var provider = _serviceCollection.BuildServiceProvider();
 
@@ -91,7 +91,7 @@ public class BpmnClientIntegrationTests
     [Fact]
     public async Task AutoRegisterHandlersFromAssemblyOf_FullPass_FillContext()
     {
-        _serviceCollection.AutoRegisterHandlersFromAssemblyOf<TestActivity>();
+        _serviceCollection.AutoRegisterBpmnHandlersFromAssemblyOf<TestActivity>();
         
         //  Run service
         await using var provider = _serviceCollection.BuildServiceProvider();
