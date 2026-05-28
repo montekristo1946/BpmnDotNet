@@ -100,4 +100,10 @@
 
 Это собственно стрелочка от блока к блоку.
 
+## Text annotation
+
+Аннотация.<br>
+![plot](./Images/text_annotation.jpg)<br>
+
+
 
