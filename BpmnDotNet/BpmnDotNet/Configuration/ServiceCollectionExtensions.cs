@@ -68,7 +68,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Коллекция сервисов.</param>
     /// <typeparam name="THandler">Тип регистрируемых сервисов.</typeparam>
     /// <returns>IServiceCollection.</returns>
-    public static IServiceCollection AutoRegisterHandlersFromAssemblyOf<THandler>(
+    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyOf<THandler>(
         this IServiceCollection services)
     {
         if (services == null)
@@ -89,7 +89,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Коллекция сервисов.</param>
     /// <param name="handlerType">Type handler.</param>
     /// <returns>IServiceCollection.</returns>
-    public static IServiceCollection AutoRegisterHandlersFromAssemblyNamespaceOf(this IServiceCollection services, Type handlerType)
+    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(this IServiceCollection services, Type handlerType)
     {
         if (services == null)
         {

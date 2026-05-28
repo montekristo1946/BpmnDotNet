@@ -38,7 +38,7 @@ var host = Host.CreateDefaultBuilder()
         services.AddBusinessProcess("./BpmnDiagram");
 
         //Зарегистрирует все Handlers реализующие интерфейс IBpmnHandler
-        services.AutoRegisterHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
+        services.AutoRegisterBpmnHandlersFromAssemblyOf<ServiceTaskFirstHandler>();
 
         //Вспомогательные классы для тестовой консоли.
         services.AddSingleton<Producer>();
