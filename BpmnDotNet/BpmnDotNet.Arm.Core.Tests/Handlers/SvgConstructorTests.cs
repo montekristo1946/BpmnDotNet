@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Numerics;
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.Arm.Core.SvgDomain.Service;
@@ -15,12 +16,14 @@ public class SvgConstructorTests
 {
     private readonly BpmnPlane _string;
     private readonly SvgConstructor _svgConstructor;
+    private readonly IFixture _fixture;
 
     public SvgConstructorTests()
     {
         _svgConstructor = new SvgConstructor();
         var serialization = new XmlSerializationBpmnDiagramSection();
         _string = serialization.LoadXmlBpmnDiagram("./BpmnDiagram/diagram_1.bpmn");
+        _fixture = new Fixture();
     }
 
     [Fact]
@@ -36,7 +39,30 @@ public class SvgConstructorTests
         var normalizedResult = result.TrimEnd();
         Assert.Equal(38774, normalizedResult.Length);
     }
-    
+
+    [Fact]
+    public async Task CreatePlaneAsync_ShouldCallCreateColorShapesAndReturnItsResult()
+    {
+        // Arrange
+        var svgConstructor = Substitute.ForPartsOf<SvgConstructor>();
+        var plane = _fixture
+            .Build<BpmnPlane>()
+            .With(p => p.Shapes, _fixture.CreateMany<BpmnShape>().ToArray )
+            .Create();
+        var statuses = _fixture.CreateMany<NodeJobStatus>().ToArray();
+        var size = _fixture.Create<SizeWindows>();
+        var descriptions = _fixture.CreateMany<DescriptionData>().ToArray();
+
+        svgConstructor.CreateColorShapes(Arg.Any<IBpmnShape[]>(), Arg.Any<NodeJobStatus[]>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<DescriptionData[]>())
+            .Returns("<svg>MOCK</svg>");
+
+        // Act
+        var result = await svgConstructor.CreatePlaneAsync(plane, statuses, size, descriptions);
+
+        // Assert
+        Assert.Equal("<svg>MOCK</svg>", result);
+    }
+
     [Theory]
     [InlineData(100, 10, 50, 1)]
     [InlineData(100, 20, 120, 0.7142857142857143)]
