@@ -21,8 +21,6 @@ internal interface IDescriptionWriteService
 
     /// <summary>
     /// Инициализировать новый инстанс.
-    /// </summary>
-    /// <param name="token">Токен отмены.</param>
-    /// <returns>Task.</returns>
-    Task InitAsync(CancellationToken token = default);
+    /// </summary> >
+    void InitNewInstance();
 }

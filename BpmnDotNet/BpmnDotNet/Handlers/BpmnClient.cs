@@ -92,7 +92,7 @@ internal class BpmnClient : IBpmnClient
         where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlersBpmn);
-        _descriptionWriteService.InitAsync();
+        _descriptionWriteService.InitNewInstance();
 
         foreach (THandler handler in handlersBpmn)
         {
@@ -126,7 +126,8 @@ internal class BpmnClient : IBpmnClient
                 $"[BpmnClient:RegisterHandlers] Registration completed; Handler:{handler.GetType().Name}; TaskDefinitionId: {taskDefinitionId}");
         }
 
-        _descriptionWriteService.CommitAsync();
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        _descriptionWriteService.CommitAsync(cts.Token).Wait(cts.Token);
     }
 
     /// <inheritdoc />
