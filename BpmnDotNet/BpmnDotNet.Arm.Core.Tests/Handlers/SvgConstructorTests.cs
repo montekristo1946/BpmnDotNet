@@ -6,6 +6,8 @@ using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Handlers;
 using AutoFixture;
+using BpmnDotNet.Dto;
+using NSubstitute;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;
 
@@ -657,5 +659,182 @@ public class SvgConstructorTests
 
         // Assert
         Assert.Equal(string.Empty, result);
+    }
+
+    [Fact]
+    public void CreateColorShapes_ShouldComposeSvgFromStubbedChildren()
+    {
+        // Arrange
+        var svgConstructor = Substitute.ForPartsOf<SvgConstructor>();
+        svgConstructor.CalculateScalingViewportCoordinateX(Arg.Any<IBpmnShape[]>(), Arg.Any<int>())
+            .Returns(1.0);
+        svgConstructor.CalculateScalingViewportCoordinateY(Arg.Any<IBpmnShape[]>(), Arg.Any<int>())
+            .Returns(1.0);
+        svgConstructor.GetColor(Arg.Any<string>(), Arg.Any<NodeJobStatus[]>())
+            .Returns("#123456");
+        svgConstructor.CreateServiceTask(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+            .Returns("SERVICE");
+        svgConstructor.AddLabel(Arg.Any<IBpmnShape>(), Arg.Any<string>())
+            .Returns("LABEL");
+
+        var shape = new BpmnShape
+        {
+            Id = "service_1",
+            Type = ElementType.ServiceTask,
+            BpmnLabel = new Bound { X = 10, Y = 5 },
+            BpmnElement = "service_1"
+        };
+
+        var nodeJobStatus = new[]
+        {
+            new NodeJobStatus { IdNode = "service_1", StatusType = StatusType.Pending }
+        };
+
+        // Act
+        var result = svgConstructor.CreateColorShapes(
+            [shape],
+            nodeJobStatus,
+            100,
+            100,
+            Array.Empty<DescriptionData>());
+
+        // Assert
+        Assert.Contains("SERVICE", result);
+        Assert.Contains("LABEL", result);
+    }
+
+    [Theory]
+    [InlineData(ElementType.StartEvent,  "START_EVENT")]
+    [InlineData(ElementType.EndEvent,  "END_EVENT")]
+    [InlineData(ElementType.SequenceFlow,  "SEQUENCE_FLOW")]
+    [InlineData(ElementType.ServiceTask,  "SERVICE_TASK")]
+    [InlineData(ElementType.SendTask, "SEND_TASK")]
+    [InlineData(ElementType.ReceiveTask,  "RECEIVE_TASK")]
+    [InlineData(ElementType.ExclusiveGateway,  "EXCLUSIVE_GATEWAY")]
+    [InlineData(ElementType.ParallelGateway,  "PARALLEL_GATEWAY")]
+    [InlineData(ElementType.SubProcess,  "SUB_PROCESS")]
+    [InlineData(ElementType.Association,  "ASSOCIATION")]
+    [InlineData(ElementType.TextAnnotation,  "TEXT_ANNOTATION")]
+    public void CreateColorShapes_ShouldDispatchToCorrectCreateMethod(
+        ElementType elementType,
+        string expectedChildMarker)
+    {
+        // Arrange
+        var svgConstructor = Substitute.ForPartsOf<SvgConstructor>();
+        svgConstructor.CalculateScalingViewportCoordinateX(Arg.Any<IBpmnShape[]>(), Arg.Any<int>())
+            .Returns(1.0);
+        svgConstructor.CalculateScalingViewportCoordinateY(Arg.Any<IBpmnShape[]>(), Arg.Any<int>())
+            .Returns(1.0);
+        svgConstructor.GetColor(Arg.Any<string>(), Arg.Any<NodeJobStatus[]>())
+            .Returns("#123456");
+        svgConstructor.AddLabel(Arg.Any<IBpmnShape>(), Arg.Any<string>())
+            .Returns("LABEL");
+
+        var shape = CreateShapeForType(elementType, "shape_1");
+        var description = new DescriptionData
+        {
+            TaskDefinitionId = shape.BpmnElement,
+            Description = "Custom title"
+        };
+
+        switch (elementType)
+        {
+            case ElementType.StartEvent:
+            case ElementType.EndEvent:
+                svgConstructor.CreateStartEvent(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.SequenceFlow:
+                svgConstructor.CreateSequenceFlow(Arg.Any<BpmnEdge>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.ServiceTask:
+                svgConstructor.CreateServiceTask(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.SendTask:
+                svgConstructor.CreateSendTask(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.ReceiveTask:
+                svgConstructor.CreateReceiveTask(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.ExclusiveGateway:
+                svgConstructor.CreateExclusiveGateway(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.ParallelGateway:
+                svgConstructor.CreateParallelGateway(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.SubProcess:
+                svgConstructor.CreateSubProcess(Arg.Any<BpmnShape>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.Association:
+                svgConstructor.CreateAssociation(Arg.Any<BpmnEdge>(), Arg.Any<string>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+            case ElementType.TextAnnotation:
+                svgConstructor.CreateTextAnnotation(Arg.Any<BpmnShape>(), Arg.Any<string>())
+                    .Returns(expectedChildMarker);
+                break;
+        }
+
+        var nodeJobStatus = new[]
+        {
+            new NodeJobStatus { IdNode = shape.BpmnElement, StatusType = StatusType.Pending }
+        };
+
+        // Act
+        var result = svgConstructor.CreateColorShapes(
+            new[] { shape },
+            nodeJobStatus,
+            100,
+            100,
+            [description]);
+
+        // Assert
+        Assert.Contains(expectedChildMarker, result);
+        Assert.Contains("LABEL", result);
+
+        
+        
+    }
+
+    private static IBpmnShape CreateShapeForType(ElementType elementType, string elementId)
+    {
+        return elementType switch
+        {
+            ElementType.SequenceFlow => new BpmnEdge
+            {
+                Id = elementId,
+                BpmnElement = elementId,
+                Type = elementType,
+                Waypoints =
+                [
+                    new Waypoint { X = 1, Y = 1 },
+                    new Waypoint { X = 2, Y = 2 }
+                ]
+            },
+            ElementType.Association => new BpmnEdge
+            {
+                Id = elementId,
+                BpmnElement = elementId,
+                Type = elementType,
+                Waypoints =
+                [
+                    new Waypoint { X = 1, Y = 1 },
+                    new Waypoint { X = 2, Y = 2 }
+                ]
+            },
+            _ => new BpmnShape
+            {
+                Id = elementId,
+                BpmnElement = elementId,
+                Type = elementType
+            }
+        };
     }
 }

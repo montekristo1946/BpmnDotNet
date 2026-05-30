@@ -28,6 +28,81 @@ public class SvgConstructor : ISvgConstructor
     }
 
     /// <summary>
+    /// Создаст svg из IBpmnShape.
+    /// </summary>
+    /// <param name="shapes">Shapes.</param>
+    /// <param name="nodeJobStatus">Состояния.</param>
+    /// <param name="widthWindows">Ширина области отрисовки.</param>
+    /// <param name="heightWindows">Высота области отрисовки.</param>
+    /// <param name="descriptions">Всплывающие подсказки.</param>
+    /// <returns>svg.</returns>
+    internal virtual string CreateColorShapes(
+        IBpmnShape[] shapes,
+        NodeJobStatus[] nodeJobStatus,
+        int widthWindows,
+        int heightWindows,
+        DescriptionData[] descriptions)
+    {
+        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
+
+        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
+        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
+        var minScale = Math.Min(scalingX, scalingY);
+
+        var viewportBuilder = IBpmnBuild<ViewportBuilder>
+            .Create()
+            .AddScalingX(minScale)
+            .AddScalingY(minScale);
+
+        const int stokeWidthStart = 2;
+        const int stokeWidthEnd = 4;
+
+        foreach (var shape in shapes)
+        {
+            var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shape.BpmnElement)
+                ?.Description ?? string.Empty;
+            var color = "#22242a";
+            if (nodeJobStatus.Any())
+            {
+                color = GetColor(shape.BpmnElement, nodeJobStatus);
+            }
+
+            var typeShape = shape switch
+            {
+                BpmnShape bpmnShape => bpmnShape.Type,
+                BpmnEdge bpmnEdge => bpmnEdge.Type,
+                _ => throw new InvalidOperationException(
+                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
+            };
+
+            var stringShape = typeShape switch
+            {
+                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
+                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
+                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
+                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
+                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
+                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
+                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
+                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
+                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
+                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
+                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
+                _ => string.Empty,
+            };
+
+            viewportBuilder.AddChild(stringShape);
+            var label = AddLabel(shape, color);
+            viewportBuilder.AddChild(label);
+        }
+
+        var viewportString = viewportBuilder.BuildSvg();
+        svgRootBuilder.AddChild(viewportString);
+        var retStringSvg = svgRootBuilder.BuildSvg();
+        return retStringSvg;
+    }
+
+    /// <summary>
     /// Рассчитать коэффициент масштабирования по оси Х.
     /// </summary>
     /// <param name="shapes">IBpmnShape.</param>
@@ -202,7 +277,8 @@ public class SvgConstructor : ISvgConstructor
     internal virtual string CreateSendTask(BpmnShape shape, string color, string title)
     {
         var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}");
+                               ?? throw new ArgumentOutOfRangeException(
+                                   $"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}");
 
         var tspan = IBpmnBuild<TspanBuilder>
             .Create()
@@ -479,80 +555,5 @@ public class SvgConstructor : ISvgConstructor
             .BuildSvg();
 
         return label;
-    }
-
-    /// <summary>
-    /// Создаст svg из IBpmnShape.
-    /// </summary>
-    /// <param name="shapes">Shapes.</param>
-    /// <param name="nodeJobStatus">Состояния.</param>
-    /// <param name="widthWindows">Ширина области отрисовки.</param>
-    /// <param name="heightWindows">Высота области отрисовки.</param>
-    /// <param name="descriptions">Всплывающие подсказки.</param>
-    /// <returns>svg.</returns>
-    internal string CreateColorShapes(
-        IBpmnShape[] shapes,
-        NodeJobStatus[] nodeJobStatus,
-        int widthWindows,
-        int heightWindows,
-        DescriptionData[] descriptions)
-    {
-        var svgRootBuilder = IBpmnBuild<SvgRootBuilder>.Create();
-
-        var scalingX = CalculateScalingViewportCoordinateX(shapes, widthWindows);
-        var scalingY = CalculateScalingViewportCoordinateY(shapes, heightWindows);
-        var minScale = Math.Min(scalingX, scalingY);
-
-        var viewportBuilder = IBpmnBuild<ViewportBuilder>
-            .Create()
-            .AddScalingX(minScale)
-            .AddScalingY(minScale);
-
-        const int stokeWidthStart = 2;
-        const int stokeWidthEnd = 4;
-
-        foreach (var shape in shapes)
-        {
-            var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shape.BpmnElement)
-                            ?.Description ?? string.Empty;
-            var color = "#22242a";
-            if (nodeJobStatus.Any())
-            {
-                color = GetColor(shape.BpmnElement, nodeJobStatus);
-            }
-
-            var typeShape = shape switch
-            {
-                BpmnShape bpmnShape => bpmnShape.Type,
-                BpmnEdge bpmnEdge => bpmnEdge.Type,
-                _ => throw new InvalidOperationException(
-                    $"Unsupported shape type: {shape.GetType().Name}. Expected BpmnShape or BpmnEdge."),
-            };
-
-            var stringShape = typeShape switch
-            {
-                ElementType.StartEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthStart, title),
-                ElementType.EndEvent => CreateStartEvent((BpmnShape)shape, color, stokeWidthEnd, title),
-                ElementType.SequenceFlow => CreateSequenceFlow((BpmnEdge)shape, color, title),
-                ElementType.ServiceTask => CreateServiceTask((BpmnShape)shape, color, title),
-                ElementType.SendTask => CreateSendTask((BpmnShape)shape, color, title),
-                ElementType.ReceiveTask => CreateReceiveTask((BpmnShape)shape, color, title),
-                ElementType.ExclusiveGateway => CreateExclusiveGateway((BpmnShape)shape, color, title),
-                ElementType.ParallelGateway => CreateParallelGateway((BpmnShape)shape, color, title),
-                ElementType.SubProcess => CreateSubProcess((BpmnShape)shape, color, title),
-                ElementType.Association => CreateAssociation((BpmnEdge)shape, color, title),
-                ElementType.TextAnnotation => CreateTextAnnotation((BpmnShape)shape, color),
-                _ => string.Empty,
-            };
-
-            viewportBuilder.AddChild(stringShape);
-            var label = AddLabel(shape, color);
-            viewportBuilder.AddChild(label);
-        }
-
-        var viewportString = viewportBuilder.BuildSvg();
-        svgRootBuilder.AddChild(viewportString);
-        var retStringSvg = svgRootBuilder.BuildSvg();
-        return retStringSvg;
     }
 }
