@@ -120,12 +120,17 @@ public partial class FilterPanel : ComponentBase
     {
         if (changeEventArgs?.Value == null)
             return;
-
+        
         _filterToken = changeEventArgs.Value.ToString() ?? string.Empty;
     }
 
     private async Task OnclickButtonSearch()
     {
+        IsCheckFilterNone = true;
+        IsCheckFilterWorks = true;
+        IsCheckFilterCompleted = true;
+        IsCheckFilterError = true;
         await SetFilterToken(_filterToken);
+        await UpdatePanel();
     }
 }
