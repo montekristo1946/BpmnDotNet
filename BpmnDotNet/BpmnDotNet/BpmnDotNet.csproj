@@ -21,7 +21,7 @@
         <TrimMode>partial</TrimMode>
 
 
-<!--        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
