@@ -97,6 +97,217 @@ public class SvgConstructor : ISvgConstructor
             : (double)heightWindows / contentHeight;
     }
 
+    /// <summary>
+    /// Создать блок StartEvent.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="stokeWidth">stokeWidth.</param>
+    /// <param name="title">title.</param>
+    /// <returns>StartEvent from svg.</returns>
+    internal string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
+    {
+        var boundCircle = shape.Bounds
+                          ?? throw new ArgumentOutOfRangeException($"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}");
+
+        var radius = boundCircle.Width / 2;
+        var xStart = boundCircle.X;
+        var yStart = boundCircle.Y;
+        var id = shape.Id;
+
+        var startEvent = IBpmnBuild<StartEventBuilder>
+            .Create()
+            .AddId(id)
+            .AddColor(color)
+            .AddRadius(radius)
+            .AddStokeWidth(stokeWidth)
+            .AddPositionOffsets(xStart, yStart)
+            .AddTitle(title)
+            .BuildSvg();
+
+        return startEvent;
+    }
+
+    /// <summary>
+    /// Создать  SequenceFlow.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>SequenceFlow from svg.</returns>
+    internal string CreateSequenceFlow(BpmnEdge shape, string color, string title)
+    {
+        if (shape.Waypoints.Length < 2)
+        {
+            throw new ArgumentException("Shape must have at least 2 bounds");
+        }
+
+        var id = shape.Id;
+        var waypoints = shape.Waypoints;
+
+        var sequenceFlow = IBpmnBuild<SequenceFlowBuilder>
+            .Create()
+            .AddColor(color)
+            .AddWayPoint(waypoints)
+            .AddId(id)
+            .AddTitle(title)
+            .BuildSvg();
+        return sequenceFlow;
+    }
+
+    /// <summary>
+    /// Создать блок ServiceTask.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>SequenceFlow from svg.</returns>
+    internal string CreateServiceTask(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException(
+                                   $"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddPaddingY(20)
+            .AddBoundBlock(shape.Bounds)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<ServiceTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return task;
+    }
+
+    /// <summary>
+    /// Создать блок SendTask.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>SendTask from svg.</returns>
+    internal string CreateSendTask(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddPaddingY(20)
+            .AddBoundBlock(shape.Bounds)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<SendTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return task;
+    }
+
+    /// <summary>
+    /// Создать блок ReceiveTask.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>ReceiveTask from svg.</returns>
+    internal string CreateReceiveTask(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddPaddingY(20)
+            .AddBoundBlock(shape.Bounds)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<ReceiveTaskBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return task;
+    }
+
+    /// <summary>
+    /// Создать блок ExclusiveGateway.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>ExclusiveGateway from svg.</returns>
+    internal string CreateExclusiveGateway(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var gateway = IBpmnBuild<ExlusiveGatewayBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return gateway;
+    }
+
+    /// <summary>
+    /// Создать блок ParallelGateway.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>ParallelGateway from svg.</returns>
+    internal string CreateParallelGateway(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var gateway = IBpmnBuild<ParallelGatewayBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return gateway;
+    }
+
     private string CreateColorShapes(
         IBpmnShape[] shapes,
         NodeJobStatus[] nodeJobStatus,
@@ -265,123 +476,6 @@ public class SvgConstructor : ISvgConstructor
         return task;
     }
 
-    private string CreateParallelGateway(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var gateway = IBpmnBuild<ParallelGatewayBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return gateway;
-    }
-
-    private string CreateExclusiveGateway(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var gateway = IBpmnBuild<ExlusiveGatewayBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return gateway;
-    }
-
-    private string CreateReceiveTask(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddChild(shape.Name)
-            .AddPaddingY(20)
-            .AddBoundBlock(shape.Bounds)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<ReceiveTaskBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return task;
-    }
-
-    private string CreateSendTask(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddChild(shape.Name)
-            .AddPaddingY(20)
-            .AddBoundBlock(shape.Bounds)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<SendTaskBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return task;
-    }
-
-    private string CreateServiceTask(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddChild(shape.Name)
-            .AddPaddingY(20)
-            .AddBoundBlock(shape.Bounds)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<ServiceTaskBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return task;
-    }
-
     private string AddLabel(IBpmnShape shape, string color)
     {
         var labelShape = shape switch
@@ -425,48 +519,5 @@ public class SvgConstructor : ISvgConstructor
             .BuildSvg();
 
         return label;
-    }
-
-    private string CreateSequenceFlow(BpmnEdge shape, string color, string title)
-    {
-        if (shape.Waypoints.Length < 2)
-        {
-            throw new ArgumentException("Shape must have at least 2 bounds");
-        }
-
-        var id = shape.Id;
-        var waypoints = shape.Waypoints;
-
-        var sequenceFlow = IBpmnBuild<SequenceFlowBuilder>
-            .Create()
-            .AddColor(color)
-            .AddWayPoint(waypoints)
-            .AddId(id)
-            .AddTitle(title)
-            .BuildSvg();
-        return sequenceFlow;
-    }
-
-    private string CreateStartEvent(BpmnShape shape, string color, int stokeWidth, string title)
-    {
-        var boundCircle = shape.Bounds
-                          ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var radius = boundCircle.Width / 2;
-        var xStart = boundCircle.X;
-        var yStart = boundCircle.Y;
-        var id = shape.Id;
-
-        var startEvent = IBpmnBuild<StartEventBuilder>
-            .Create()
-            .AddId(id)
-            .AddColor(color)
-            .AddRadius(radius)
-            .AddStokeWidth(stokeWidth)
-            .AddPositionOffsets(xStart, yStart)
-            .AddTitle(title)
-            .BuildSvg();
-
-        return startEvent;
     }
 }

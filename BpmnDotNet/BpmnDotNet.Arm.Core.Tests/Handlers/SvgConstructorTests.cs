@@ -5,6 +5,7 @@ using BpmnDotNet.Arm.Core.SvgDomain.Service;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Handlers;
+using AutoFixture;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;
 
@@ -160,5 +161,268 @@ public class SvgConstructorTests
 
         // Assert
         Assert.Equal(expected, result, 10);
+    }
+
+    [Fact]
+    public void CreateStartEvent_ShouldReturn_SvgWithCorrectAttributes()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "start_1",
+            Bounds = new Bound { X = 10, Y = 20, Width = 40, Height = 40 }
+        };
+
+        var color = "#123456";
+        var strokeWidth = 3;
+        var title = "Start title";
+
+        // Act
+        var result = _svgConstructor.CreateStartEvent(shape, color, strokeWidth, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"start_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("transform=\"matrix(1 0 0 1 10 20)\"", result);
+
+        var expectedRadius = shape.Bounds.Width / 2;
+        Assert.Contains($"cx=\"{expectedRadius}\"", result);
+        Assert.Contains($"cy=\"{expectedRadius}\"", result);
+        Assert.Contains($"r=\"{expectedRadius}\"", result);
+        Assert.Contains($"stroke: {color}", result);
+        Assert.Contains($"stroke-width: {strokeWidth}px", result);
+    }
+
+    [Fact]
+    public void CreateStartEvent_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "start_null",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateStartEvent(shape, "#000000", 1, "title"));
+    }
+
+    [Fact]
+    public void CreateSequenceFlow_ShouldReturn_SvgWithPathAndMarker()
+    {
+        // Arrange
+        var edge = new BpmnEdge
+        {
+            Id = "edge_1",
+            Waypoints =
+            [
+                new Waypoint { X = 10, Y = 20 },
+                new Waypoint { X = 30, Y = 40 }
+            ],
+            Name = "flow name"
+        };
+
+        var color = "#abcdef";
+        var title = "Edge title";
+
+        // Act
+        var result = _svgConstructor.CreateSequenceFlow(edge, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"edge_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<defs>", result);
+        Assert.Contains("marker", result);
+        Assert.Contains($"stroke: {color}", result);
+        // path d should contain the two points in order
+        Assert.Contains("M10,20L30,40L", result.Replace("\r", string.Empty));
+    }
+
+    [Fact]
+    public void CreateSequenceFlow_ShouldThrow_WhenWaypointsLessThanTwo()
+    {
+        // Arrange
+        var edge = new BpmnEdge
+        {
+            Id = "edge_bad",
+            Waypoints = [new Waypoint { X = 1, Y = 2 }]
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _svgConstructor.CreateSequenceFlow(edge, "#000", "t"));
+    }
+
+    [Fact]
+    public void CreateServiceTask_ShouldReturn_SvgUsingFixtureCreatedDto()
+    {
+        // Arrange
+        var fixture = new Fixture();
+        var bounds = new Bound { X = 5, Y = 6, Width = 100, Height = 60 };
+
+        var shape = fixture.Build<BpmnShape>()
+            .With(s => s.Bounds, bounds)
+            .With(s => s.Id, "svc_1")
+            .With(s => s.Name, "ServiceName")
+            .Create();
+
+        var color = "#00ff00";
+        var title = "Service Title";
+
+        // Act
+        var result = _svgConstructor.CreateServiceTask(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"svc_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<rect", result);
+        Assert.Contains("stroke: ", result);
+        Assert.Contains(shape.Name, result);
+    }
+    
+    
+    [Fact]
+    public void CreateServiceTask_ShouldThrow_ArgumentOutOfRangeExceptionWithParamName()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "svc_null",
+            Bounds = null
+        };
+
+        // Act
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateServiceTask(shape, "#000000", "title"));
+
+        // Assert
+        var expectedParamName = $"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}";
+        Assert.Equal(expectedParamName, ex.ParamName);
+    }
+
+    [Fact]
+    public void CreateSendTask_ShouldReturn_SvgWithEnvelopePath()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "send_1",
+            Name = "SendName",
+            Bounds = new Bound { X = 12, Y = 34, Width = 80, Height = 50 }
+        };
+
+        var color = "#ff8800";
+        var title = "Send Title";
+
+        // Act
+        var result = _svgConstructor.CreateSendTask(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"send_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<rect", result);
+        Assert.Contains("<path d=\"m 5.984999999999999,4.997999999999999 l 0,14 l 21,0 l 0,-14 z l 10.5,6 l 10.5,-6\"", result);
+        Assert.Contains("fill: #ff8800", result);
+        Assert.Contains(shape.Name, result);
+    }
+
+    [Fact]
+    public void CreateSendTask_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "send_null",
+            Bounds = null
+        };
+
+        // Act
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateSendTask(shape, "#000000", "title"));
+
+        // Assert
+        var expectedParamName = $"{shape.Id}:{nameof(shape.Bounds)}, {shape.Id}";
+        Assert.Equal(expectedParamName, ex.ParamName);
+    }
+
+    [Fact]
+    public void CreateExclusiveGateway_ShouldReturn_SvgWithDiamondAndInnerBody()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "exclusive_1",
+            Bounds = new Bound { X = 7, Y = 9, Width = 50, Height = 50 }
+        };
+
+        var color = "#8822cc";
+        var title = "Exclusive Title";
+
+        // Act
+        var result = _svgConstructor.CreateExclusiveGateway(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"exclusive_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<polygon points=\"25,0 50,25 25,50 0,25\"", result);
+        Assert.Contains($"fill: white; fill-opacity: 0.95;", result);
+        Assert.Contains($"stroke: {color}; stroke-width: 2px;", result);
+        Assert.Contains($"fill: {color}; stroke-linecap: round; stroke-linejoin: round; stroke: #8822cc; stroke-width: 1px", result);
+    }
+
+    [Fact]
+    public void CreateExclusiveGateway_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "exclusive_null",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateExclusiveGateway(shape, "#000000", "title"));
+    }
+
+    [Fact]
+    public void CreateReceiveTask_ShouldReturn_SvgWithEnvelopePath()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "receive_1",
+            Name = "ReceiveName",
+            Bounds = new Bound { X = 23, Y = 45, Width = 90, Height = 55 }
+        };
+
+        var color = "#00aaff";
+        var title = "Receive Title";
+
+        // Act
+        var result = _svgConstructor.CreateReceiveTask(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"receive_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<rect", result);
+        Assert.Contains("<path d=\"m 6.3,5.6000000000000005 l 0,12.6 l 18.900000000000002,0 l 0,-12.6 z l 9.450000000000001,5.4 l 9.450000000000001,-5.4\"", result);
+        Assert.Contains($"stroke: {color}", result);
+        Assert.Contains(shape.Name, result);
+    }
+
+    [Fact]
+    public void CreateReceiveTask_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "receive_null",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateReceiveTask(shape, "#000000", "title"));
     }
 }
