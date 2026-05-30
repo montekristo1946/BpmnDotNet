@@ -45,7 +45,11 @@ internal class BusinessProcess : IBusinessProcess
 
     private readonly IPathFinder _pathFinder;
     private readonly long _dateFromInitInstance;
-    private volatile bool _idDispose;
+    private int _disposed;
+    private Task _threadBackground = null!;
+    private BusinessProcessJobStatus _jobStatus = null!;
+    private int _isStarted;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusinessProcess"/> class.
@@ -76,25 +80,36 @@ internal class BusinessProcess : IBusinessProcess
 
         _cts = new CancellationTokenSource(timeout);
         _dateFromInitInstance = DateTime.Now.Ticks;
-        var task = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
-        JobStatus = new BusinessProcessJobStatus
-        {
-            StatusType = StatusType.Works,
-            IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
-            TokenProcess = contextBpmnProcess.TokenProcess,
-            ProcessTask = task,
-            Process = this,
-        };
     }
 
     /// <inheritdoc/>
-    public BusinessProcessJobStatus JobStatus { get; }
+    public BusinessProcessJobStatus StartBusinessProcess()
+    {
+        if (Interlocked.Exchange(ref _isStarted, 1) == 1)
+        {
+            throw new InvalidOperationException(
+                $"[BusinessProcess:StartBusinessProcess] Business process is already started " +
+                $"{_jobStatus.IdBpmnProcess}:{_jobStatus.TokenProcess}");
+        }
+
+        _threadBackground = Task.Run(() => ThreadBackground(_cts.Token), _cts.Token);
+        _jobStatus = new BusinessProcessJobStatus
+        {
+            StatusType = StatusType.Works,
+            IdBpmnProcess = _contextBpmnProcess.IdBpmnProcess,
+            TokenProcess = _contextBpmnProcess.TokenProcess,
+            ProcessTask = _threadBackground,
+            Process = this,
+        };
+        return _jobStatus;
+    }
 
     /// <inheritdoc/>
     public bool AddMessageToQueue(Type messageType, object message)
     {
         ArgumentNullException.ThrowIfNull(messageType);
         ArgumentNullException.ThrowIfNull(message);
+
         try
         {
             _messagesStore.AddOrUpdate(
@@ -114,13 +129,28 @@ internal class BusinessProcess : IBusinessProcess
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (_idDispose)
+        if (Interlocked.Exchange(ref _disposed, 1) == 1)
         {
             return;
         }
 
-        _cts.Dispose();
-        _idDispose = true;
+        _cts?.Cancel();
+
+        try
+        {
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            _threadBackground.Wait(timeoutCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger?.LogWarning("Background task did not complete within timeout during async disposal");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error during async background task completion");
+        }
+
+        _cts?.Dispose();
     }
 
     /// <inheritdoc/>
@@ -168,29 +198,29 @@ internal class BusinessProcess : IBusinessProcess
         catch (OperationCanceledException)
         {
             _logger.LogDebug(
-                "Command Stop. Business process is stopped. IdBpmnProcess: {IdBpmnProcess} TokenProcess:{TokenProcess}",
+                "[BusinessProcess:ThreadBackground] Command Stop. Business process is stopped. IdBpmnProcess: {IdBpmnProcess} TokenProcess:{TokenProcess}",
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            _logger.LogError(e, "[BusinessProcess:ThreadBackground] Message:{Message}", e.Message);
+            _jobStatus?.StatusType = StatusType.Failed;
+            ErrorsRegistryUpdate("MainThreadBackground", e.Message);
 
-            await _historyNodeStateWriter.SetStateProcessAsync(
+            await _historyNodeStateWriter.SetStateProcessWithManualProcessStatus(
                 _contextBpmnProcess.IdBpmnProcess,
                 _contextBpmnProcess.TokenProcess,
                 _nodeStateRegistry.Values.ToArray(),
                 _errorsRegistry.Values.ToArray(),
-                true,
-                _dateFromInitInstance);
-
-            JobStatus.StatusType = StatusType.Failed;
+                _dateFromInitInstance,
+                ProcessStatus.Error);
         }
 
-        JobStatus.StatusType = JobStatus.StatusType != StatusType.Failed ? StatusType.Completed : StatusType.Failed;
+        _jobStatus?.StatusType = _jobStatus?.StatusType != StatusType.Failed ? StatusType.Completed : StatusType.Failed;
 
         _logger.LogDebug(
-            "[ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
+            "[BusinessProcess:ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
             _contextBpmnProcess.TokenProcess);
     }
@@ -234,15 +264,15 @@ internal class BusinessProcess : IBusinessProcess
         }
 
         var messageReceiveTask = context as IMessageReceiveTask;
+        var dic = messageReceiveTask?.ReceivedMessage;
 
-        if (messageReceiveTask is null)
+        if (dic is null)
         {
             throw new InvalidOperationException(
-                $"[AddMessageInContext] Fail Get context IMessageReceiveTask Dictionary, " +
-                $"From node {typeMessage} {context.IdBpmnProcess} {context.TokenProcess}");
+                $"[AddMessageInContext] Fail get context IMessageReceiveTask dictionary, " +
+                $"from type message:{typeMessage}; IdBpmnProcess:{context.IdBpmnProcess}; TokenProcess:{context.TokenProcess}");
         }
 
-        var dic = messageReceiveTask.ReceivedMessage;
         var resSet = dic.TryAdd(typeMessage, message);
 
         if (!resSet)
@@ -258,16 +288,17 @@ internal class BusinessProcess : IBusinessProcess
     {
         var messageReceiveTask = context as IMessageReceiveTask;
 
-        if (messageReceiveTask is null)
+        var dic = messageReceiveTask?.RegistrationMessagesType;
+
+        if (dic is null)
         {
             NodeRegistryChangeState(nodeIdElement, StatusType.Failed);
-            var textMessage = $"[GetTypeMessage] Fail Get context IMessageReceiveTask Dictionary, " +
-                              $"From node {nodeIdElement} {context.IdBpmnProcess} {context.TokenProcess}";
+            var textMessage =
+                $"[GetTypeMessage] For node {nodeIdElement}  Fail Get context IMessageReceiveTask Dictionary is null; " +
+                $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}";
             ErrorsRegistryUpdate(nodeIdElement, textMessage);
             throw new InvalidOperationException(textMessage);
         }
-
-        var dic = messageReceiveTask.RegistrationMessagesType;
 
         var resGet = dic.TryGetValue(nodeIdElement, out var typeName);
 
@@ -344,12 +375,12 @@ internal class BusinessProcess : IBusinessProcess
         {
             _logger.LogError(
                 ex,
-                $"{ex.Message} {nodeId}, {_contextBpmnProcess.IdBpmnProcess}, {_contextBpmnProcess.TokenProcess}");
+                $"Message:{ex.Message}; nodeId:{nodeId}; IdBpmnProcess:{_contextBpmnProcess.IdBpmnProcess}; TokenProcess:{_contextBpmnProcess.TokenProcess};");
             NodeRegistryChangeState(nodeId, StatusType.Failed);
 
             ErrorsRegistryUpdate(nodeId, ex.Message);
             isForcedTermination = true;
-            JobStatus.StatusType = StatusType.Failed;
+            _jobStatus.StatusType = StatusType.Failed;
         }
         finally
         {

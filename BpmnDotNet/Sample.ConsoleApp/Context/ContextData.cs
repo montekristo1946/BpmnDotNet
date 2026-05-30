@@ -4,7 +4,7 @@ using Sample.ConsoleApp.Common;
 
 namespace Sample.ConsoleApp.Context;
 
-internal class ContextData : IContextBpmnProcess, IExclusiveGateWayRoute, IMessageReceiveTask
+internal class ContextData : IContextBpmnProcess
 {
     
     public string IdBpmnProcess { get; init; } = Constants.IdBpmnProcessingMain;

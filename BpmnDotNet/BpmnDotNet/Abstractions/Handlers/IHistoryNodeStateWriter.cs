@@ -24,4 +24,22 @@ internal interface IHistoryNodeStateWriter
         string[] arrayMessageErrors,
         bool isCompleted,
         long dateFromInitInstance);
+
+    /// <summary>
+    /// Записать данные с принудительной установкой статуса процесса.
+    /// </summary>
+    /// <param name="idBpmnProcess">ID процесса.</param>
+    /// <param name="tokenProcess">Токен.</param>
+    /// <param name="nodeStateRegistry">Состояние нод.</param>
+    /// <param name="arrayMessageErrors">Массив с текстом ошибок.</param>
+    /// <param name="dateFromInitInstance">Временная метка создания отчета.</param>
+    /// <param name="processStatus">Статус процесса.</param>
+    /// <returns> <see cref="Task"/> representing the asynchronous operation.</returns>
+    Task SetStateProcessWithManualProcessStatus(
+        string idBpmnProcess,
+        string tokenProcess,
+        NodeJobStatus[] nodeStateRegistry,
+        string[] arrayMessageErrors,
+        long dateFromInitInstance,
+        ProcessStatus processStatus);
 }

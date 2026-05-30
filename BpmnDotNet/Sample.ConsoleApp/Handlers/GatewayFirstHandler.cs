@@ -28,8 +28,8 @@ internal class GatewayFirstHandler : IBpmnHandler
         if (conditionRoute is null)
             throw new OperationCanceledException("Fail try Add key ConditionRoute");
 
-        conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SendTaskFirstHandler");
-        // conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_ReceiveTaskFirstHandle");
+        // conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_SendTaskFirstHandler");
+        conditionRoute.ConditionRoute.TryAdd(nameof(GatewayFirstHandler), "Flow_in_ReceiveTaskFirstHandle");
         
         await Task.Delay(1, ctsToken);
     }

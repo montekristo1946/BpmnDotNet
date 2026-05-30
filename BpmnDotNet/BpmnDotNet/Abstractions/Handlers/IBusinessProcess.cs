@@ -8,9 +8,10 @@ using BpmnDotNet.Dto;
 internal interface IBusinessProcess : IDisposable
 {
     /// <summary>
-    ///     Gets получить статус процесса.
+    /// Запустить бизнес процесс.
     /// </summary>
-    public BusinessProcessJobStatus JobStatus { get; }
+    /// <returns>BusinessProcessJobStatus.</returns>
+    public BusinessProcessJobStatus StartBusinessProcess();
 
     /// <summary>
     ///     Добавить сообщение в очередь.

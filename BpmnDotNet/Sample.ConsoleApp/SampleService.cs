@@ -27,7 +27,10 @@ internal class SampleService
             IdBpmnProcess = Constants.IdBpmnProcessingMain,
             TokenProcess = tokenProcess,
             TestValue = 25,
-            TestValue2 = "Call from StartNewProcess"
+            TestValue2 = "Call from StartNewProcess",
+            RegistrationMessagesType = new(),
+            ConditionRoute = new(),
+            ReceivedMessage = new(),
         };
 
         //Регистрируем сообщение которое нужно ожидать.
@@ -51,7 +54,7 @@ internal class SampleService
         var tasks = new List<Task>();
         var startID = 1;
 
-        var totalCount = 10;
+        var totalCount = 1;
         var batchSize = 1;
         var sw = new Stopwatch();
         sw.Restart();
