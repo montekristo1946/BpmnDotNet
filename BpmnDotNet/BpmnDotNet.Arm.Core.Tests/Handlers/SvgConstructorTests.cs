@@ -228,7 +228,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "start_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert
@@ -316,7 +316,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "svc_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act
@@ -361,7 +361,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "send_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act
@@ -405,7 +405,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "exclusive_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert
@@ -445,7 +445,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "parallel_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert
@@ -487,7 +487,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "subprocess_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert
@@ -528,7 +528,7 @@ public class SvgConstructorTests
         var shape = new BpmnShape
         {
             Id = "receive_null",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert
@@ -613,7 +613,7 @@ public class SvgConstructorTests
         {
             Id = "text_null",
             BpmnText = "Annotation text",
-            Bounds = null
+            Bounds = null!
         };
 
         // Act & Assert

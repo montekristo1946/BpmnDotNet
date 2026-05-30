@@ -50,7 +50,6 @@ internal class BusinessProcess : IBusinessProcess
     private BusinessProcessJobStatus _jobStatus = null!;
     private int _isStarted;
 
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BusinessProcess"/> class.
     /// </summary>
