@@ -308,6 +308,101 @@ public class SvgConstructor : ISvgConstructor
         return gateway;
     }
 
+    /// <summary>
+    /// Создать блок SubProcess.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>SubProcess from svg.</returns>
+    internal string CreateSubProcess(BpmnShape shape, string color, string title)
+    {
+        var boundServiceTask = shape.Bounds
+                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanBuilder>
+            .Create()
+            .AddChild(shape.Name)
+            .AddPaddingY(25)
+            .AddBoundBlock(shape.Bounds)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<SubProcessBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
+            .AddTitle(title)
+            .BuildSvg();
+        return task;
+    }
+
+    /// <summary>
+    /// Создать блок Association.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <param name="title">title.</param>
+    /// <returns>SubProcess from svg.</returns>
+    internal string CreateAssociation(BpmnEdge shape, string color, string title)
+    {
+        if (shape.Waypoints.Length < 2)
+        {
+            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
+        }
+
+        var id = shape.Id;
+        var waypoints = shape.Waypoints;
+
+        var association = IBpmnBuild<AssociationBuilder>
+            .Create()
+            .AddWayPoint(waypoints)
+            .AddColor(color)
+            .AddId(id)
+            .BuildSvg();
+        return association;
+    }
+
+    /// <summary>
+    /// Создать блок TextAnnotation.
+    /// </summary>
+    /// <param name="shape">BpmnShape.</param>
+    /// <param name="color">color.</param>
+    /// <returns>TextAnnotation from svg.</returns>
+    internal string CreateTextAnnotation(BpmnShape shape, string color)
+    {
+        var bound = shape.Bounds
+                    ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
+
+        var tspan = IBpmnBuild<TspanAnnotationBuilder>
+            .Create()
+            .AddChild(shape.BpmnText)
+            .AddWidthBlock(shape.Bounds.Width)
+            .BuildSvg();
+
+        var textBuilder = IBpmnBuild<TextBuilder>
+            .Create()
+            .AddChild(tspan)
+            .AddColor(color)
+            .BuildSvg();
+
+        var task = IBpmnBuild<TextAnnotationBuilder>
+            .Create()
+            .AddColor(color)
+            .AddId(shape.Id)
+            .AddChild(textBuilder)
+            .AddBounds(bound)
+            .BuildSvg();
+        return task;
+    }
+
     private string CreateColorShapes(
         IBpmnShape[] shapes,
         NodeJobStatus[] nodeJobStatus,
@@ -373,52 +468,6 @@ public class SvgConstructor : ISvgConstructor
         return retStringSvg;
     }
 
-    private string CreateTextAnnotation(BpmnShape shape, string color)
-    {
-        var bound = shape.Bounds
-                    ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanAnnotationBuilder>
-            .Create()
-            .AddChild(shape.BpmnText)
-            .AddWidthBlock(shape.Bounds.Width)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<TextAnnotationBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddBounds(bound)
-            .BuildSvg();
-        return task;
-    }
-
-    private string CreateAssociation(BpmnEdge shape, string color, string title)
-    {
-        if (shape.Waypoints.Length < 2)
-        {
-            throw new ArgumentException("[SvgConstructor:CreateAssociation] Shape must have at least 2 bounds");
-        }
-
-        var id = shape.Id;
-        var waypoints = shape.Waypoints;
-
-        var association = IBpmnBuild<AssociationBuilder>
-            .Create()
-            .AddWayPoint(waypoints)
-            .AddColor(color)
-            .AddId(id)
-            .BuildSvg();
-        return association;
-    }
-
     private string GetTitle(string shapeBpmnElement, DescriptionData[] descriptions)
     {
         var title = descriptions.FirstOrDefault(p => p.TaskDefinitionId == shapeBpmnElement)?.Description ??
@@ -445,35 +494,6 @@ public class SvgConstructor : ISvgConstructor
             StatusType.WaitingReceivedMessage => running,
             _ => throw new ArgumentOutOfRangeException(),
         };
-    }
-
-    private string CreateSubProcess(BpmnShape shape, string color, string titleText)
-    {
-        var boundServiceTask = shape.Bounds
-                               ?? throw new ArgumentOutOfRangeException($"{nameof(shape.Bounds)}, {shape.Id}");
-
-        var tspan = IBpmnBuild<TspanBuilder>
-            .Create()
-            .AddChild(shape.Name)
-            .AddPaddingY(25)
-            .AddBoundBlock(shape.Bounds)
-            .BuildSvg();
-
-        var textBuilder = IBpmnBuild<TextBuilder>
-            .Create()
-            .AddChild(tspan)
-            .AddColor(color)
-            .BuildSvg();
-
-        var task = IBpmnBuild<SubProcessBuilder>
-            .Create()
-            .AddColor(color)
-            .AddId(shape.Id)
-            .AddChild(textBuilder)
-            .AddPositionOffsets(boundServiceTask.X, boundServiceTask.Y)
-            .AddTitle(titleText)
-            .BuildSvg();
-        return task;
     }
 
     private string AddLabel(IBpmnShape shape, string color)

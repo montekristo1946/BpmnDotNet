@@ -386,6 +386,88 @@ public class SvgConstructorTests
     }
 
     [Fact]
+    public void CreateParallelGateway_ShouldReturn_SvgWithDiamondAndParallelBody()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "parallel_1",
+            Bounds = new Bound { X = 11, Y = 13, Width = 60, Height = 60 }
+        };
+
+        var color = "#338855";
+        var title = "Parallel Title";
+
+        // Act
+        var result = _svgConstructor.CreateParallelGateway(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"parallel_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<polygon points=\"25,0 50,25 25,50 0,25\"", result);
+        Assert.Contains($"style=\"stroke-linecap: round; stroke-linejoin: round; stroke: {color}; stroke-width: 2px; fill: white; fill-opacity: 0.95;\"", result);
+        Assert.Contains("<path d=\"m 23,10 0,12.5 -12.5,0 0,5 12.5,0 0,12.5 5,0 0,-12.5 12.5,0 0,-5 -12.5,0 0,-12.5 -5,0 z\"", result);
+        Assert.Contains($"fill: {color}; stroke-linecap: round; stroke-linejoin: round; stroke: {color}; stroke-width: 1px;\"", result);
+    }
+
+    [Fact]
+    public void CreateParallelGateway_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "parallel_null",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateParallelGateway(shape, "#000000", "title"));
+    }
+
+    [Fact]
+    public void CreateSubProcess_ShouldReturn_SvgWithInnerSquareAndPath()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "subprocess_1",
+            Name = "SubprocessName",
+            Bounds = new Bound { X = 15, Y = 25, Width = 120, Height = 80 }
+        };
+
+        var color = "#4477cc";
+        var title = "Subprocess Title";
+
+        // Act
+        var result = _svgConstructor.CreateSubProcess(shape, color, title);
+
+        // Assert
+        Assert.Contains("data-element-id=\"subprocess_1\"", result);
+        Assert.Contains($"<title>{title}</title>", result);
+        Assert.Contains("<rect", result);
+        Assert.Contains("<rect x=\"0\" y=\"0\" width=\"14\" height=\"14\"", result);
+        Assert.Contains("data-marker=\"sub-process\"", result);
+        Assert.Contains($"stroke: {color}; stroke-width: 2px;", result);
+        Assert.Contains(shape.Name, result);
+    }
+
+    [Fact]
+    public void CreateSubProcess_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "subprocess_null",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateSubProcess(shape, "#000000", "title"));
+    }
+
+    [Fact]
     public void CreateReceiveTask_ShouldReturn_SvgWithEnvelopePath()
     {
         // Arrange
@@ -424,5 +506,90 @@ public class SvgConstructorTests
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             _svgConstructor.CreateReceiveTask(shape, "#000000", "title"));
+    }
+
+    [Fact]
+    public void CreateAssociation_ShouldReturn_SvgWithDashedPath()
+    {
+        // Arrange
+        var edge = new BpmnEdge
+        {
+            Id = "assoc_1",
+            Name = "AssociationName",
+            Waypoints =
+            [
+                new Waypoint { X = 5, Y = 5 },
+                new Waypoint { X = 20, Y = 20 }
+            ]
+        };
+
+        var color = "#551199";
+
+        // Act
+        var result = _svgConstructor.CreateAssociation(edge, color, "unused title");
+
+        // Assert
+        Assert.Contains("data-element-id=\"assoc_1\"", result);
+        Assert.Contains("<path", result);
+        Assert.Contains($"stroke: {color}; stroke-width: 1px; stroke-dasharray: 1,5;", result);
+        Assert.Contains("marker-end", result);
+        Assert.Contains("M5,5L20,20L", result);
+    }
+
+    [Fact]
+    public void CreateAssociation_ShouldThrow_WhenWaypointsLessThanTwo()
+    {
+        // Arrange
+        var edge = new BpmnEdge
+        {
+            Id = "assoc_bad",
+            Waypoints =
+            [
+                new Waypoint { X = 1, Y = 2 }
+            ]
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _svgConstructor.CreateAssociation(edge, "#000000", "title"));
+    }
+
+    [Fact]
+    public void CreateTextAnnotation_ShouldReturn_SvgWithPathAndText()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "text_1",
+            BpmnText = "Annotation text",
+            Bounds = new Bound { X = 8, Y = 12, Width = 120, Height = 50 }
+        };
+
+        var color = "#aa2233";
+
+        // Act
+        var result = _svgConstructor.CreateTextAnnotation(shape, color);
+
+        // Assert
+        Assert.Contains("data-element-id=\"text_1\"", result);
+        Assert.Contains("transform=\"matrix(1 0 0 1 8 12)\"", result);
+        Assert.Contains("marker-end=\"url(#", result);
+        Assert.Contains($"stroke=\"{color}\"", result);
+        Assert.Contains(shape.BpmnText, result);
+    }
+
+    [Fact]
+    public void CreateTextAnnotation_ShouldThrow_WhenBoundsIsNull()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "text_null",
+            BpmnText = "Annotation text",
+            Bounds = null
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _svgConstructor.CreateTextAnnotation(shape, "#000000"));
     }
 }
