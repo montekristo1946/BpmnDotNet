@@ -592,4 +592,70 @@ public class SvgConstructorTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             _svgConstructor.CreateTextAnnotation(shape, "#000000"));
     }
+
+    [Theory]
+    [InlineData(BpmnDotNet.Dto.StatusType.None, "#22242a")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Pending, "#19aee8")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Works, "#19aee8")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Completed, "#319940")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Failed, "#f34848")]
+    [InlineData(BpmnDotNet.Dto.StatusType.WaitingCompletedWays, "#19aee8")]
+    [InlineData(BpmnDotNet.Dto.StatusType.WaitingReceivedMessage, "#19aee8")]
+    public void GetColor_ShouldReturn_ExpectedColorForStatus(BpmnDotNet.Dto.StatusType statusType, string expectedColor)
+    {
+        // Arrange
+        var statuses = new[]
+        {
+            new Dto.NodeJobStatus
+            {
+                IdNode = "task_1",
+                StatusType = statusType
+            }
+        };
+
+        // Act
+        var result = _svgConstructor.GetColor("task_1", statuses);
+
+        // Assert
+        Assert.Equal(expectedColor, result);
+    }
+
+    [Fact]
+    public void AddLabel_ShouldReturn_LabelSvg_WhenCoordinatesAreValid()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "label_1",
+            Name = "LabelName",
+            BpmnLabel = new Bound { X = 10, Y = 20, Width = 100, Height = 20 }
+        };
+
+        // Act
+        var result = _svgConstructor.AddLabel(shape, "#112233");
+
+        // Assert
+        Assert.Contains("data-element-id=\"Label_label_1\"", result);
+        Assert.Contains("transform=\"matrix(1 0 0 1 10 20)\"", result);
+        Assert.Contains("<text", result);
+        Assert.Contains("LabelName", result);
+    }
+
+    [Fact]
+    public void AddLabel_ShouldReturn_EmptyString_WhenLabelCoordinatesAreNegative()
+    {
+        // Arrange
+        var shape = new BpmnShape
+        {
+            Id = "label_negative",
+            Name = "LabelName",
+            BpmnLabel = new Bound { X = -1, Y = -1, Width = 100, Height = 20 }
+        };
+
+        // Act
+        var result = _svgConstructor.AddLabel(shape, "#112233");
+
+        // Assert
+        Assert.Equal(string.Empty, result);
+    }
 }
