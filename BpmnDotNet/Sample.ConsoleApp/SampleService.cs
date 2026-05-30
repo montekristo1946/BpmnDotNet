@@ -27,7 +27,10 @@ internal class SampleService
             IdBpmnProcess = Constants.IdBpmnProcessingMain,
             TokenProcess = tokenProcess,
             TestValue = 25,
-            TestValue2 = "Call from StartNewProcess"
+            TestValue2 = "Call from StartNewProcess",
+            RegistrationMessagesType = new(),
+            ConditionRoute = new(),
+            ReceivedMessage = new(),
         };
 
         //Регистрируем сообщение которое нужно ожидать.
@@ -48,34 +51,11 @@ internal class SampleService
 
     public void StartNewProcess(DateTime dataTimeProcess)
     {
-        var tasks = new List<Task>();
-        var startID = 1;
-
-        var totalCount = 10;
-        var batchSize = 1;
-        var sw = new Stopwatch();
-        sw.Restart();
-        for (int i = 0; i < totalCount; i += batchSize)
-        {
-            var currentBatchSize = Math.Min(batchSize, totalCount - i);
-
-            // Обработка текущей партии
-            for (int j = i; j < i + currentBatchSize; j++)
-            {
-
-                var tokenId = startID + j;
-                var timeout = TimeSpan.FromMinutes(10);
-                var contextData = CreateContextData(tokenId,dataTimeProcess);
-                var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
-
-                tasks.Add(taskNode.ProcessTask);
-            }
-            // Task.WaitAll(tasks.ToArray());
-            Console.WriteLine($"  Элемент {i}");
-        }
-        sw.Stop();
-        Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
-
+        var timeout = TimeSpan.FromMinutes(10);
+        var contextData = CreateContextData(1,dataTimeProcess);
+        var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
+        
+        Console.WriteLine($"End StartNewProcess");
     }
 
     public void SendMessage(DateTime dataTimeProcess)
@@ -124,5 +104,36 @@ internal class SampleService
         taskNode.ProcessTask.Wait();
         
         Console.WriteLine($"End Multi input: {dataTimeProcess:yyyy-MM-dd HH:mm:ss.fff} ms");
+    }
+
+    public void StressTest()
+    {
+      
+        var startID = 1;
+
+        var totalCount = 10000;
+        var batchSize = 10;
+        var sw = new Stopwatch();
+        var testTime = DateTime.Now;
+        sw.Restart();
+        for (int i = 0; i < totalCount; i += batchSize)
+        {
+            var currentBatchSize = Math.Min(batchSize, totalCount - i);
+            var tasks = new List<Task>();
+            // Обработка текущей партии
+            for (int j = i; j < i + currentBatchSize; j++)
+            {
+                var tokenId = startID + j;
+                var timeout = TimeSpan.FromMinutes(10);
+                var contextData = CreateContextData(tokenId,testTime);
+                var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
+        
+                tasks.Add(taskNode.ProcessTask);
+            }
+            Task.WaitAll(tasks.ToArray());
+            Console.WriteLine($"--- Партия ---  {i}");
+        }
+        sw.Stop();
+        Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
     }
 }

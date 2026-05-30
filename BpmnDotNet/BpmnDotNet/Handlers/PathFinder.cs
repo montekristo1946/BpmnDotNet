@@ -94,6 +94,10 @@ public class PathFinder : IPathFinder
         }
 
         var dict = context.ConditionRoute;
+        if (dict is null)
+        {
+            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] Context ConditionRoute dictionary is null");
+        }
 
         if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
             || string.IsNullOrWhiteSpace(conditionName))

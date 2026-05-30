@@ -54,9 +54,8 @@ internal class DescriptionWriteService : IDescriptionWriteService
     }
 
     /// <inheritdoc/>
-    public Task InitAsync(CancellationToken token = default)
+    public void InitNewInstance()
     {
         _dictionary = new ConcurrentDictionary<string, string>();
-        return Task.CompletedTask;
     }
 }

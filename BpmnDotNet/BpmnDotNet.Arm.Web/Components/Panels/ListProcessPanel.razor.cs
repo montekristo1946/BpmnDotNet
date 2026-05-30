@@ -1,3 +1,4 @@
+using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using BpmnDotNet.Arm.Core.UiDomain.Dto;
 using BpmnDotNet.Dto;
@@ -109,11 +110,11 @@ public partial class ListProcessPanel : ComponentBase
     {
         return tableState switch
         {
-            ProcessState.Works => "#19aee8",
-            ProcessState.None => "#212529",
-            ProcessState.Completed => "#00ae5e",
-            ProcessState.Error => "#f34848",
-            _ => "#212529"
+            ProcessState.Works => ColorBpmnSvg.Running,
+            ProcessState.None => ColorBpmnSvg.DefaultColor,
+            ProcessState.Completed => ColorBpmnSvg.Completed,
+            ProcessState.Error => ColorBpmnSvg.Error,
+            _ => ColorBpmnSvg.DefaultColor
         };
     }
 

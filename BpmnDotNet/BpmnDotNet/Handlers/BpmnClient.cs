@@ -13,7 +13,8 @@ internal class BpmnClient : IBpmnClient
     /// <summary>
     /// Хранилище процессов.
     /// </summary>
-    internal readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus> BpmnProcesses = new();
+    internal readonly ConcurrentDictionary<(string IdBpmnProcess, string TokenProcess), BusinessProcessJobStatus>
+        BpmnProcesses = new();
 
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
     private readonly Task _cleanerTask;
@@ -68,7 +69,7 @@ internal class BpmnClient : IBpmnClient
         var logger = _loggerFactory.CreateLogger<BusinessProcess>();
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
 
-        var process = new BusinessProcess(
+        var processInstance = new BusinessProcess(
             context,
             logger,
             bpmnShema,
@@ -77,14 +78,16 @@ internal class BpmnClient : IBpmnClient
             timeout,
             _historyNodeStateWriter);
 
-        var resAdd = BpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), process.JobStatus);
+        var retValue = processInstance.StartBusinessProcess();
+
+        var resAdd = BpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), retValue);
         if (resAdd is false)
         {
             throw new InvalidOperationException(
                 $"[BpmnClient:StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
         }
 
-        return process.JobStatus;
+        return retValue;
     }
 
     /// <inheritdoc/>
@@ -92,7 +95,7 @@ internal class BpmnClient : IBpmnClient
         where THandler : IBpmnHandler
     {
         ArgumentNullException.ThrowIfNull(handlersBpmn);
-        _descriptionWriteService.InitAsync();
+        _descriptionWriteService.InitNewInstance();
 
         foreach (THandler handler in handlersBpmn)
         {
@@ -111,14 +114,16 @@ internal class BpmnClient : IBpmnClient
 
             if (_handlers.ContainsKey(taskDefinitionId))
             {
-                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: {taskDefinitionId} is already registered");
+                throw new InvalidOperationException(
+                    $"[BpmnClient:RegisterHandlers] Handler for TaskDefinitionId: {taskDefinitionId} is already registered");
             }
 
             var resAdd = _handlers.TryAdd(taskDefinitionId, handler.ActivityHandlerAsync);
 
             if (resAdd is false)
             {
-                throw new InvalidOperationException($"[BpmnClient:RegisterHandlers] Fail Registration {taskDefinitionId} Handler:{handler.GetType().Name}");
+                throw new InvalidOperationException(
+                    $"[BpmnClient:RegisterHandlers] Fail Registration {taskDefinitionId} Handler:{handler.GetType().Name}");
             }
 
             _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
@@ -126,7 +131,8 @@ internal class BpmnClient : IBpmnClient
                 $"[BpmnClient:RegisterHandlers] Registration completed; Handler:{handler.GetType().Name}; TaskDefinitionId: {taskDefinitionId}");
         }
 
-        _descriptionWriteService.CommitAsync();
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        _descriptionWriteService.CommitAsync(cts.Token).Wait(cts.Token);
     }
 
     /// <inheritdoc />
@@ -138,7 +144,9 @@ internal class BpmnClient : IBpmnClient
         ArgumentNullException.ThrowIfNull(message);
 
         var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
-        if (!resGet || bpmn is null || bpmn.Process is null)
+        if (!resGet || bpmn is null || bpmn.Process is null
+            || bpmn.StatusType == StatusType.Completed
+            || bpmn.StatusType == StatusType.Failed)
         {
             throw new InvalidOperationException(
                 $"[SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");

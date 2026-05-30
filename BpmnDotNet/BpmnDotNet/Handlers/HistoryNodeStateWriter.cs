@@ -67,7 +67,54 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 
         if (resSetData is false)
         {
-            _logger.LogError($"[SetStateProcess] Failed to set history node state: {idBpmnProcess} {tokenProcess}");
+            _logger.LogError($"[HistoryNodeStateWriter:SetStateProcessAsync] Failed to set history node state: {idBpmnProcess} {tokenProcess}");
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task SetStateProcessWithManualProcessStatus(
+        string idBpmnProcess,
+        string tokenProcess,
+        NodeJobStatus[] nodeStateRegistry,
+        string[] arrayMessageErrors,
+        long dateFromInitInstance,
+        ProcessStatus processStatus)
+    {
+        if (string.IsNullOrWhiteSpace(idBpmnProcess))
+        {
+            throw new ArgumentNullException(nameof(idBpmnProcess));
+        }
+
+        if (string.IsNullOrWhiteSpace(tokenProcess))
+        {
+            throw new ArgumentNullException(nameof(tokenProcess));
+        }
+
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
+        ArgumentNullException.ThrowIfNull(arrayMessageErrors);
+
+        var nodeJobStatus = nodeStateRegistry.Select(p => new NodeJobStatus()
+        {
+            IdNode = p.IdNode,
+            StatusType = p.StatusType,
+        }).ToArray();
+
+        var historyNodeState = new HistoryNodeState()
+        {
+            IdBpmnProcess = idBpmnProcess,
+            TokenProcess = tokenProcess,
+            NodeStaus = nodeJobStatus,
+            ArrayMessageErrors = arrayMessageErrors,
+            DateCreated = dateFromInitInstance,
+            DateLastModified = DateTime.Now.Ticks,
+            ProcessStatus = processStatus,
+        };
+
+        var resSetData = await _elasticClient.SetDataAsync(historyNodeState);
+
+        if (resSetData is false)
+        {
+            _logger.LogError($"[HistoryNodeStateWriter:SetStateProcessWithManualProcessStatus] Failed to set history node state: {idBpmnProcess} {tokenProcess}");
         }
     }
 

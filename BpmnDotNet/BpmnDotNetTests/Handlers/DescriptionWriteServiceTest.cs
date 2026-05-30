@@ -153,7 +153,7 @@ public class DescriptionWriteServiceTest
     }
 
     [Fact]
-    public async Task InitAsync_ShouldClearDictionary()
+    public void InitAsync_ShouldClearDictionary()
     {
         // Arrange - добавляем данные в словарь
         _sut.AddDescription("task-1", "description-1");
@@ -165,12 +165,35 @@ public class DescriptionWriteServiceTest
         Assert.Equal(3, dictionaryBefore.Count);
 
         // Act
-        await _sut.InitAsync();
+         _sut.InitNewInstance();
 
         // Assert
         var dictionaryAfter = DescriptionWriteServiceReflectionHelper.GetDictionary(_sut);
         Assert.NotNull(dictionaryAfter);
         Assert.Empty(dictionaryAfter);
+    }
+    
+    [Fact]
+    public async Task Commit_CheckFillDatabase_CallMoq()
+    {
+        _sut.AddDescription("testId1", "test_message1");
+        _sut.AddDescription("testId2", "test_message2");
+
+        await _sut.CommitAsync();
+        
+        await _elasticClient.Received(2).SetDataAsync(Arg.Any<DescriptionData>());
+    }
+
+    [Fact]
+    public async Task Init_CheckFillDatabase_CallMoq()
+    {
+        _sut.AddDescription("testId1", "test_message1");
+        _sut.AddDescription("testId2", "test_message2");
+
+        _sut.InitNewInstance();
+        await _sut.CommitAsync();
+        
+        await _elasticClient.Received(0).SetDataAsync(Arg.Any<DescriptionData>());
     }
     
 }

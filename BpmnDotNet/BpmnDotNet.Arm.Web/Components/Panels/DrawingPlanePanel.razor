@@ -1,18 +1,19 @@
 @using BlazorBrowserInteractLabeler.Web.Common
 
-<div class="p-0 m-0 row"
-     id="@ConstantsArm.DrawingPlanePanel"
-     style="width: 100%; height: 100%;  overflow: hidden; background-color: #f8f9fa; "
-     @onmousewheel="@MouseWheelHandler"
-     @onmousemove="@MouseMoveHandler"
-     @onmousedown="@OnmouseDownHandler" 
-     @onmouseup="@OnmouseUpHandler">
+<div
+    id="@ConstantsArm.DrawingPlanePanel"
+    class="p-0 m-0 row"
+    style="width: 100%; height: 100%;  overflow: hidden; background-color: #f8f9fa; "
+    @onmousewheel="@MouseWheelHandler"
+    @onmousemove="@MouseMoveHandler"
+    @onmousedown="@OnmouseDownHandler"
+    @onmouseup="@OnmouseUpHandler">
 
     <div class="p-0 m-0"
-        style="width:@WidthConvas; height: @HeightConvas;
-        @CssScale();
-        background-position: center ;
-        transform-origin: center;">
+         style="width:@WidthConvas; height: @HeightConvas;
+         @CssScale();
+         background-position: center ;
+         transform-origin: center;">
         @{
             if (string.IsNullOrWhiteSpace(_svgToString))
             {

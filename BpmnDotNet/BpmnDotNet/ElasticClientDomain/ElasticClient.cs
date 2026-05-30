@@ -173,7 +173,7 @@ public class ElasticClient : IElasticClient
                                     .Terms(teams => teams.Value(fieldsValue))))))
                     .Sort(s => s
                         .Field(f => f
-                            .Field("dateCreated")
+                            .Field(nameof(HistoryNodeStateBase.DateCreated))
                             .Order(SortOrder.Desc)))
                     .Source(src => src
                         .Filter(f => f
