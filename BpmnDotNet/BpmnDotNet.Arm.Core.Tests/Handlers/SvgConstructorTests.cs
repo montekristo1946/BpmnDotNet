@@ -623,12 +623,12 @@ public class SvgConstructorTests
 
     [Theory]
     [InlineData(BpmnDotNet.Dto.StatusType.None, "#22242a")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Pending, "#19aee8")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Works, "#19aee8")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Completed, "#319940")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Pending, "#238ff0")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Works, "#238ff0")]
+    [InlineData(BpmnDotNet.Dto.StatusType.Completed, "#028515")]
     [InlineData(BpmnDotNet.Dto.StatusType.Failed, "#f34848")]
-    [InlineData(BpmnDotNet.Dto.StatusType.WaitingCompletedWays, "#19aee8")]
-    [InlineData(BpmnDotNet.Dto.StatusType.WaitingReceivedMessage, "#19aee8")]
+    [InlineData(BpmnDotNet.Dto.StatusType.WaitingCompletedWays, "#238ff0")]
+    [InlineData(BpmnDotNet.Dto.StatusType.WaitingReceivedMessage, "#238ff0")]
     public void GetColor_ShouldReturn_ExpectedColorForStatus(BpmnDotNet.Dto.StatusType statusType, string expectedColor)
     {
         // Arrange

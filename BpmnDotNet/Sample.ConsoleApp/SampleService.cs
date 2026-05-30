@@ -111,7 +111,7 @@ internal class SampleService
       
         var startID = 1;
 
-        var totalCount = 1000;
+        var totalCount = 10000;
         var batchSize = 10;
         var sw = new Stopwatch();
         var testTime = DateTime.Now;
