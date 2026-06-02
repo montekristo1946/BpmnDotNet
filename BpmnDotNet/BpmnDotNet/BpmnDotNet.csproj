@@ -21,7 +21,7 @@
         <TrimMode>partial</TrimMode>
 
 
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+<!--        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -38,6 +38,12 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+    
+
+
+    <ItemGroup>
+      <Folder Include="BpmnEngineDomain\Activity\" />
     </ItemGroup>
     
 </Project>
