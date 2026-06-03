@@ -8,5 +8,5 @@ public interface IIncomingPath
     /// <summary>
     /// Gets перечисления входных flow.
     /// </summary>
-    string[] Incoming { get; }
+    string SourceId { get; }
 }

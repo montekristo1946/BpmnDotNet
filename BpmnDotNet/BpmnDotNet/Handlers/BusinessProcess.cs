@@ -506,21 +506,22 @@ internal class BusinessProcess : IBusinessProcess
 
     private string[] GetOutgoingPath(IElement currentNode)
     {
-        if (currentNode is IOutgoingPath outgoingPath)
-        {
-            return outgoingPath.Outgoing;
-        }
+        // if (currentNode is IOutgoingPath outgoingPath)
+        // {
+        //     return outgoingPath.Outgoing;
+        // }
 
+        throw new NotImplementedException();
         return [];
     }
 
     private string[] GetIncomingPath(IElement currentNode)
     {
-        if (currentNode is IIncomingPath incomingPath)
-        {
-            return incomingPath.Incoming;
-        }
-
+        // if (currentNode is IIncomingPath incomingPath)
+        // {
+        //     return incomingPath.Incoming;
+        // }
+        throw new NotImplementedException();
         return [];
     }
 

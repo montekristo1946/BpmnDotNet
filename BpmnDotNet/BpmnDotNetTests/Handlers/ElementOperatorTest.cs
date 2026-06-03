@@ -24,15 +24,15 @@ public class ElementOperatorTest
         ((IElement)currentNode).ElementType.Returns(ElementType.SequenceFlow);
         
         // Настройка свойств IOutgoingPath
-        currentNode.Outgoing.Returns(expectedOutgoing);
+        currentNode.TargetId.Returns(expectedOutgoing);
 
         // Act
         var result = ElementOperator.GetOutgoingPath((IElement)currentNode);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(expectedOutgoing, result.Outgoing);
-        Assert.Equal(2, result.Outgoing.Length);
+        Assert.Equal(expectedOutgoing, result.TargetId);
+        Assert.Equal(2, result.TargetId.Length);
     }
     
     
@@ -46,7 +46,7 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Outgoing.Returns((string[])null!);
+        currentNode.TargetId.Returns((string[])null!);
 
         // Act & Assert
         var exception = Assert.Throws<InvalidDataException>(() => 
@@ -67,7 +67,7 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Outgoing.Returns(Array.Empty<string>());
+        currentNode.TargetId.Returns(Array.Empty<string>());
 
         // Act & Assert
         var exception = Assert.Throws<InvalidDataException>(() => 
@@ -83,7 +83,7 @@ public class ElementOperatorTest
     {
         // Arrange
         var currentNode = Substitute.For<IOutgoingPath, IElement>();
-        currentNode.Outgoing.Returns([string.Empty]);
+        currentNode.TargetId.Returns([string.Empty]);
         
         ((IElement)currentNode).IdElement.Returns("flow-001");
         ((IElement)currentNode).ElementType.Returns(ElementType.SequenceFlow);
@@ -109,15 +109,15 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Outgoing.Returns(outgoingElements);
+        currentNode.TargetId.Returns(outgoingElements);
 
         // Act
         var result = ElementOperator.GetOutgoingPath((IElement)currentNode);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(3, result.Outgoing.Length);
-        Assert.Equal(outgoingElements, result.Outgoing);
+        Assert.Equal(3, result.TargetId.Length);
+        Assert.Equal(outgoingElements, result.TargetId);
     }
     
     
@@ -139,7 +139,7 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Outgoing.Returns(Array.Empty<string>());
+        currentNode.TargetId.Returns(Array.Empty<string>());
 
         // Act & Assert
         var exception = Assert.Throws<InvalidDataException>(() => 
@@ -167,7 +167,7 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Incoming.Returns([]);
+        currentNode.SourceId.Returns([]);
 
         // Act & Assert
         var exception = Assert.Throws<InvalidDataException>(() => 
@@ -194,15 +194,15 @@ public class ElementOperatorTest
         ((IElement)currentNode).ElementType.Returns(ElementType.ServiceTask);
         
         // Настройка свойств IIncomingPath
-        currentNode.Incoming.Returns(expectedIncoming);
+        currentNode.SourceId.Returns(expectedIncoming);
 
         // Act
         var result = ElementOperator.GetIncomingPath((IElement)currentNode);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(expectedIncoming, result.Incoming);
-        Assert.Equal(2, result.Incoming.Length);
+        Assert.Equal(expectedIncoming, result.SourceId);
+        Assert.Equal(2, result.SourceId.Length);
     }
     
     [Fact]
@@ -215,7 +215,7 @@ public class ElementOperatorTest
         
         ((IElement)currentNode).IdElement.Returns(elementId);
         ((IElement)currentNode).ElementType.Returns(elementType);
-        currentNode.Incoming.Returns((string[])null!);
+        currentNode.SourceId.Returns((string[])null!);
 
         // Act & Assert
         var exception = Assert.Throws<InvalidDataException>(() => 

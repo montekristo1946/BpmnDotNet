@@ -6,10 +6,7 @@ using BpmnDotNet.Abstractions.Elements;
 /// Node в объектовом виде, ExclusiveGateway.
 /// </summary>
 /// <param name="id">ID.</param>
-/// <param name="incoming">Входные Flow.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class ExclusiveGatewayComponent(string id, string[] incoming, string[] outgoing)
-    : IElement, IIncomingPath, IOutgoingPath
+public class ExclusiveGatewayComponent(string id) : IElement
 {
     /// <summary>
     /// Gets iD.
@@ -20,14 +17,4 @@ public class ExclusiveGatewayComponent(string id, string[] incoming, string[] ou
     /// Gets elementType.
     /// </summary>
     public ElementType ElementType { get; } = ElementType.ExclusiveGateway;
-
-    /// <summary>
-    /// Gets входные Flow.
-    /// </summary>
-    public string[] Incoming { get; } = incoming;
-
-    /// <summary>
-    /// Gets выходные Flow.
-    /// </summary>
-    public string[] Outgoing { get; } = outgoing;
 }

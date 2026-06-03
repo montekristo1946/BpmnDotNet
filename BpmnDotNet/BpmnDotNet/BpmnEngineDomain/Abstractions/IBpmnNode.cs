@@ -1,7 +1,7 @@
+namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
+
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Dto;
-
-namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 /// <summary>
 /// Описывает базовый функционал.
@@ -14,9 +14,14 @@ internal interface IBpmnNode
     public string Id { get; init; }
 
     /// <summary>
-    /// Метод вызова.
+    /// Метод вызова блока для engine.
     /// </summary>
     /// <param name="contextBpmnProcess">IContextBpmnProcess.</param>
     /// <returns>Token следующего шага.</returns>
     public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess);
+
+    /// <summary>
+    /// Gets метод вызова реальзации пользователя.
+    /// </summary>
+    public Func<IContextBpmnProcess, CancellationToken, Task> Handler { get; init; }
 }

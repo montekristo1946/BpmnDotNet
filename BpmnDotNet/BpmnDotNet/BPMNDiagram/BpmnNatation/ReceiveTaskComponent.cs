@@ -5,11 +5,8 @@ using BpmnDotNet.Abstractions.Elements;
 /// <summary>
 /// Node в объектовом виде, ReceiveTask.
 /// </summary>
-/// <param name="id">ID.</param>
-/// <param name="incoming">Входные Flow.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class ReceiveTaskComponent(string id, string[] incoming, string[] outgoing)
-    : IElement, IIncomingPath, IOutgoingPath
+/// <param name="id">ID.</param> >
+public class ReceiveTaskComponent(string id) : IElement
 {
     /// <summary>
     /// Gets iD.
@@ -20,14 +17,4 @@ public class ReceiveTaskComponent(string id, string[] incoming, string[] outgoin
     /// Gets elementType.
     /// </summary>
     public ElementType ElementType { get; } = ElementType.ReceiveTask;
-
-    /// <summary>
-    /// Gets входные Flow.
-    /// </summary>
-    public string[] Incoming { get; } = incoming;
-
-    /// <summary>
-    /// Gets выходные Flow.
-    /// </summary>
-    public string[] Outgoing { get; } = outgoing;
 }

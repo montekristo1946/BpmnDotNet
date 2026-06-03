@@ -86,35 +86,37 @@ public class PathFinder : IPathFinder
     /// <inheritdoc />
     public string GetConditionRouteWithExclusiveGateWay(IExclusiveGateWayRoute context, IElement currentNode)
     {
-        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
-
-        if (outgoingNode.Outgoing.Length == 1)
-        {
-            return outgoingNode.Outgoing.First();
-        }
-
-        var dict = context.ConditionRoute;
-        if (dict is null)
-        {
-            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] Context ConditionRoute dictionary is null");
-        }
-
-        if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
-            || string.IsNullOrWhiteSpace(conditionName))
-        {
-            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
-                                        $"Couldn't find the condition from gateway:{currentNode.IdElement}");
-        }
-
-        var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p => p == conditionName) ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(checkPatch))
-        {
-            throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
-                                        $"There is no such way from gateway:{currentNode.IdElement}");
-        }
-
-        return checkPatch;
+        // var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
+        //
+        // if (outgoingNode.Outgoing.Length == 1)
+        // {
+        //     return outgoingNode.Outgoing;
+        // }
+        //
+        // var dict = context.ConditionRoute;
+        // if (dict is null)
+        // {
+        //     throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] Context ConditionRoute dictionary is null");
+        // }
+        //
+        // if (!dict.TryGetValue(currentNode.IdElement, out var conditionName)
+        //     || string.IsNullOrWhiteSpace(conditionName))
+        // {
+        //     throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
+        //                                 $"Couldn't find the condition from gateway:{currentNode.IdElement}");
+        // }
+        //
+        // var checkPatch = outgoingNode.Outgoing.FirstOrDefault(p => p == conditionName) ?? string.Empty;
+        //
+        // if (string.IsNullOrWhiteSpace(checkPatch))
+        // {
+        //     throw new InvalidDataException($" [GetConditionRouteWithExclusiveGateWay] " +
+        //                                 $"There is no such way from gateway:{currentNode.IdElement}");
+        // }
+        //
+        // return checkPatch;
+        
+        throw new NotImplementedException();
     }
 
     private IEnumerable<IElement> EndEventGetNextNode(IElement currentNode, IElement[] elementsSrc)
@@ -130,23 +132,24 @@ public class PathFinder : IPathFinder
 
     private IElement[] ParallelGatewayGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
-        var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
+        // var outgoingNode = ElementOperator.GetOutgoingPath(currentNode);
+        //
+        // var allFlow = outgoingNode.Outgoing.Select(flow =>
+        // {
+        //     var elementFlow =
+        //         elementsSrc.Where(p => p.IdElement == flow && p.ElementType == ElementType.SequenceFlow) ??
+        //         throw new InvalidOperationException($"Not element type Flow, name: {flow}");
+        //     return elementFlow;
+        // }).SelectMany(p => p).ToArray();
+        //
+        // var retArr = allFlow.Select(flow =>
+        // {
+        //     var node = GetNextFromFlowElement(elementsSrc, flow);
+        //     return node;
+        // }).ToArray();
 
-        var allFlow = outgoingNode.Outgoing.Select(flow =>
-        {
-            var elementFlow =
-                elementsSrc.Where(p => p.IdElement == flow && p.ElementType == ElementType.SequenceFlow) ??
-                throw new InvalidOperationException($"Not element type Flow, name: {flow}");
-            return elementFlow;
-        }).SelectMany(p => p).ToArray();
-
-        var retArr = allFlow.Select(flow =>
-        {
-            var node = GetNextFromFlowElement(elementsSrc, flow);
-            return node;
-        }).ToArray();
-
-        return retArr;
+        // return retArr;
+        throw new NotImplementedException();
     }
 
     private IElement[] ExclusiveGatewayGetNextNode(
@@ -168,40 +171,42 @@ public class PathFinder : IPathFinder
 
     private IElement[] OnPathGetNextNode(IElement currentNode, IElement[] elementsSrc)
     {
-        var outgoingNodes = ElementOperator.GetOutgoingPath(currentNode);
-
-        if (outgoingNodes.Outgoing.Length != 1)
-        {
-            throw new InvalidOperationException(
-                $"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
-        }
-
-        var outgoingIdStartEvent = outgoingNodes.Outgoing.First();
-
-        var elementFlow = elementsSrc.FirstOrDefault(p =>
-                              p.IdElement == outgoingIdStartEvent && p.ElementType == ElementType.SequenceFlow) ??
-                          throw new InvalidOperationException($"Not element type Flow, name: {outgoingIdStartEvent}");
-
-        var elementNext = GetNextFromFlowElement(elementsSrc, elementFlow);
-
-        return [elementNext];
+        // var outgoingNodes = ElementOperator.GetOutgoingPath(currentNode);
+        //
+        // if (outgoingNodes.Outgoing.Length != 1)
+        // {
+        //     throw new InvalidOperationException(
+        //         $"There can be no outputs from the {currentNode.ElementType} block != 1; curren {outgoingNodes.Outgoing.Length}");
+        // }
+        //
+        // var outgoingIdStartEvent = outgoingNodes.Outgoing.First();
+        //
+        // var elementFlow = elementsSrc.FirstOrDefault(p =>
+        //                       p.IdElement == outgoingIdStartEvent && p.ElementType == ElementType.SequenceFlow) ??
+        //                   throw new InvalidOperationException($"Not element type Flow, name: {outgoingIdStartEvent}");
+        //
+        // var elementNext = GetNextFromFlowElement(elementsSrc, elementFlow);
+        //
+        // return [elementNext];
+        throw new NotImplementedException();
     }
 
     private IElement GetNextFromFlowElement(IElement[] elementsSrc, IElement elementFlow)
     {
-        var outgoingFlow = ElementOperator.GetOutgoingPath(elementFlow);
-
-        if (outgoingFlow.Outgoing.Length != 1)
-        {
-            throw new InvalidOperationException(
-                $"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");
-        }
-
-        var outgoingIdFlow = outgoingFlow.Outgoing.First();
-
-        var elementNext = elementsSrc.FirstOrDefault(p => p.IdElement == outgoingIdFlow) ??
-                          throw new InvalidOperationException(
-                              $"Not found Outgoing element from Flow, name: {elementFlow.IdElement}");
-        return elementNext;
+        // var outgoingFlow = ElementOperator.GetOutgoingPath(elementFlow);
+        //
+        // if (outgoingFlow.Outgoing.Length != 1)
+        // {
+        //     throw new InvalidOperationException(
+        //         $"There can be no outputs from the Flow  != 1; current {outgoingFlow.Outgoing.Length}");
+        // }
+        //
+        // var outgoingIdFlow = outgoingFlow.Outgoing.First();
+        //
+        // var elementNext = elementsSrc.FirstOrDefault(p => p.IdElement == outgoingIdFlow) ??
+        //                   throw new InvalidOperationException(
+        //                       $"Not found Outgoing element from Flow, name: {elementFlow.IdElement}");
+        // return elementNext;
+        throw new NotImplementedException();
     }
 }

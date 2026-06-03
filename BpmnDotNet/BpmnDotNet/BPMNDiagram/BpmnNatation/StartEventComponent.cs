@@ -6,8 +6,7 @@ using BpmnDotNet.Abstractions.Elements;
 /// Node в объектовом виде, StartEvent.
 /// </summary>
 /// <param name="id">ID.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class StartEventComponent(string id, string[] outgoing) : IElement, IOutgoingPath
+public class StartEventComponent(string id) : IElement
 {
     /// <summary>
     /// Gets iD.
@@ -18,9 +17,4 @@ public class StartEventComponent(string id, string[] outgoing) : IElement, IOutg
     /// Gets elementType.
     /// </summary>
     public ElementType ElementType { get; } = ElementType.StartEvent;
-
-    /// <summary>
-    /// Gets выходные Flow.
-    /// </summary>
-    public string[] Outgoing { get; } = outgoing;
 }

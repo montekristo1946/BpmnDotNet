@@ -6,9 +6,7 @@ using BpmnDotNet.Abstractions.Elements;
 /// Node в объектовом виде, SendTask.
 /// </summary>
 /// <param name="id">ID.</param>
-/// <param name="incoming">Входные Flow.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class SendTaskComponent(string id, string[] incoming, string[] outgoing) : IElement, IIncomingPath, IOutgoingPath
+public class SendTaskComponent(string id) : IElement
 {
     /// <summary>
     /// Gets iD.
@@ -19,14 +17,4 @@ public class SendTaskComponent(string id, string[] incoming, string[] outgoing) 
     /// Gets elementType.
     /// </summary>
     public ElementType ElementType { get; } = ElementType.SendTask;
-
-    /// <summary>
-    /// Gets входные Flow.
-    /// </summary>
-    public string[] Incoming { get; } = incoming;
-
-    /// <summary>
-    /// Gets выходные Flow.
-    /// </summary>
-    public string[] Outgoing { get; } = outgoing;
 }

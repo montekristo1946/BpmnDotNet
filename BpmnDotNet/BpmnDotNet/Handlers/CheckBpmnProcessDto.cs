@@ -85,7 +85,7 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
     private void CheckIncomingPathOneWay(IElement element, string bpmnProcessIdBpmnProcess)
     {
         var res = ElementOperator.GetIncomingPath(element);
-        if (res.Incoming.Length != 1)
+        if (res.SourceId.Length != 1)
         {
             throw new InvalidDataException(
                 $"{bpmnProcessIdBpmnProcess} Outgoing elements must have exactly one incoming element. {element.IdElement}");
@@ -121,7 +121,7 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
     private void CheckOutgoingsOneWay(IElement element, string bpmnProcessIdBpmnProcess)
     {
         var res = ElementOperator.GetOutgoingPath(element);
-        if (res.Outgoing.Length != 1)
+        if (res.TargetId.Length != 1)
         {
             throw new InvalidDataException(
                 $"{bpmnProcessIdBpmnProcess} Outgoing elements must have exactly one outgoing element. {element.IdElement}");

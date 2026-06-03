@@ -1,7 +1,7 @@
+namespace BpmnDotNet.BpmnEngineDomain.Dto;
+
 using System.Collections.Concurrent;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
-
-namespace BpmnDotNet.BpmnEngineDomain.Dto;
 
 /// <summary>
 /// Описывает модель bpmn процесса.
@@ -9,12 +9,12 @@ namespace BpmnDotNet.BpmnEngineDomain.Dto;
 internal class ProcessModel
 {
     /// <summary>
-    /// Список нод.
+    /// Gets список нод.
     /// </summary>
-    public ConcurrentDictionary<string, IBpmnNode> Nodes { get; set; } = new();
+    public ConcurrentDictionary<string, IBpmnNode> Nodes { get; init; } = new();
 
     /// <summary>
-    /// Массив стрелочек.
+    /// Gets массив стрелочек.
     /// </summary>
-    public ConcurrentQueue<Flow> Flow { get; set; } = new();
+    public ConcurrentQueue<Flow> Flow { get; init; } = new();
 }

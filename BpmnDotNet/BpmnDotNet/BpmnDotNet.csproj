@@ -40,10 +40,4 @@
         </PackageReference>
     </ItemGroup>
     
-
-
-    <ItemGroup>
-      <Folder Include="BpmnEngineDomain\Activity\" />
-    </ItemGroup>
-    
 </Project>

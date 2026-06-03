@@ -86,28 +86,19 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ServiceTaskComponent CreateServiceTask(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
-
-        return new ServiceTaskComponent(id, incoming, outgoing);
+        return new ServiceTaskComponent(id);
     }
 
     private ReceiveTaskComponent CreateReceiveTask(XmlNode elements)
     {
-        var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
-
-        return new ReceiveTaskComponent(id, incoming, outgoing);
+        var id = GetId(elements); 
+        return new ReceiveTaskComponent(id);
     }
 
     private SendTaskComponent CreateSendTaskName(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
-
-        return new SendTaskComponent(id, incoming, outgoing);
+        return new SendTaskComponent(id);
     }
 
     private ParallelGatewayComponent CreateParallelGateway(XmlNode elements)
@@ -122,10 +113,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ExclusiveGatewayComponent CreateExclusiveGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
-
-        return new ExclusiveGatewayComponent(id, incoming, outgoing);
+        return new ExclusiveGatewayComponent(id);
     }
 
     private SequenceFlowComponent CreateSequenceFlow(XmlNode elements)
@@ -137,15 +125,14 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
         var outGoing = elements.Attributes?[Constants.BpmnTargetRef]?.Value
                        ?? throw new InvalidDataException($"{id} Not Find sourceRef from:{elements.Name}");
 
-        var sequenceFlow = new SequenceFlowComponent(id, [incoming], [outGoing]);
+        var sequenceFlow = new SequenceFlowComponent(id, incoming, outGoing);
         return sequenceFlow;
     }
 
     private StartEventComponent CreateStartEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var startEvent = new StartEventComponent(id, outgoing);
+        var startEvent = new StartEventComponent(id);
 
         return startEvent;
     }
@@ -153,8 +140,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private EndEventComponent CreateEndEvent(XmlNode elements)
     {
         var id = GetId(elements);
-        var incoming = GetIncoming(elements, id);
-        var endEvent = new EndEventComponent(id, incoming);
+        var endEvent = new EndEventComponent(id);
 
         return endEvent;
     }

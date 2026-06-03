@@ -16,7 +16,7 @@ internal static class ElementOperator
     {
         var outgoingPath = (IOutgoingPath)currentNode;
 
-        if (outgoingPath.Outgoing is null || outgoingPath.Outgoing.Length == 0)
+        if (outgoingPath.TargetId is null || outgoingPath.TargetId.Length == 0)
         {
             throw new InvalidDataException(
                 $"{currentNode.ElementType} does not contain Outgoing: {currentNode.IdElement}");
@@ -34,7 +34,7 @@ internal static class ElementOperator
     {
         var outgoingPath = (IIncomingPath)currentNode;
 
-        if (outgoingPath.Incoming is null || outgoingPath.Incoming.Length == 0)
+        if (outgoingPath.SourceId is null || outgoingPath.SourceId.Length == 0)
         {
             throw new InvalidDataException(
                 $"{currentNode.ElementType} does not contain IncomingPath: {currentNode.IdElement}");

@@ -8,8 +8,7 @@ using BpmnDotNet.Abstractions.Elements;
 /// <param name="id">ID.</param>
 /// <param name="incoming">Входные Flow.</param>
 /// <param name="outgoing">Выходные Flow.</param>
-public class ParallelGatewayComponent(string id, string[] incoming, string[] outgoing)
-    : IElement, IIncomingPath, IOutgoingPath
+public class ParallelGatewayComponent(string id, string[] incoming, string[] outgoing) : IElement
 {
     /// <summary>
     /// Gets iD.
@@ -20,14 +19,4 @@ public class ParallelGatewayComponent(string id, string[] incoming, string[] out
     /// Gets elementType.
     /// </summary>
     public ElementType ElementType { get; } = ElementType.ParallelGateway;
-
-    /// <summary>
-    /// Gets входные Flow.
-    /// </summary>
-    public string[] Incoming { get; } = incoming;
-
-    /// <summary>
-    /// Gets выходные Flow.
-    /// </summary>
-    public string[] Outgoing { get; } = outgoing;
 }

@@ -8,5 +8,5 @@ public interface IOutgoingPath
     /// <summary>
     /// Gets перечисление выходных flow.
     /// </summary>
-    string[] Outgoing { get; }
+    string TargetId { get; }
 }
