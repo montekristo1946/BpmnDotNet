@@ -1,25 +1,31 @@
-using System.Collections.Concurrent;
-using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
-using BpmnDotNet.BpmnEngineDomain.Activity;
-using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.BpmnEngineDomain.Handlers;
 
+using System.Collections.Concurrent;
+using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
+using BpmnDotNet.BpmnEngineDomain.Activity;
 using BpmnDotNet.BpmnEngineDomain.Dto;
+using Microsoft.Extensions.Logging;
 
-internal class ProcessModelBuilder
+/// <inheritdoc />
+internal class ProcessModelBuilder : IProcessModelBuilder
 {
     private readonly ILogger<ProcessModelBuilder> _logger;
 
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProcessModelBuilder"/> class.
+    /// </summary>
+    /// <param name="logger">ILogger.</param>
     public ProcessModelBuilder(ILogger<ProcessModelBuilder> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public ProcessModel Build(
         BpmnProcessDto bpmnProcessDto,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers)
@@ -47,7 +53,50 @@ internal class ProcessModelBuilder
             }
         }
 
+        var flowsBySource = BuildFlowsBySourceIndex(processModel.Flows.Values);
+        flowsBySource.ToList().ForEach(kvp =>
+            processModel.FlowsBySource.AddOrUpdate(kvp.Key, _ => kvp.Value, (key, oldMessage) => kvp.Value));
+
+        var flowsByTarget = BuildFlowsByTargetIndex(processModel.Flows.Values);
+        flowsByTarget.ToList().ForEach(kvp =>
+            processModel.FlowsByTarget.AddOrUpdate(kvp.Key, _ => kvp.Value, (key, oldMessage) => kvp.Value));
+
         return processModel;
+    }
+
+
+    /// <summary>
+    ///  Группируем все потоки по SourceId и преобразуем в словарь массивов TargetId потоков.
+    /// </summary>
+    /// <param name="flows">Flow.</param>
+    /// <returns>Словарь с ветками {SourceId:TargetId[]}.</returns>
+    internal Dictionary<string, string[]> BuildFlowsBySourceIndex(IEnumerable<Flow> flows)
+    {
+        var sourceIndex = flows
+            .GroupBy(flow => flow.SourceId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(flow => flow.TargetId).ToArray()
+            );
+
+        return sourceIndex;
+    }
+
+    /// <summary>
+    ///  Группируем все потоки по TargetId и преобразуем в словарь массивов SourceId потоков.
+    /// </summary>
+    /// <param name="flows">Flow.</param>
+    /// <returns>Словарь с ветками {SourceId:TargetId[]}.</returns>
+    internal Dictionary<string, string[]> BuildFlowsByTargetIndex(IEnumerable<Flow> flows)
+    {
+        var sourceIndex = flows
+            .GroupBy(flow => flow.TargetId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(flow => flow.SourceId).ToArray()
+            );
+
+        return sourceIndex;
     }
 
     private void CreateServiceTask(
@@ -88,7 +137,7 @@ internal class ProcessModelBuilder
             TargetId = flow.TargetId,
         };
 
-        processModel.Flow.Enqueue(bpmnNode);
+        processModel.Flows.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
     }
 
     private void CreateEndEvent(

@@ -17,7 +17,7 @@ internal class ServiceTask : IBpmnNode
 
 
     /// <inheritdoc/>
-    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess)
+    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

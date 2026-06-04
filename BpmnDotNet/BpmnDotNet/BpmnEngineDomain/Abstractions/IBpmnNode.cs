@@ -17,8 +17,9 @@ internal interface IBpmnNode
     /// Метод вызова блока для engine.
     /// </summary>
     /// <param name="contextBpmnProcess">IContextBpmnProcess.</param>
+    /// <param name="cancellationToken">CancellationToken.</param>
     /// <returns>Token следующего шага.</returns>
-    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess);
+    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets метод вызова реальзации пользователя.

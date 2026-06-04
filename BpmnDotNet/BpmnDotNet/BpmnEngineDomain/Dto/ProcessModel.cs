@@ -6,7 +6,7 @@ using BpmnDotNet.BpmnEngineDomain.Abstractions;
 /// <summary>
 /// Описывает модель bpmn процесса.
 /// </summary>
-internal class ProcessModel
+internal record ProcessModel
 {
     /// <summary>
     /// Gets список нод.
@@ -14,7 +14,17 @@ internal class ProcessModel
     public ConcurrentDictionary<string, IBpmnNode> Nodes { get; init; } = new();
 
     /// <summary>
-    /// Gets массив стрелочек.
+    /// Gets основное хранилище стрелочек.
     /// </summary>
-    public ConcurrentQueue<Flow> Flow { get; init; } = new();
+    public ConcurrentDictionary<string, Flow> Flows { get; init; } = new();
+
+    /// <summary>
+    /// Индексы для быстрого поиска source.
+    /// </summary>
+    public ConcurrentDictionary<string, string[]> FlowsBySource { get; init; } = new();
+
+    /// <summary>
+    /// Индексы для быстрого поиска Target.
+    /// </summary>
+    public ConcurrentDictionary<string, string[]> FlowsByTarget { get; init; } = new();
 }

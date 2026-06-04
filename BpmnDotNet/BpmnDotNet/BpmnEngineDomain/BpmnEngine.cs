@@ -58,9 +58,8 @@ internal class BpmnEngine : IBpmnEngine
         while (!ctsToken.IsCancellationRequested)
         {
             await _semaphore.WaitAsync(ctsToken);
-            await RunEventLoopAsync(contextBpmnProcess, ctsToken,processModel);
+            await RunEventLoopAsync(contextBpmnProcess, ctsToken, processModel);
         }
-
     }
 
     private async Task RunEventLoopAsync(
@@ -68,26 +67,34 @@ internal class BpmnEngine : IBpmnEngine
         CancellationToken ctsToken,
         ProcessModel processModel)
     {
-
         while (_eventQueue.Count > 0 && !ctsToken.IsCancellationRequested)
         {
             var resGetToken = _eventQueue.TryDequeue(out var token);
-            if (!resGetToken)
+            if (!resGetToken || token == null)
             {
                 _logger.LogError("[BpmnEngine:RunEventLoopAsync] No events queued");
                 return;
             }
-            
-            var node = 
+
+            try
+            {
+                var node = processModel.Nodes[token.CurrentNodeId];
+                var nodes = await node.ExecuteAsync(contextBpmnProcess, ctsToken);
+
+                nodes.ToList().ForEach(p => _eventQueue.Enqueue(p));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[BpmnEngine:RunEventLoopAsync] Exception");
+            }
         }
-        throw new NotImplementedException();
     }
 
 
     public bool AddMessageToQueue(Type messageType, object message)
     {
         _semaphore.Release();
-        
+
         throw new NotImplementedException();
     }
 }
