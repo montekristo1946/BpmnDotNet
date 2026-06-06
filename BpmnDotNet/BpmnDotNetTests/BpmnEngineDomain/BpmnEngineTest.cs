@@ -34,7 +34,7 @@ public class BpmnEngineTest
     }
 
     [Fact]
-    public async Task StartProcessAsync_FullPass_CallMethod()
+    public async Task StartProcessAsync_CheckBaseBpmnProcess_CallMethod()
     {
         var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_3.bpmn");
         var count = 0;
@@ -45,24 +45,26 @@ public class BpmnEngineTest
                 count++;
                 return Task.CompletedTask;
             },
-            ["Activity_01"] = (ctx, ct) =>  {
+            ["Activity_01"] = (ctx, ct) =>
+            {
                 count++;
                 return Task.CompletedTask;
             },
-            ["Event_01"] = (ctx, ct) =>  {
+            ["Event_01"] = (ctx, ct) =>
+            {
                 count++;
                 return Task.CompletedTask;
             },
         };
         var processModel = _processModelBuilder.Build(diagram, handlers);
-        using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
+        using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
         var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
 
-        Assert.Equal(3,count);
+        Assert.Equal(3, count);
     }
 
     [Fact]
@@ -74,8 +76,8 @@ public class BpmnEngineTest
         var serviceTask = Substitute.For<ServiceTask>(
             Substitute.For<ILogger<ServiceTask>>(),
             handler, _fixture.Create<string>());
-        
-        var endEvent =  Substitute.For<EndEvent>(
+
+        var endEvent = Substitute.For<EndEvent>(
             Substitute.For<ILogger<EndEvent>>(),
             handler, _fixture.Create<string>());
 
@@ -108,4 +110,43 @@ public class BpmnEngineTest
 
         Assert.Contains("No ServiceTask found", exception.Message);
     }
+
+    [Theory]
+    [InlineData("StartEvent_1")]
+    [InlineData("ServiceTaskFirstHandler")]
+    [InlineData("GatewayFirstHandler")]
+    [InlineData("SendTaskFirstHandler")]
+    [InlineData("ReceiveTaskFirstHandle")]
+    [InlineData("Gateway_Second")]
+    [InlineData("GatewayThirdHandler")]
+    [InlineData("ServiceTaskSecondHandler")]
+    [InlineData("ServiceTaskThirdHandler")]
+    [InlineData("ServiceTaskFourthHandler")]
+    [InlineData("SubProcessFirstHandler")]
+    [InlineData("GatewayFourthHandler")]
+    [InlineData("End_event")]
+    public async Task StartProcessAsync_CheckStartEvent_1_CallMethod(string idActivity)
+    {
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_1.bpmn");
+        var isCallMethod = false;
+        var handlers = new ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>>
+        {
+            [idActivity] = (ctx, ct) =>
+            {
+                isCallMethod = true;
+                return Task.CompletedTask;
+            },
+        };
+        var processModel = _processModelBuilder.Build(diagram, handlers);
+        using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
+        var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
+
+        var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
+
+        await res.ProcessTask.WaitAsync(cancellationToken.Token);
+
+        Assert.True(isCallMethod);
+    }
+    
+
 }
