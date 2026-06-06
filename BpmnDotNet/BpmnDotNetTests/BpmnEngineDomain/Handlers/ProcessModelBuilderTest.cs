@@ -14,14 +14,14 @@ public class ProcessModelBuilderTest
 {
     private readonly IXmlSerializationProcessSection _xmlSerializationProcessSection;
     private readonly ProcessModelBuilder _processModelBuilder;
-    private readonly ILogger<ProcessModelBuilder> _logger;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly Fixture _fixture;
 
     public ProcessModelBuilderTest()
     {
         _xmlSerializationProcessSection = new XmlSerializationProcessSection();
-        _logger = Substitute.For<ILogger<ProcessModelBuilder>>();
-        _processModelBuilder = new ProcessModelBuilder(_logger);
+        _loggerFactory = Substitute.For<ILoggerFactory>();
+        _processModelBuilder = new ProcessModelBuilder(_loggerFactory);
         _fixture = new Fixture();
     }
 

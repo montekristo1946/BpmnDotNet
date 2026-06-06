@@ -1,11 +1,10 @@
-using BpmnDotNet.BPMNDiagram.BpmnNatation;
-using BpmnDotNet.BpmnEngineDomain.Activity;
-
 namespace BpmnDotNet.BpmnEngineDomain;
 
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
+using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Activity;
 using BpmnDotNet.BpmnEngineDomain.Dto;
 using Microsoft.Extensions.Logging;
 
@@ -56,8 +55,8 @@ internal class BpmnEngine : IBpmnEngine
     internal void CreateStartToken(ProcessModel processModel)
     {
         var startEvent = processModel.Nodes
-            .FirstOrDefault(p => p.Value is ServiceTask)
-            .Value as ServiceTask;
+            .FirstOrDefault(p => p.Value is StartEvent)
+            .Value as StartEvent;
 
         if (startEvent == null)
         {
@@ -129,17 +128,18 @@ internal class BpmnEngine : IBpmnEngine
                 return false;
             }
 
-            var node = processModel.Nodes[token.CurrentNodeId];
+            var currentId = token.CurrentNodeId;
+            var node = processModel.Nodes[currentId];
 
             // TODO: Записывать состояние node Works.
-            var nodes = await node.ExecuteAsync(contextBpmnProcess, ctsToken);
+            var nodes = await node.ExecuteAsync(processModel, currentId, contextBpmnProcess, ctsToken);
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
             }
 
             // TODO: Записывать состояние node что вернул BpmnNodeResult.
-            if (nodes.SatusNode == StatusBpmnEngine.Failed || nodes.SatusNode == StatusBpmnEngine.Completed)
+            if (nodes.Status == StatusNode.FailedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
             {
                 return true;
             }

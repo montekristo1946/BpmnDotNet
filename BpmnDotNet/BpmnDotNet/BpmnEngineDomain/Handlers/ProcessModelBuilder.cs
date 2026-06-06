@@ -13,16 +13,18 @@ using Microsoft.Extensions.Logging;
 /// <inheritdoc />
 internal class ProcessModelBuilder : IProcessModelBuilder
 {
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<ProcessModelBuilder> _logger;
 
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessModelBuilder"/> class.
     /// </summary>
-    /// <param name="logger">ILogger.</param>
-    public ProcessModelBuilder(ILogger<ProcessModelBuilder> logger)
+    /// <param name="loggerFactory"><inheritdoc cref="ILoggerFactory"/></param>
+    public ProcessModelBuilder(ILoggerFactory loggerFactory)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+        _logger = _loggerFactory.CreateLogger<ProcessModelBuilder>();
     }
 
     /// <inheritdoc />
@@ -177,7 +179,8 @@ internal class ProcessModelBuilder : IProcessModelBuilder
             handler = MoqHandler;
         }
 
-        var bpmnNode = new StartEvent()
+        var logger = _loggerFactory.CreateLogger<StartEvent>();
+        var bpmnNode = new StartEvent(logger)
         {
             ActivityHandlerAsync = handler,
             Id = id,

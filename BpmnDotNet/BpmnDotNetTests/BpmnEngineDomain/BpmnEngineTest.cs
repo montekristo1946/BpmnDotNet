@@ -18,21 +18,22 @@ public class BpmnEngineTest
 {
     private readonly IXmlSerializationProcessSection _xmlSerializationProcessSection;
     private readonly ProcessModelBuilder _processModelBuilder;
-    private readonly ILogger<ProcessModelBuilder> _loggerProcessModelBuilder;
     private readonly BpmnEngine _bpmnEngine;
     private readonly ILogger<BpmnEngine> _logger;
     private readonly Fixture _fixture;
+    private readonly ILoggerFactory _loggerFactory;
 
     public BpmnEngineTest()
     {
         _xmlSerializationProcessSection = new XmlSerializationProcessSection();
-        _loggerProcessModelBuilder = Substitute.For<ILogger<ProcessModelBuilder>>();
-        _processModelBuilder = new ProcessModelBuilder(_loggerProcessModelBuilder);
+        _loggerFactory = Substitute.For<ILoggerFactory>();
+        _processModelBuilder = new ProcessModelBuilder(_loggerFactory);
         _logger =  Substitute.For<ILogger<BpmnEngine>>();
         _bpmnEngine = new BpmnEngine(_logger);
         _fixture = new Fixture();
     }
-    [Fact(Skip = "Placeholder test is not implemented")]
+    
+    [Fact]
     public async Task StartProcessAsync_FullPass_CallMethod()
     {
         var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_3.bpmn");
@@ -56,7 +57,8 @@ public class BpmnEngineTest
     [Fact]
     public void CreateStartToken_WithStartServiceTask_EnqueuesStartToken()
     {
-        var startTask = new ServiceTask
+        var logger = Substitute.For<ILogger<StartEvent>>();
+        var startTask = new StartEvent(logger)
         {
             Id = "StartEvent_01",
             ActivityHandlerAsync = (context, ct) => Task.CompletedTask,

@@ -17,7 +17,8 @@ internal class ServiceTask : IBpmnNode
 
 
     /// <inheritdoc/>
-    public Task<BpmnNodeResult> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
+    public Task<BpmnNodeResult> ExecuteAsync(ProcessModel processModel, string currentId,
+        IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
     {
         return Task.FromResult(new BpmnNodeResult());
         

@@ -13,5 +13,5 @@ internal record BpmnNodeResult()
     /// <summary>
     /// Gets статус выполнения.
     /// </summary>
-    public StatusBpmnEngine SatusNode { get; init; } = StatusBpmnEngine.None;
+    public StatusNode Status { get; init; } = StatusNode.None;
 };
