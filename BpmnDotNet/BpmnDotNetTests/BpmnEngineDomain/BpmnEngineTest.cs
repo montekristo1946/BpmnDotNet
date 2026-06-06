@@ -140,13 +140,19 @@ public class BpmnEngineTest
         var processModel = _processModelBuilder.Build(diagram, handlers);
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
+        var conditionRoute = new ConcurrentDictionary<string, string>();
+        conditionRoute.TryAdd("GatewayFirstHandler","Flow_in_SendTaskFirstHandler");
+   
 
+        contextBpmnProcess.ConditionRoute.Returns(conditionRoute);
         var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
 
         Assert.True(isCallMethod);
     }
+    
+  
     
 
 }

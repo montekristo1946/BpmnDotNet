@@ -171,14 +171,10 @@ public class ServiceTaskTest
         var sut = new ServiceTask(logger,handler,currentId) ;
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+       var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
-        logger.Received(1).Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(currentId)),
-            null,
-            Arg.Any<Func<object, Exception?, string>>());
+        Assert.Equal(StatusNode.FailedCompletedNode,res.Status);
+        Assert.Empty(res.Tokens.ToArray());
     }
 }

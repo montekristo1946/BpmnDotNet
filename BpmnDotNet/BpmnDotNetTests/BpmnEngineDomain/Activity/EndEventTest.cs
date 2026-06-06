@@ -22,7 +22,7 @@ public class EndEventTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new EndEvent(logger,handler,currentId);
+        var sut = new EndEvent(logger, handler, currentId);
         IContextBpmnProcess? contextBpmnProcess = null;
 
         // Act & Assert
@@ -40,9 +40,9 @@ public class EndEventTest
         IContextBpmnProcess contextBpmnProcess)
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => null!);
-        
+
         // Arrange
-        var sut = new EndEvent(logger,handler,_fixture.Create<string>()) { ActivityHandlerAsync = null! };
+        var sut = new EndEvent(logger, handler, _fixture.Create<string>()) { ActivityHandlerAsync = null! };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
@@ -55,11 +55,12 @@ public class EndEventTest
     internal async Task ExecuteAsync_CallActivityHandlerAsync_CountCall()
     {
         int countCall = 0;
-        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>  {
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>
+        {
             countCall++;
             return Task.CompletedTask;
         });
-        var sub = new EndEvent(Substitute.For<ILogger<EndEvent>>(),handler,_fixture.Create<string>());
+        var sub = new EndEvent(Substitute.For<ILogger<EndEvent>>(), handler, _fixture.Create<string>());
 
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
@@ -80,7 +81,7 @@ public class EndEventTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new EndEvent(logger,handler,currentId);
+        var sut = new EndEvent(logger, handler, currentId);
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
@@ -89,13 +90,8 @@ public class EndEventTest
         var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.AllBpmnProcessCompleted, result.Status);
-        Assert.Equal(nextNodes.Length, result.Tokens.ToArray().Length);
-
-        foreach (var token in result.Tokens)
-        {
-            Assert.Contains(nextNodes, n => n.IdResource == token.CurrentNodeId);
-        }
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Empty(result.Tokens.ToArray());
     }
 
     [Theory]
@@ -109,7 +105,7 @@ public class EndEventTest
         // Arrange
         var expectedException = new InvalidOperationException("Test exception");
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
-        var sut = new EndEvent(logger,handler,currentId) ;
+        var sut = new EndEvent(logger, handler, currentId);
 
         // Act
         var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
@@ -141,13 +137,14 @@ public class EndEventTest
         CancellationToken capturedToken = default;
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((ctx, ct) =>
-        {        handlerCalled = true;
+        {
+            handlerCalled = true;
             capturedContext = ctx;
             capturedToken = ct;
             return Task.CompletedTask;
         });
         // Arrange
-        var sut = new EndEvent(logger,handler,currentId) ;
+        var sut = new EndEvent(logger, handler, currentId);
 
         // Act
         await sut.ExecuteAsync(processModel, contextBpmnProcess, cancellationToken);
@@ -168,17 +165,13 @@ public class EndEventTest
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         // Arrange
-        var sut = new EndEvent(logger,handler,currentId) ;
+        var sut = new EndEvent(logger, handler, currentId);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
-        logger.Received(1).Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(currentId)),
-            null,
-            Arg.Any<Func<object, Exception?, string>>());
+        Assert.Empty(res.Tokens.ToArray());
+        Assert.Equal(StatusNode.AllBpmnProcessCompleted,res.Status);
     }
 }

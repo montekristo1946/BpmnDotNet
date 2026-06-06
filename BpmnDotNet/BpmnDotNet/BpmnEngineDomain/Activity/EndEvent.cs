@@ -56,22 +56,15 @@ internal class EndEvent : IBpmnNode
         }
 
         StatusNode statusBpmnEngine;
-        Token[] nextTokens = [];
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
             var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
-            if (!isGetNextNodes)
+            if (isGetNextNodes || nextNodes is not null)
             {
-                _logger.LogWarning(
-                    "[EndEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    Id);
+                throw new InvalidDataException($"[ExclusiveGateway:ExecuteAsync] EndEvent must be the final event, IdNode:{Id}");
             }
 
-            nextTokens = nextNodes?.Select(p => new Token
-            {
-                CurrentNodeId = p.IdResource,
-            }).ToArray() ?? [];
             statusBpmnEngine = StatusNode.AllBpmnProcessCompleted;
         }
         catch (Exception e)
@@ -83,7 +76,7 @@ internal class EndEvent : IBpmnNode
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
-            Tokens = nextTokens,
+            Tokens = [],
         };
     }
 }

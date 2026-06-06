@@ -44,8 +44,7 @@ internal class ExclusiveGateway : IBpmnNode
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
-       /* if (contextBpmnProcess == null)
+        if (contextBpmnProcess == null)
         {
             throw new ArgumentNullException(nameof(contextBpmnProcess));
         }
@@ -56,22 +55,44 @@ internal class ExclusiveGateway : IBpmnNode
         }
 
         StatusNode statusBpmnEngine;
-        Token[] nextTokens = [];
+        Token? nextToken = null;
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(i, out var nextNodes);
-            if (!isGetNextNodes)
+
+            var isGetCandidateNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var candidateNextNodes);
+
+            if (!isGetCandidateNextNodes || candidateNextNodes is null || candidateNextNodes.Length == 0)
             {
-                _logger.LogWarning(
-                    "[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    currentId);
+                throw new InvalidDataException(
+                    $"[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
-            nextTokens = nextNodes?.Select(p => new Token
+            if (candidateNextNodes.Length == 1)
             {
-                CurrentNodeId = p.IdResource,
-            }).ToArray() ?? [];
+                nextToken = new Token
+                {
+                    CurrentNodeId = candidateNextNodes.FirstOrDefault()?.IdResource
+                                    ?? throw new InvalidDataException(
+                                        "[ExclusiveGateway:ExecuteAsync] Fail get IdResource"),
+                };
+            }
+            else
+            {
+                var idRouteFlow = GetRouteFlow(contextBpmnProcess, Id);
+                var isGetNextNodes = processModel.Flows.TryGetValue(idRouteFlow, out var flow);
+                if (!isGetNextNodes || flow is null)
+                {
+                    throw new InvalidDataException(
+                        $"[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
+                }
+
+                nextToken = new Token
+                {
+                    CurrentNodeId = flow.TargetId,
+                };
+            }
+
             statusBpmnEngine = StatusNode.NormalCompletedNode;
         }
         catch (Exception e)
@@ -83,7 +104,31 @@ internal class ExclusiveGateway : IBpmnNode
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
-            Tokens = nextTokens,
-        };*/
+            Tokens = nextToken is null ? Array.Empty<Token>() : new[] { nextToken },
+        };
+    }
+
+    /// <summary>
+    /// Получить id ветки назначения из словаря ConditionRoute.
+    /// </summary>
+    /// <param name="context"><inheritdoc cref="IContextBpmnProcess"/></param>
+    /// <param name="idCurrentNode">id текущей node.</param>
+    /// <returns>Id flow которая выбрана.</returns>
+    internal virtual string GetRouteFlow(IContextBpmnProcess context, string idCurrentNode)
+    {
+        var dict = context.ConditionRoute;
+        if (dict is null)
+        {
+            throw new InvalidDataException(
+                $" [ExclusiveGateway:GetRouteFlow] Context ConditionRoute dictionary is null");
+        }
+
+        if (!dict.TryGetValue(idCurrentNode, out var conditionName) || string.IsNullOrWhiteSpace(conditionName))
+        {
+            throw new InvalidDataException($" [ExclusiveGateway:GetRouteFlow] " +
+                                           $"Couldn't find the condition from gateway:{idCurrentNode}");
+        }
+
+        return conditionName;
     }
 }

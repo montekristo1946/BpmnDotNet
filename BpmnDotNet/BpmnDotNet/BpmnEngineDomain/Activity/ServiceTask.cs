@@ -60,11 +60,11 @@ internal class ServiceTask : IBpmnNode
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
             var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
-            if (!isGetNextNodes)
+
+            if (!isGetNextNodes || nextNodes is null || nextNodes.Length == 0)
             {
-                _logger.LogWarning(
-                    "[ServiceTask:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    Id);
+                throw new InvalidDataException(
+                    $"[ServiceTask:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
             nextTokens = nextNodes?.Select(p => new Token
