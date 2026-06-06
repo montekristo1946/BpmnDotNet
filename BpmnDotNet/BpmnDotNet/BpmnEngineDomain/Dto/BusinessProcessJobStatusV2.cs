@@ -8,11 +8,6 @@ using BpmnDotNet.BpmnEngineDomain.Abstractions;
 public class BusinessProcessJobStatusV2
 {
     /// <summary>
-    /// Gets or sets текущее состояние.
-    /// </summary>
-    public StatusBpmnEngine StatusType { get; set; } = StatusBpmnEngine.None;
-
-    /// <summary>
     /// Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
     public string IdBpmnProcess { get; init; } = string.Empty;

@@ -38,7 +38,6 @@ internal class BpmnEngine : IBpmnEngine
         _threadBackground = Task.Run(() => ThreadBackground(processModel, contextBpmnProcess, ct), ct);
         var jobStatus = new BusinessProcessJobStatusV2
         {
-            StatusType = StatusBpmnEngine.Works,
             IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
             TokenProcess = contextBpmnProcess.TokenProcess,
             ProcessTask = _threadBackground,

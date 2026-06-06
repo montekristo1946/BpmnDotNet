@@ -37,11 +37,22 @@ public class BpmnEngineTest
     public async Task StartProcessAsync_FullPass_CallMethod()
     {
         var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_3.bpmn");
+        var count = 0;
         var handlers = new ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>>
         {
-            ["StartEvent_01"] = (ctx, ct) => Task.CompletedTask,
-            ["Activity_01"] = (ctx, ct) => Task.CompletedTask,
-            ["Event_01"] = (ctx, ct) => Task.CompletedTask,
+            ["StartEvent_01"] = (ctx, ct) =>
+            {
+                count++;
+                return Task.CompletedTask;
+            },
+            ["Activity_01"] = (ctx, ct) =>  {
+                count++;
+                return Task.CompletedTask;
+            },
+            ["Event_01"] = (ctx, ct) =>  {
+                count++;
+                return Task.CompletedTask;
+            },
         };
         var processModel = _processModelBuilder.Build(diagram, handlers);
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
@@ -51,7 +62,7 @@ public class BpmnEngineTest
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
 
-        throw new NotImplementedException();
+        Assert.Equal(3,count);
     }
 
     [Fact]
