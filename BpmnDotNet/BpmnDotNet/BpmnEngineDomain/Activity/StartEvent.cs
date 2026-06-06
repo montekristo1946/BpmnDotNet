@@ -61,12 +61,12 @@ internal class StartEvent : IBpmnNode
             {
                 CurrentNodeId = p.IdResource,
             }).ToArray() ?? [];
-            statusBpmnEngine = StatusNode.CompletedNode;
+            statusBpmnEngine = StatusNode.NormalCompletedNode;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[StartEvent:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedNode;
+            statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
         return new BpmnNodeResult()

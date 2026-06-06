@@ -114,7 +114,9 @@ internal class ProcessModelBuilder : IProcessModelBuilder
             handler = MoqHandler;
         }
 
-        var bpmnNode = new ServiceTask()
+        var logger = _loggerFactory.CreateLogger<ServiceTask>();
+
+        var bpmnNode = new ServiceTask(logger)
         {
             ActivityHandlerAsync = handler,
             Id = id,

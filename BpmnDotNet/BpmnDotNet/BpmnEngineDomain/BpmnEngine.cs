@@ -139,7 +139,7 @@ internal class BpmnEngine : IBpmnEngine
             }
 
             // TODO: Записывать состояние node что вернул BpmnNodeResult.
-            if (nodes.Status == StatusNode.FailedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
+            if (nodes.Status == StatusNode.FailedCompletedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
             {
                 return true;
             }

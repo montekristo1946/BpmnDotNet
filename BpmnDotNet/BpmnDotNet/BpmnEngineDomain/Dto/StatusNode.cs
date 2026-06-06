@@ -18,12 +18,12 @@ public enum StatusNode
     /// <summary>
     ///     Удачно завершен.
     /// </summary>
-    CompletedNode = 2,
+    NormalCompletedNode = 2,
 
     /// <summary>
     ///     Не удачно завершен.
     /// </summary>
-    FailedNode = 3,
+    FailedCompletedNode = 3,
 
     /// <summary>
     /// Завершен весь процесс bpmn.

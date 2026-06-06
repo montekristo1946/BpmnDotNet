@@ -9,7 +9,7 @@ using NSubstitute;
 
 namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 
-public class StartEventTests
+public class StartEventTest
 {
     private readonly Fixture _fixture = new Fixture();
 
@@ -90,7 +90,7 @@ public class StartEventTests
         var result = await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.CompletedNode, result.Status);
+        Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
         Assert.Equal(nextNodes.Length, result.Tokens.ToArray().Length);
 
         foreach (var token in result.Tokens)
@@ -118,7 +118,7 @@ public class StartEventTests
         var result = await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
         Assert.Empty(result.Tokens);
 
         logger.Received(1).Log(
