@@ -6,7 +6,7 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// StartEvent ServiceTask.
+/// ServiceTask Activity.
 /// </summary>
 internal class ServiceTask : IBpmnNode
 {

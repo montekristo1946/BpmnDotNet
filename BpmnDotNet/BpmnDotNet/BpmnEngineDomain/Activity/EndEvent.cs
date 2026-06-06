@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
 using BpmnDotNet.Abstractions.Context;
@@ -9,17 +11,69 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 /// </summary>
 internal class EndEvent : IBpmnNode
 {
+    private readonly ILogger<EndEvent> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EndEvent"/> class.
+    /// </summary>
+    /// <param name="logger"><inheritdoc cref="ILogger"/></param>
+    public EndEvent(ILogger<EndEvent> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
     /// <inheritdoc/>
     public string Id { get; init; } = string.Empty;
 
     /// <inheritdoc/>
     public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; } = null!;
 
-
     /// <inheritdoc/>
-    public Task<BpmnNodeResult> ExecuteAsync(ProcessModel processModel, string currentId,
-        IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
+    public async Task<BpmnNodeResult> ExecuteAsync(
+        ProcessModel processModel,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new BpmnNodeResult());
+        if (contextBpmnProcess == null)
+        {
+            throw new ArgumentNullException(nameof(contextBpmnProcess));
+        }
+
+        if (ActivityHandlerAsync == null)
+        {
+            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
+        }
+
+        StatusNode statusBpmnEngine;
+        Token[] nextTokens = [];
+        try
+        {
+            await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
+            if (!isGetNextNodes)
+            {
+                _logger.LogWarning(
+                    "[EndEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
+                    currentId);
+            }
+
+            nextTokens = nextNodes?.Select(p => new Token
+            {
+                CurrentNodeId = p.IdResource,
+            }).ToArray() ?? [];
+            statusBpmnEngine = StatusNode.AllBpmnProcessCompleted;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[EndEvent:ExecuteAsync] Exception");
+            statusBpmnEngine = StatusNode.FailedCompletedNode;
+        }
+
+        return new BpmnNodeResult()
+        {
+            Status = statusBpmnEngine,
+            Tokens = nextTokens,
+        };
     }
 }

@@ -157,7 +157,8 @@ internal class ProcessModelBuilder : IProcessModelBuilder
             handler = MoqHandler;
         }
 
-        var bpmnNode = new EndEvent()
+        var logger = _loggerFactory.CreateLogger<EndEvent>();
+        var bpmnNode = new EndEvent(logger)
         {
             ActivityHandlerAsync = handler,
             Id = id,
