@@ -33,7 +33,7 @@ internal class StartEvent : IBpmnNode
         ProcessModel processModel,
         string currentId,
         IContextBpmnProcess contextBpmnProcess,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         if (contextBpmnProcess == null)
         {
@@ -53,7 +53,8 @@ internal class StartEvent : IBpmnNode
             var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
             if (!isGetNextNodes)
             {
-                _logger.LogWarning("[StartEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}", currentId);
+                _logger.LogWarning("[StartEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
+                    currentId);
             }
 
             nextTokens = nextNodes?.Select(p => new Token

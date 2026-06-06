@@ -8,7 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoFixture" Version="$(AutoFixtureVersion)"/>
+        <PackageReference Include="AutoFixture" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.AutoNSubstitute" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.Xunit2" Version="5.0.0-preview0012" />
         <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorVesion)"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)"/>
         <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)"/>
