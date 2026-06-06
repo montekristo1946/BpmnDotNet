@@ -19,10 +19,10 @@ internal interface IBpmnNode
     /// <param name="contextBpmnProcess">IContextBpmnProcess.</param>
     /// <param name="cancellationToken">CancellationToken.</param>
     /// <returns>Token следующего шага.</returns>
-    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken);
+    public Task<BpmnNodeResult> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets метод вызова реальзации пользователя.
+    /// Gets метод вызова реализации пользователя.
     /// </summary>
-    public Func<IContextBpmnProcess, CancellationToken, Task> Handler { get; init; }
+    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; }
 }

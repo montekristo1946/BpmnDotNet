@@ -59,7 +59,7 @@ public class BpmnEngineTest
         var startTask = new ServiceTask
         {
             Id = "StartEvent_01",
-            Handler = (context, ct) => Task.CompletedTask,
+            ActivityHandlerAsync = (context, ct) => Task.CompletedTask,
         };
         var serviceTask = _fixture.Create<ServiceTask>();
         var endEvent = _fixture.Create<EndEvent>();

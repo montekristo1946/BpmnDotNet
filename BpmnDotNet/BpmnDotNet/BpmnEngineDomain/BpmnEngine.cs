@@ -78,14 +78,44 @@ internal class BpmnEngine : IBpmnEngine
             contextBpmnProcess.IdBpmnProcess,
             contextBpmnProcess.TokenProcess);
 
-        while (!ctsToken.IsCancellationRequested)
+        try
         {
-            await _semaphore.WaitAsync(ctsToken);
-            await RunEventLoopAsync(contextBpmnProcess, ctsToken, processModel);
+            while (!ctsToken.IsCancellationRequested)
+            {
+                await _semaphore.WaitAsync(ctsToken);
+                var isCompletedBackground = await RunEventLoopAsync(contextBpmnProcess, ctsToken, processModel);
+                if (isCompletedBackground)
+                {
+                    return;
+                }
+            }
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogDebug("[BpmnEngine:ThreadBackground] Event loop cancelled");
+
+            // TODO: Присваиваем статус процесса Failed.
+            return;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[BpmnEngine:ThreadBackground] Exception");
+
+            // TODO: Присваиваем статус процесса Failed.
+            return;
+        }
+        finally
+        {
+            // TODO: Записывать состояния всего процесса в базу данных.
+        }
+
+        _logger.LogDebug(
+            "[BpmnEngine:ThreadBackground] End business... {IdBpmnProcess} {TokenProcess}",
+            contextBpmnProcess.IdBpmnProcess,
+            contextBpmnProcess.TokenProcess);
     }
 
-    private async Task RunEventLoopAsync(
+    private async Task<bool> RunEventLoopAsync(
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken ctsToken,
         ProcessModel processModel)
@@ -96,21 +126,28 @@ internal class BpmnEngine : IBpmnEngine
             if (!resGetToken || token == null)
             {
                 _logger.LogError("[BpmnEngine:RunEventLoopAsync] No events queued");
-                return;
+                return false;
             }
 
-            try
-            {
-                var node = processModel.Nodes[token.CurrentNodeId];
-                var nodes = await node.ExecuteAsync(contextBpmnProcess, ctsToken);
+            var node = processModel.Nodes[token.CurrentNodeId];
 
-                nodes.ToList().ForEach(p => _eventQueue.Enqueue(p));
-            }
-            catch (Exception e)
+            // TODO: Записывать состояние node Works.
+            var nodes = await node.ExecuteAsync(contextBpmnProcess, ctsToken);
+            if (nodes is null)
             {
-                _logger.LogError(e, "[BpmnEngine:RunEventLoopAsync] Exception");
+                throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
             }
+
+            // TODO: Записывать состояние node что вернул BpmnNodeResult.
+            if (nodes.SatusNode == StatusBpmnEngine.Failed || nodes.SatusNode == StatusBpmnEngine.Completed)
+            {
+                return true;
+            }
+
+            nodes.Tokens.ToList().ForEach(p => _eventQueue.Enqueue(p));
         }
+
+        return false;
     }
 
 

@@ -13,12 +13,13 @@ internal class ServiceTask : IBpmnNode
     public string Id { get; init; } = string.Empty;
 
     /// <inheritdoc/>
-    public Func<IContextBpmnProcess, CancellationToken, Task> Handler { get; init; } = null!;
+    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; } = null!;
 
 
     /// <inheritdoc/>
-    public Task<IEnumerable<Token>> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
+    public Task<BpmnNodeResult> ExecuteAsync(IContextBpmnProcess contextBpmnProcess, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new BpmnNodeResult());
+        
     }
 }

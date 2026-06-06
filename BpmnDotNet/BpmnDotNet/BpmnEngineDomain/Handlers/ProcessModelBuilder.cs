@@ -114,7 +114,7 @@ internal class ProcessModelBuilder : IProcessModelBuilder
 
         var bpmnNode = new ServiceTask()
         {
-            Handler = handler,
+            ActivityHandlerAsync = handler,
             Id = id,
         };
 
@@ -155,7 +155,7 @@ internal class ProcessModelBuilder : IProcessModelBuilder
 
         var bpmnNode = new EndEvent()
         {
-            Handler = handler,
+            ActivityHandlerAsync = handler,
             Id = id,
         };
 
@@ -179,7 +179,7 @@ internal class ProcessModelBuilder : IProcessModelBuilder
 
         var bpmnNode = new StartEvent()
         {
-            Handler = handler,
+            ActivityHandlerAsync = handler,
             Id = id,
         };
 
