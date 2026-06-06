@@ -132,7 +132,7 @@ internal class BpmnEngine : IBpmnEngine
             var node = processModel.Nodes[currentId];
 
             // TODO: Записывать состояние node Works.
-            var nodes = await node.ExecuteAsync(processModel, currentId, contextBpmnProcess, ctsToken);
+            var nodes = await node.ExecuteAsync(processModel, contextBpmnProcess, ctsToken);
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");

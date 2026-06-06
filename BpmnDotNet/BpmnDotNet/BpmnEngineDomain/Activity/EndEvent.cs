@@ -16,14 +16,25 @@ internal class EndEvent : IBpmnNode
     /// <summary>
     /// Initializes a new instance of the <see cref="EndEvent"/> class.
     /// </summary>
-    /// <param name="logger"><inheritdoc cref="ILogger"/></param>
-    public EndEvent(ILogger<EndEvent> logger)
+    /// <param name="logger">ILogger.</param>
+    /// <param name="handlerAsync">Func метода клиента.</param>
+    /// <param name="id">Id на Bpmn схеме.</param>
+    public EndEvent(
+        ILogger<EndEvent> logger,
+        Func<IContextBpmnProcess, CancellationToken, Task> handlerAsync,
+        string id)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        Id = id ?? throw new ArgumentNullException(nameof(id));
+        ActivityHandlerAsync = handlerAsync ?? throw new ArgumentNullException(nameof(handlerAsync));
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            throw new ArgumentNullException(nameof(Id));
+        }
     }
 
     /// <inheritdoc/>
-    public string Id { get; init; } = string.Empty;
+    public string Id { get; init; }
 
     /// <inheritdoc/>
     public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; } = null!;
@@ -31,7 +42,6 @@ internal class EndEvent : IBpmnNode
     /// <inheritdoc/>
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
-        string currentId,
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken cancellationToken = default)
     {
@@ -50,12 +60,12 @@ internal class EndEvent : IBpmnNode
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
             if (!isGetNextNodes)
             {
                 _logger.LogWarning(
                     "[EndEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    currentId);
+                    Id);
             }
 
             nextTokens = nextNodes?.Select(p => new Token

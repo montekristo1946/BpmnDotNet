@@ -28,11 +28,11 @@ public class BpmnEngineTest
         _xmlSerializationProcessSection = new XmlSerializationProcessSection();
         _loggerFactory = Substitute.For<ILoggerFactory>();
         _processModelBuilder = new ProcessModelBuilder(_loggerFactory);
-        _logger =  Substitute.For<ILogger<BpmnEngine>>();
+        _logger = Substitute.For<ILogger<BpmnEngine>>();
         _bpmnEngine = new BpmnEngine(_logger);
         _fixture = new Fixture();
     }
-    
+
     [Fact]
     public async Task StartProcessAsync_FullPass_CallMethod()
     {
@@ -47,10 +47,10 @@ public class BpmnEngineTest
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess,processModel,cancellationToken.Token);
+        var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
-        
+
         throw new NotImplementedException();
     }
 
@@ -58,13 +58,15 @@ public class BpmnEngineTest
     public void CreateStartToken_WithStartServiceTask_EnqueuesStartToken()
     {
         var logger = Substitute.For<ILogger<StartEvent>>();
-        var startTask = new StartEvent(logger)
-        {
-            Id = "StartEvent_01",
-            ActivityHandlerAsync = (context, ct) => Task.CompletedTask,
-        };
-        var serviceTask = _fixture.Create<ServiceTask>();
-        var endEvent = _fixture.Create<EndEvent>();
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        var startTask = new StartEvent(logger, handler, "StartEvent_01");
+        var serviceTask = Substitute.For<ServiceTask>(
+            Substitute.For<ILogger<ServiceTask>>(),
+            handler, _fixture.Create<string>());
+        
+        var endEvent =  Substitute.For<EndEvent>(
+            Substitute.For<ILogger<EndEvent>>(),
+            handler, _fixture.Create<string>());
 
         var processModel = new ProcessModel
         {
@@ -78,7 +80,8 @@ public class BpmnEngineTest
 
         _bpmnEngine.CreateStartToken(processModel);
 
-        var eventQueueField = typeof(BpmnEngine).GetField("_eventQueue", BindingFlags.Instance | BindingFlags.NonPublic);
+        var eventQueueField =
+            typeof(BpmnEngine).GetField("_eventQueue", BindingFlags.Instance | BindingFlags.NonPublic);
         var eventQueue = (ConcurrentQueue<Token>)eventQueueField!.GetValue(_bpmnEngine)!;
 
         Assert.True(eventQueue.TryPeek(out var token));

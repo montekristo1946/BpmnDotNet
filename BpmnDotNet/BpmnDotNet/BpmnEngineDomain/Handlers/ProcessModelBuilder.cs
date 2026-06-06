@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 namespace BpmnDotNet.BpmnEngineDomain.Handlers;
@@ -38,17 +39,32 @@ internal class ProcessModelBuilder : IProcessModelBuilder
         {
             switch (element)
             {
-                case StartEventComponent startEvent:
-                    CreateStartEvent(startEvent, handlers, processModel);
-                    break;
-                case EndEventComponent endEvent:
-                    CreateEndEvent(endEvent, handlers, processModel);
-                    break;
-                case ServiceTaskComponent serviceTask:
-                    CreateServiceTask(serviceTask, handlers, processModel);
-                    break;
                 case SequenceFlowComponent flow:
                     CreateSequenceFlow(flow, handlers, processModel);
+                    break;
+                case StartEventComponent component:
+                    CreateGenericActivity<StartEventComponent, StartEvent>(component, handlers, processModel);
+                    break;
+                case EndEventComponent component:
+                    CreateGenericActivity<EndEventComponent, EndEvent>(component, handlers, processModel);
+                    break;
+                case ExclusiveGatewayComponent component:
+                    CreateGenericActivity<ExclusiveGatewayComponent, ExclusiveGateway>(component, handlers, processModel);
+                    break;
+                case ParallelGatewayComponent component:
+                    CreateGenericActivity<ParallelGatewayComponent, ParallelGateway>(component, handlers, processModel);
+                    break;
+                case ReceiveTaskComponent component:
+                    CreateGenericActivity<ReceiveTaskComponent, ReceiveTask>(component, handlers, processModel);
+                    break;
+                case SendTaskComponent component:
+                    CreateGenericActivity<SendTaskComponent, SendTask>(component, handlers, processModel);
+                    break;
+                case ServiceTaskComponent component:
+                    CreateGenericActivity<ServiceTaskComponent, ServiceTask>(component, handlers, processModel);
+                    break;
+                case SubProcessComponent component:
+                    CreateGenericActivity<SubProcessComponent, SubProcess>(component, handlers, processModel);
                     break;
                 default:
                     throw new ArgumentException($"Unknown element type: {element.GetType()}");
@@ -66,6 +82,32 @@ internal class ProcessModelBuilder : IProcessModelBuilder
         return processModel;
     }
 
+    // TODO: Протестить что будет если TDestination не будет соответствовать интерфейсу, возможно завернуть в try cath.
+    private void CreateGenericActivity<TSource,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDestination>(
+        TSource source,
+        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
+        ProcessModel processModel)
+        where TSource : IElement
+        where TDestination : IBpmnNode
+    {
+        var id = source.IdElement;
+
+        var res = handlers.TryGetValue(id, out var handler);
+
+        if (!res || handler is null)
+        {
+            _logger.LogWarning(
+                "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
+            handler = MoqHandler;
+        }
+
+        var logger = _loggerFactory.CreateLogger<TDestination>();
+
+        var bpmnNode = (IBpmnNode)Activator.CreateInstance(typeof(TDestination), logger, handler, id)!;
+
+        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
+    }
 
     /// <summary>
     ///  Группируем все потоки по SourceId и преобразуем в словарь массивов TargetId потоков.
@@ -99,32 +141,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
         return sourceIndex;
     }
 
-    private void CreateServiceTask(
-        ServiceTaskComponent serviceTask,
-        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        ProcessModel processModel)
-    {
-        var id = serviceTask.IdElement;
-        var res = handlers.TryGetValue(id, out var handler);
-
-        if (!res || handler is null)
-        {
-            _logger.LogWarning(
-                "[ProcessModelBuilder:CreateServiceTask] Unknown get handlers; Id: {IdElement}", id);
-            handler = MoqHandler;
-        }
-
-        var logger = _loggerFactory.CreateLogger<ServiceTask>();
-
-        var bpmnNode = new ServiceTask(logger)
-        {
-            ActivityHandlerAsync = handler,
-            Id = id,
-        };
-
-        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
-    }
-
     private void CreateSequenceFlow(
         SequenceFlowComponent flow,
         ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
@@ -140,56 +156,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
         };
 
         processModel.Flows.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
-    }
-
-    private void CreateEndEvent(
-        EndEventComponent endEvent,
-        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        ProcessModel processModel)
-    {
-        var id = endEvent.IdElement;
-        var res = handlers.TryGetValue(id, out var handler);
-
-        if (!res || handler is null)
-        {
-            _logger.LogWarning(
-                "[ProcessModelBuilder:CreateEndEvent] Unknown get handlers; Id: {IdElement}", id);
-            handler = MoqHandler;
-        }
-
-        var logger = _loggerFactory.CreateLogger<EndEvent>();
-        var bpmnNode = new EndEvent(logger)
-        {
-            ActivityHandlerAsync = handler,
-            Id = id,
-        };
-
-        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
-    }
-
-    private void CreateStartEvent(
-        StartEventComponent startEvent,
-        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        ProcessModel processModel)
-    {
-        var id = startEvent.IdElement;
-        var res = handlers.TryGetValue(id, out var handler);
-
-        if (!res || handler is null)
-        {
-            _logger.LogWarning(
-                "[ProcessModelBuilder:CreateStartEvent] Unknown get handlers; Id: {IdElement}", id);
-            handler = MoqHandler;
-        }
-
-        var logger = _loggerFactory.CreateLogger<StartEvent>();
-        var bpmnNode = new StartEvent(logger)
-        {
-            ActivityHandlerAsync = handler,
-            Id = id,
-        };
-
-        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
     }
 
     private Task MoqHandler(IContextBpmnProcess contextBpmnProcess, CancellationToken ctsToken)

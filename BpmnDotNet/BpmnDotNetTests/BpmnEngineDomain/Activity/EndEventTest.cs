@@ -21,12 +21,13 @@ public class EndEventTest
         string currentId)
     {
         // Arrange
-        var sut = new EndEvent(logger) { ActivityHandlerAsync = (_, _) => Task.CompletedTask };
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        var sut = new EndEvent(logger,handler,currentId);
         IContextBpmnProcess? contextBpmnProcess = null;
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, currentId, contextBpmnProcess!, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, CancellationToken.None));
 
         Assert.Equal("contextBpmnProcess", exception.ParamName);
     }
@@ -36,15 +37,16 @@ public class EndEventTest
     internal async Task ExecuteAsync_ShouldThrowArgumentNullException_WhenActivityHandlerIsNull(
         [Frozen] ILogger<EndEvent> logger,
         ProcessModel processModel,
-        string currentId,
         IContextBpmnProcess contextBpmnProcess)
     {
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => null!);
+        
         // Arrange
-        var sut = new EndEvent(logger) { ActivityHandlerAsync = null! };
+        var sut = new EndEvent(logger,handler,_fixture.Create<string>()) { ActivityHandlerAsync = null! };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
@@ -53,20 +55,16 @@ public class EndEventTest
     internal async Task ExecuteAsync_CallActivityHandlerAsync_CountCall()
     {
         int countCall = 0;
-        var EndEvent = new EndEvent(Substitute.For<ILogger<EndEvent>>())
-        {
-            ActivityHandlerAsync = (_, _) =>
-            {
-                countCall++;
-                return Task.CompletedTask;
-            }
-        };
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>  {
+            countCall++;
+            return Task.CompletedTask;
+        });
+        var sub = new EndEvent(Substitute.For<ILogger<EndEvent>>(),handler,_fixture.Create<string>());
 
         var processModel = _fixture.Create<ProcessModel>();
-        var currentId = _fixture.Create<string>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await EndEvent.ExecuteAsync(processModel, currentId, contextBpmnProcess);
+        var res = await sub.ExecuteAsync(processModel, contextBpmnProcess);
 
         Assert.Equal(1, countCall);
     }
@@ -81,13 +79,14 @@ public class EndEventTest
         DirectionFlow[] nextNodes)
     {
         // Arrange
-        var sut = new EndEvent(logger) { ActivityHandlerAsync = (_, _) => Task.CompletedTask };
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        var sut = new EndEvent(logger,handler,currentId);
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.AllBpmnProcessCompleted, result.Status);
@@ -109,13 +108,11 @@ public class EndEventTest
     {
         // Arrange
         var expectedException = new InvalidOperationException("Test exception");
-        var sut = new EndEvent(logger)
-        {
-            ActivityHandlerAsync = (_, _) => throw expectedException
-        };
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
+        var sut = new EndEvent(logger,handler,currentId) ;
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -143,19 +140,17 @@ public class EndEventTest
         IContextBpmnProcess? capturedContext = null;
         CancellationToken capturedToken = default;
 
-        var sut = new EndEvent(logger)
-        {
-            ActivityHandlerAsync = (ctx, ct) =>
-            {
-                handlerCalled = true;
-                capturedContext = ctx;
-                capturedToken = ct;
-                return Task.CompletedTask;
-            }
-        };
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((ctx, ct) =>
+        {        handlerCalled = true;
+            capturedContext = ctx;
+            capturedToken = ct;
+            return Task.CompletedTask;
+        });
+        // Arrange
+        var sut = new EndEvent(logger,handler,currentId) ;
 
         // Act
-        await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -171,11 +166,12 @@ public class EndEventTest
         string currentId,
         IContextBpmnProcess contextBpmnProcess)
     {
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         // Arrange
-        var sut = new EndEvent(logger) { ActivityHandlerAsync = (_, _) => Task.CompletedTask };
+        var sut = new EndEvent(logger,handler,currentId) ;
 
         // Act
-        await sut.ExecuteAsync(processModel, currentId, contextBpmnProcess, CancellationToken.None);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
 
         // Assert
         logger.Received(1).Log(

@@ -6,20 +6,20 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// StartEvent Activity.
+/// SubProcess Activity.
 /// </summary>
-internal class StartEvent : IBpmnNode
+internal class SubProcess : IBpmnNode
 {
-    private readonly ILogger<StartEvent> _logger;
+    private readonly ILogger<SubProcess> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="StartEvent"/> class.
+    /// Initializes a new instance of the <see cref="SubProcess"/> class.
     /// </summary>
     /// <param name="logger">ILogger.</param>
     /// <param name="handlerAsync">Func метода клиента.</param>
     /// <param name="id">Id на Bpmn схеме.</param>
-    public StartEvent(
-        ILogger<StartEvent> logger,
+    public SubProcess(
+        ILogger<SubProcess> logger,
         Func<IContextBpmnProcess, CancellationToken, Task> handlerAsync,
         string id)
     {
@@ -36,15 +36,16 @@ internal class StartEvent : IBpmnNode
     public string Id { get; init; }
 
     /// <inheritdoc/>
-    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; }
+    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; } = null!;
 
     /// <inheritdoc/>
-    public virtual async Task<BpmnNodeResult> ExecuteAsync(
+    public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken cancellationToken = default)
     {
-        if (contextBpmnProcess == null)
+        throw new NotImplementedException();
+       /* if (contextBpmnProcess == null)
         {
             throw new ArgumentNullException(nameof(contextBpmnProcess));
         }
@@ -54,17 +55,17 @@ internal class StartEvent : IBpmnNode
             throw new ArgumentNullException(nameof(ActivityHandlerAsync));
         }
 
-        var statusBpmnEngine = StatusNode.WorksNode;
+        StatusNode statusBpmnEngine;
         Token[] nextTokens = [];
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
             if (!isGetNextNodes)
             {
                 _logger.LogWarning(
-                    "[StartEvent:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    Id);
+                    "[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
+                    currentId);
             }
 
             nextTokens = nextNodes?.Select(p => new Token
@@ -75,7 +76,7 @@ internal class StartEvent : IBpmnNode
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[StartEvent:ExecuteAsync] Exception");
+            _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
@@ -83,6 +84,6 @@ internal class StartEvent : IBpmnNode
         {
             Status = statusBpmnEngine,
             Tokens = nextTokens,
-        };
+        };*/
     }
 }
