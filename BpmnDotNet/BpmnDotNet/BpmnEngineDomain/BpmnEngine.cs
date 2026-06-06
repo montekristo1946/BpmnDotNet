@@ -34,7 +34,6 @@ internal class BpmnEngine : IBpmnEngine
                 "[BpmnEngine:StartProcessAsync] The thread background has already been started.");
         }
 
-        //TODO: остановился тут, нужно в _eventQueue добавить токе startEvent.
         CreateStartToken(processModel);
         _semaphore.Release();
         _threadBackground = Task.Run(() => ThreadBackground(processModel, contextBpmnProcess, ct), ct);
@@ -57,10 +56,13 @@ internal class BpmnEngine : IBpmnEngine
     internal void CreateStartToken(ProcessModel processModel)
     {
         var startEvent = processModel.Nodes
-                             .Select(p => p.Value)
-                             .OfType<ServiceTask>()
-                             .FirstOrDefault()
-                         ?? throw new InvalidOperationException("[BpmnEngine:CreateStartToken] No StartEventComponent found.");
+            .FirstOrDefault(p => p.Value is ServiceTask)
+            .Value as ServiceTask;
+
+        if (startEvent == null)
+        {
+            throw new InvalidOperationException("[BpmnEngine:CreateStartToken] No ServiceTask found.");
+        }
 
         var startToken = new Token() { CurrentNodeId = startEvent.Id };
         _eventQueue.Enqueue(startToken);

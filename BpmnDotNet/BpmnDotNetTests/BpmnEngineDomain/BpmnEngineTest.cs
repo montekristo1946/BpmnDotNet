@@ -1,8 +1,12 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using AutoFixture;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BpmnEngineDomain;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Activity;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.BpmnEngineDomain.Handlers;
 using BpmnDotNet.Handlers;
 using Microsoft.Extensions.Logging;
@@ -28,7 +32,7 @@ public class BpmnEngineTest
         _bpmnEngine = new BpmnEngine(_logger);
         _fixture = new Fixture();
     }
-    [Fact]
+    [Fact(Skip = "Placeholder test is not implemented")]
     public async Task StartProcessAsync_FullPass_CallMethod()
     {
         var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_3.bpmn");
@@ -46,6 +50,46 @@ public class BpmnEngineTest
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
         
-        throw  new NotImplementedException();
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public void CreateStartToken_WithStartServiceTask_EnqueuesStartToken()
+    {
+        var startTask = new ServiceTask
+        {
+            Id = "StartEvent_01",
+            Handler = (context, ct) => Task.CompletedTask,
+        };
+        var serviceTask = _fixture.Create<ServiceTask>();
+        var endEvent = _fixture.Create<EndEvent>();
+
+        var processModel = new ProcessModel
+        {
+            Nodes = new ConcurrentDictionary<string, IBpmnNode>
+            {
+                [serviceTask.Id] = serviceTask,
+                [startTask.Id] = startTask,
+                [endEvent.Id] = endEvent,
+            },
+        };
+
+        _bpmnEngine.CreateStartToken(processModel);
+
+        var eventQueueField = typeof(BpmnEngine).GetField("_eventQueue", BindingFlags.Instance | BindingFlags.NonPublic);
+        var eventQueue = (ConcurrentQueue<Token>)eventQueueField!.GetValue(_bpmnEngine)!;
+
+        Assert.True(eventQueue.TryPeek(out var token));
+        Assert.Equal(startTask.Id, token.CurrentNodeId);
+    }
+
+    [Fact]
+    public void CreateStartToken_WithoutStartEvent_ThrowsInvalidOperationException()
+    {
+        var processModel = new ProcessModel();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => _bpmnEngine.CreateStartToken(processModel));
+
+        Assert.Contains("No ServiceTask found", exception.Message);
     }
 }
