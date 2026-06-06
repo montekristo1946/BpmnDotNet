@@ -70,14 +70,13 @@ internal class ProcessModelBuilder : IProcessModelBuilder
     /// </summary>
     /// <param name="flows">Flow.</param>
     /// <returns>Словарь с ветками {SourceId:TargetId[]}.</returns>
-    internal Dictionary<string, string[]> BuildFlowsBySourceIndex(IEnumerable<Flow> flows)
+    internal Dictionary<string, DirectionFlow[]> BuildFlowsBySourceIndex(IEnumerable<Flow> flows)
     {
         var sourceIndex = flows
             .GroupBy(flow => flow.SourceId)
             .ToDictionary(
                 group => group.Key,
-                group => group.Select(flow => flow.TargetId).ToArray()
-            );
+                group => group.Select(flow => new DirectionFlow(flow.Id, flow.TargetId)).ToArray());
 
         return sourceIndex;
     }
@@ -87,14 +86,13 @@ internal class ProcessModelBuilder : IProcessModelBuilder
     /// </summary>
     /// <param name="flows">Flow.</param>
     /// <returns>Словарь с ветками {SourceId:TargetId[]}.</returns>
-    internal Dictionary<string, string[]> BuildFlowsByTargetIndex(IEnumerable<Flow> flows)
+    internal Dictionary<string, DirectionFlow[]> BuildFlowsByTargetIndex(IEnumerable<Flow> flows)
     {
         var sourceIndex = flows
             .GroupBy(flow => flow.TargetId)
             .ToDictionary(
                 group => group.Key,
-                group => group.Select(flow => flow.SourceId).ToArray()
-            );
+                group => group.Select(flow => new DirectionFlow(flow.Id, flow.SourceId)).ToArray());
 
         return sourceIndex;
     }

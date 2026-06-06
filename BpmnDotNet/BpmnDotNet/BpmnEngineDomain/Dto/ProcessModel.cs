@@ -19,12 +19,12 @@ internal record ProcessModel
     public ConcurrentDictionary<string, Flow> Flows { get; init; } = new();
 
     /// <summary>
-    /// Индексы для быстрого поиска source.
+    /// Gets индексы для быстрого поиска source.
     /// </summary>
-    public ConcurrentDictionary<string, string[]> FlowsBySource { get; init; } = new();
+    public ConcurrentDictionary<string, DirectionFlow[]> FlowsBySource { get; init; } = new();
 
     /// <summary>
-    /// Индексы для быстрого поиска Target.
+    /// Gets индексы для быстрого поиска Target.
     /// </summary>
-    public ConcurrentDictionary<string, string[]> FlowsByTarget { get; init; } = new();
+    public ConcurrentDictionary<string, DirectionFlow[]> FlowsByTarget { get; init; } = new();
 }

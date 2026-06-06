@@ -1,11 +1,13 @@
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+using BpmnDotNet.BPMNDiagram.BpmnNatation;
+using BpmnDotNet.BpmnEngineDomain.Activity;
 
 namespace BpmnDotNet.BpmnEngineDomain;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
+using Microsoft.Extensions.Logging;
 
 /// <inheritdoc cref="StartProcessAsync" />
 internal class BpmnEngine : IBpmnEngine
@@ -32,6 +34,9 @@ internal class BpmnEngine : IBpmnEngine
                 "[BpmnEngine:StartProcessAsync] The thread background has already been started.");
         }
 
+        //TODO: остановился тут, нужно в _eventQueue добавить токе startEvent.
+        CreateStartToken(processModel);
+        _semaphore.Release();
         _threadBackground = Task.Run(() => ThreadBackground(processModel, contextBpmnProcess, ct), ct);
         var jobStatus = new BusinessProcessJobStatusV2
         {
@@ -43,6 +48,22 @@ internal class BpmnEngine : IBpmnEngine
         };
 
         return Task.FromResult(jobStatus);
+    }
+
+    /// <summary>
+    /// Найдет StartEventComponent в Nodes, запишет в очередь.
+    /// </summary>
+    /// <param name="processModel">ProcessModel.</param>
+    internal void CreateStartToken(ProcessModel processModel)
+    {
+        var startEvent = processModel.Nodes
+                             .Select(p => p.Value)
+                             .OfType<ServiceTask>()
+                             .FirstOrDefault()
+                         ?? throw new InvalidOperationException("[BpmnEngine:CreateStartToken] No StartEventComponent found.");
+
+        var startToken = new Token() { CurrentNodeId = startEvent.Id };
+        _eventQueue.Enqueue(startToken);
     }
 
     private async Task ThreadBackground(
@@ -91,6 +112,7 @@ internal class BpmnEngine : IBpmnEngine
     }
 
 
+    /// <inheritdoc/>
     public bool AddMessageToQueue(Type messageType, object message)
     {
         _semaphore.Release();

@@ -22,7 +22,7 @@ public class ProcessModelBuilderTest
         _xmlSerializationProcessSection = new XmlSerializationProcessSection();
         _logger = Substitute.For<ILogger<ProcessModelBuilder>>();
         _processModelBuilder = new ProcessModelBuilder(_logger);
-        _fixture =  new Fixture();
+        _fixture = new Fixture();
     }
 
     [Fact]
@@ -36,13 +36,13 @@ public class ProcessModelBuilderTest
             ["Event_01"] = (ctx, ct) => Task.CompletedTask,
         };
 
-        var res =_processModelBuilder.Build(diagram, handlers);
-        
-     Assert.NotNull(res);
-     Assert.Equal(2, res.Flows.Count);
-     Assert.Equal(2, res.FlowsBySource.Count);
-     Assert.Equal(2, res.FlowsByTarget.Count);
-     Assert.Equal(3, res.Nodes.Count);
+        var res = _processModelBuilder.Build(diagram, handlers);
+
+        Assert.NotNull(res);
+        Assert.Equal(2, res.Flows.Count);
+        Assert.Equal(2, res.FlowsBySource.Count);
+        Assert.Equal(2, res.FlowsByTarget.Count);
+        Assert.Equal(3, res.Nodes.Count);
     }
 
     [Fact]
@@ -55,14 +55,16 @@ public class ProcessModelBuilderTest
             new() { Id = string.Empty, SourceId = "source2", TargetId = "target2" },
             new() { Id = string.Empty, SourceId = "source1", TargetId = "target3" }
         };
-        
+
         // Act
         var result = _processModelBuilder.BuildFlowsBySourceIndex(flows);
 
         // Assert
         Assert.Equal(2, result.Count);
+        Assert.Equal(2,result["source1"].Length);
+        Assert.Single(result["source2"]);
     }
-    
+
     [Fact]
     public void BuildFlowsByTargetIndex_FullPass_CountTarget()
     {
@@ -74,11 +76,14 @@ public class ProcessModelBuilderTest
             new() { Id = string.Empty, SourceId = "source1", TargetId = "target3" },
             new() { Id = string.Empty, SourceId = "source4", TargetId = "target2" },
         };
-        
+
         // Act
         var result = _processModelBuilder.BuildFlowsByTargetIndex(flows);
 
         // Assert
         Assert.Equal(3, result.Count);
+        Assert.Equal(2,result["target2"].Length);
+        Assert.Single(result["target1"]);
+        Assert.Single(result["target3"]);
     }
 }
