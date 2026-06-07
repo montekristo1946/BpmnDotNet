@@ -44,8 +44,7 @@ internal class SendTask : IBpmnNode
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
-      /*  if (contextBpmnProcess == null)
+        if (contextBpmnProcess == null)
         {
             throw new ArgumentNullException(nameof(contextBpmnProcess));
         }
@@ -60,12 +59,12 @@ internal class SendTask : IBpmnNode
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
-            if (!isGetNextNodes)
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
+
+            if (!isGetNextNodes || nextNodes is null || nextNodes.Length == 0)
             {
-                _logger.LogWarning(
-                    "[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    currentId);
+                throw new InvalidDataException(
+                    $"[SendTask:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
             nextTokens = nextNodes?.Select(p => new Token
@@ -76,7 +75,7 @@ internal class SendTask : IBpmnNode
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
+            _logger.LogError(e, "[SendTask:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
@@ -84,6 +83,6 @@ internal class SendTask : IBpmnNode
         {
             Status = statusBpmnEngine,
             Tokens = nextTokens,
-        };*/
+        };
     }
 }
