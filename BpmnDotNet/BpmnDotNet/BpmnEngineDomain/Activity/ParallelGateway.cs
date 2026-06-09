@@ -33,7 +33,7 @@ internal class ParallelGateway : IBpmnNode
     }
 
     /// <inheritdoc/>
-    public string Id { get; init; } = string.Empty;
+    public string Id { get; init; }
 
     /// <inheritdoc/>
     public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; } = null!;
@@ -45,7 +45,8 @@ internal class ParallelGateway : IBpmnNode
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
-        /*if (contextBpmnProcess == null)
+
+        if (contextBpmnProcess == null)
         {
             throw new ArgumentNullException(nameof(contextBpmnProcess));
         }
@@ -59,13 +60,16 @@ internal class ParallelGateway : IBpmnNode
         Token[] nextTokens = [];
         try
         {
+            //TODO: перед выполнением добавить проверить выполнили все входящие ноды.
+            
+            
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
-            if (!isGetNextNodes)
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
+
+            if (!isGetNextNodes || nextNodes is null || nextNodes.Length == 0)
             {
-                _logger.LogWarning(
-                    "[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    currentId);
+                throw new InvalidDataException(
+                    $"[ServiceTask:ParallelGateway] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
             nextTokens = nextNodes?.Select(p => new Token
@@ -76,14 +80,15 @@ internal class ParallelGateway : IBpmnNode
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
+            _logger.LogError(e, "[ServiceTask:ParallelGateway] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
+        throw new NotImplementedException();
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
             Tokens = nextTokens,
-        };*/
+        };
     }
 }
