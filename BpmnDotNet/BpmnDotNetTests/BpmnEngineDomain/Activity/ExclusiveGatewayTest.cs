@@ -223,4 +223,92 @@ public class ExclusiveGatewayTest
             expectedException,
             Arg.Any<Func<object, Exception?, string>>());
     }
+    
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_CheckFillNodeStateRegistryCheckSingFlows_WhenNextNodesExist(
+        [Frozen] ILogger<ExclusiveGateway> logger,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        DirectionFlow nextNode)
+    {
+        // Arrange
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        var sut = Substitute.ForPartsOf<ExclusiveGateway>(logger, handler, currentId);
+
+        var processModel = _fixture.Create<ProcessModel>();
+        processModel.FlowsBySource.TryAdd(currentId, [nextNode]);
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, _nodeStateRegistry.Count);
+        var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
+        Assert.True(stateSub);
+        Assert.Equal(StatusNode.NormalCompletedNode,statusNodeSub);
+        var stateFlow = _nodeStateRegistry.TryGetValue(nextNode.IdFlow, out var statusFlow);
+        Assert.True(stateFlow);
+        Assert.Equal(StatusNode.NormalCompletedNode,statusFlow);
+    }
+    
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_CheckFillNodeStateRegistryCheckMultiFlows_WhenNextNodesExist(
+        [Frozen] ILogger<ExclusiveGateway> logger,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        DirectionFlow[] nextNodes,
+        Flow nextFlow)
+    {
+        // Arrange
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        
+        var sut = Substitute.ForPartsOf<ExclusiveGateway>(logger, handler, currentId);
+        sut.GetRouteFlow(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>()).Returns(nextFlow.Id);
+
+        var processModel = _fixture.Create<ProcessModel>();
+        processModel.FlowsBySource.TryAdd(currentId, nextNodes);
+        processModel.Flows.TryAdd(nextFlow.Id, nextFlow);
+        
+        // Act
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, _nodeStateRegistry.Count);
+        var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
+        Assert.True(stateSub);
+        Assert.Equal(StatusNode.NormalCompletedNode,statusNodeSub);
+        var stateFlow = _nodeStateRegistry.TryGetValue(nextFlow.Id, out var statusFlow);
+        Assert.True(stateFlow);
+        Assert.Equal(StatusNode.NormalCompletedNode,statusFlow);
+    }
+    
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_CheckFillNodeStateRegistry_FailedCompletedNode(
+        [Frozen] ILogger<ExclusiveGateway> logger,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        DirectionFlow nextNode)
+    {
+        // Arrange
+        var expectedException = new InvalidOperationException("Test exception");
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
+        var sut = new ExclusiveGateway(logger, handler, currentId);
+
+        var processModel = _fixture.Create<ProcessModel>();
+        processModel.FlowsBySource.TryAdd(currentId, [nextNode]);
+
+        // Act
+        var result =
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+
+        // Assert
+        Assert.Single(_nodeStateRegistry);
+        var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
+        Assert.True(stateSub);
+        Assert.Equal(StatusNode.FailedCompletedNode,statusNodeSub);
+    }
+    
 }

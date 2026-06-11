@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
@@ -47,17 +46,14 @@ internal class ExclusiveGateway : IBpmnNode
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
-        if (contextBpmnProcess == null)
-        {
-            throw new ArgumentNullException(nameof(contextBpmnProcess));
-        }
+        ArgumentNullException.ThrowIfNull(processModel);
+        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
-        if (ActivityHandlerAsync == null)
-        {
-            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
-        }
+        var statusBpmnEngine = StatusNode.WorksNode;
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
-        StatusNode statusBpmnEngine;
         Token? nextToken = null;
         try
         {
@@ -73,12 +69,14 @@ internal class ExclusiveGateway : IBpmnNode
 
             if (candidateNextNodes.Length == 1)
             {
+                var nexFlow = candidateNextNodes.FirstOrDefault() ?? throw new InvalidDataException(
+                    "[ExclusiveGateway:ExecuteAsync] Fail get IdResource");
+
                 nextToken = new Token
                 {
-                    CurrentNodeId = candidateNextNodes.FirstOrDefault()?.IdResource
-                                    ?? throw new InvalidDataException(
-                                        "[ExclusiveGateway:ExecuteAsync] Fail get IdResource"),
+                    CurrentNodeId = nexFlow.IdResource,
                 };
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
             }
             else
             {
@@ -94,6 +92,7 @@ internal class ExclusiveGateway : IBpmnNode
                 {
                     CurrentNodeId = flow.TargetId,
                 };
+                nodeStateRegistry[idRouteFlow] = StatusNode.NormalCompletedNode;
             }
 
             statusBpmnEngine = StatusNode.NormalCompletedNode;
@@ -103,6 +102,8 @@ internal class ExclusiveGateway : IBpmnNode
             _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
+
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
         return new BpmnNodeResult()
         {
