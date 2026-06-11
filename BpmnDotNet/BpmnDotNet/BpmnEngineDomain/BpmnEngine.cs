@@ -134,18 +134,14 @@ internal class BpmnEngine : IBpmnEngine
 
             var currentId = token.CurrentNodeId;
             var node = processModel.Nodes[currentId];
-            _nodeStateRegistry.AddOrUpdate(currentId, StatusNode.WorksNode, (k, v) => v);
 
-            // TODO: Делать snapshot _nodeStateRegistry в ElasticSearch
             var nodes = await node.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, ctsToken);
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
             }
 
-            _nodeStateRegistry.AddOrUpdate(currentId, nodes.Status, (k, v) => nodes.Status);
             // TODO: Делать snapshot _nodeStateRegistry в ElasticSearch
-
 
             if (nodes.Status == StatusNode.FailedCompletedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
             {
