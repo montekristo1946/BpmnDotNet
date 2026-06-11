@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
@@ -43,6 +44,7 @@ internal class EndEvent : IBpmnNode
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
         if (contextBpmnProcess == null)

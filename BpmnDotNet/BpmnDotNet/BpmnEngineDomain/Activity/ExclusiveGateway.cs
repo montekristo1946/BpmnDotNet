@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
 using BpmnDotNet.Abstractions.Context;
@@ -42,6 +44,7 @@ internal class ExclusiveGateway : IBpmnNode
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
         if (contextBpmnProcess == null)

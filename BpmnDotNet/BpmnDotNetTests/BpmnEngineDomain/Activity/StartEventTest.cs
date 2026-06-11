@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AutoFixture;
 using AutoFixture.Xunit2;
 using BpmnDotNet.Abstractions.Context;
@@ -11,7 +12,8 @@ namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 
 public class StartEventTest
 {
-   private readonly Fixture _fixture = new Fixture();
+    private readonly Fixture _fixture = new Fixture();
+    ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
 
     [Theory]
     [AutoNSubstituteData]
@@ -22,12 +24,12 @@ public class StartEventTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new StartEvent(logger,handler,currentId);
+        var sut = new StartEvent(logger, handler, currentId);
         IContextBpmnProcess? contextBpmnProcess = null;
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess!, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry,CancellationToken.None));
 
         Assert.Equal("contextBpmnProcess", exception.ParamName);
     }
@@ -40,13 +42,13 @@ public class StartEventTest
         IContextBpmnProcess contextBpmnProcess)
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => null!);
-        
+
         // Arrange
-        var sut = new StartEvent(logger,handler,_fixture.Create<string>()) { ActivityHandlerAsync = null! };
+        var sut = new StartEvent(logger, handler, _fixture.Create<string>()) { ActivityHandlerAsync = null! };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry, CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
@@ -55,16 +57,17 @@ public class StartEventTest
     internal async Task ExecuteAsync_CallActivityHandlerAsync_CountCall()
     {
         int countCall = 0;
-        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>  {
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>
+        {
             countCall++;
             return Task.CompletedTask;
         });
-        var sut = new StartEvent(Substitute.For<ILogger<StartEvent>>(),handler,_fixture.Create<string>());
+        var sut = new StartEvent(Substitute.For<ILogger<StartEvent>>(), handler, _fixture.Create<string>());
 
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry);
 
         Assert.Equal(1, countCall);
     }
@@ -80,13 +83,13 @@ public class StartEventTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new StartEvent(logger,handler,currentId);
+        var sut = new StartEvent(logger, handler, currentId);
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
@@ -109,10 +112,10 @@ public class StartEventTest
         // Arrange
         var expectedException = new InvalidOperationException("Test exception");
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
-        var sut = new StartEvent(logger,handler,currentId) ;
+        var sut = new StartEvent(logger, handler, currentId);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -141,16 +144,17 @@ public class StartEventTest
         CancellationToken capturedToken = default;
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((ctx, ct) =>
-        {        handlerCalled = true;
+        {
+            handlerCalled = true;
             capturedContext = ctx;
             capturedToken = ct;
             return Task.CompletedTask;
         });
         // Arrange
-        var sut = new StartEvent(logger,handler,currentId) ;
+        var sut = new StartEvent(logger, handler, currentId);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -168,14 +172,13 @@ public class StartEventTest
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         // Arrange
-        var sut = new StartEvent(logger,handler,currentId) ;
+        var sut = new StartEvent(logger, handler, currentId);
 
         // Act
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode,res.Status);
+        Assert.Equal(StatusNode.FailedCompletedNode, res.Status);
         Assert.Empty(res.Tokens.ToArray());
     }
-
 }

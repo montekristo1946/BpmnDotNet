@@ -16,6 +16,11 @@ internal class BpmnEngine : IBpmnEngine
     private readonly SemaphoreSlim _semaphore = new(0, 1);
     private readonly ConcurrentQueue<Token> _eventQueue = new();
 
+    /// <summary>
+    ///     Очередь для вызовов.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
+
     public BpmnEngine(ILogger<BpmnEngine> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -129,15 +134,19 @@ internal class BpmnEngine : IBpmnEngine
 
             var currentId = token.CurrentNodeId;
             var node = processModel.Nodes[currentId];
+            _nodeStateRegistry.AddOrUpdate(currentId, StatusNode.WorksNode, (k, v) => v);
 
-            // TODO: Записывать состояние node Works.
-            var nodes = await node.ExecuteAsync(processModel, contextBpmnProcess, ctsToken);
+            // TODO: Делать snapshot _nodeStateRegistry в ElasticSearch
+            var nodes = await node.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, ctsToken);
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
             }
 
-            // TODO: Записывать состояние node что вернул BpmnNodeResult.
+            _nodeStateRegistry.AddOrUpdate(currentId, nodes.Status, (k, v) => nodes.Status);
+            // TODO: Делать snapshot _nodeStateRegistry в ElasticSearch
+
+
             if (nodes.Status == StatusNode.FailedCompletedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
             {
                 return true;

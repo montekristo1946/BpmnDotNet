@@ -14,6 +14,7 @@ namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 public class ExclusiveGatewayTest
 {
     private readonly IFixture _fixture;
+    ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
 
     public ExclusiveGatewayTest()
     {
@@ -93,7 +94,7 @@ public class ExclusiveGatewayTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess!, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, CancellationToken.None));
 
         Assert.Equal("contextBpmnProcess", exception.ParamName);
     }
@@ -112,7 +113,7 @@ public class ExclusiveGatewayTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
@@ -131,7 +132,7 @@ public class ExclusiveGatewayTest
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await sub.ExecuteAsync(processModel, contextBpmnProcess);
+        var res = await sub.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry );
 
         Assert.Equal(1, countCall);
     }
@@ -155,7 +156,7 @@ public class ExclusiveGatewayTest
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,  CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
@@ -183,7 +184,7 @@ public class ExclusiveGatewayTest
         processModel.FlowsBySource.TryAdd(currentId, [nextNode]);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
@@ -209,7 +210,7 @@ public class ExclusiveGatewayTest
         var sut = new ExclusiveGateway(logger,handler,currentId) ;
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,  CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);

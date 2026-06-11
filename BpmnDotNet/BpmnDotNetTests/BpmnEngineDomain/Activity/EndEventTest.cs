@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AutoFixture;
 using AutoFixture.Xunit2;
 using BpmnDotNet.Abstractions.Context;
@@ -12,6 +13,7 @@ namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 public class EndEventTest
 {
     private readonly Fixture _fixture = new Fixture();
+    ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
 
     [Theory]
     [AutoNSubstituteData]
@@ -24,10 +26,11 @@ public class EndEventTest
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         var sut = new EndEvent(logger, handler, currentId);
         IContextBpmnProcess? contextBpmnProcess = null;
+      
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess!, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, CancellationToken.None));
 
         Assert.Equal("contextBpmnProcess", exception.ParamName);
     }
@@ -46,7 +49,7 @@ public class EndEventTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
@@ -65,7 +68,7 @@ public class EndEventTest
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await sub.ExecuteAsync(processModel, contextBpmnProcess);
+        var res = await sub.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry);
 
         Assert.Equal(1, countCall);
     }
@@ -87,7 +90,7 @@ public class EndEventTest
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -108,7 +111,7 @@ public class EndEventTest
         var sut = new EndEvent(logger, handler, currentId);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -147,7 +150,7 @@ public class EndEventTest
         var sut = new EndEvent(logger, handler, currentId);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -168,7 +171,7 @@ public class EndEventTest
         var sut = new EndEvent(logger, handler, currentId);
 
         // Act
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,CancellationToken.None);
 
         // Assert
         Assert.Empty(res.Tokens.ToArray());

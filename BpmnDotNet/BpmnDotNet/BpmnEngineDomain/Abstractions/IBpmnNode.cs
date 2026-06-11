@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 using BpmnDotNet.Abstractions.Context;
@@ -18,11 +20,13 @@ internal interface IBpmnNode
     /// </summary>
     /// <param name="processModel"><inheritdoc cref="ProcessModel"/></param>
     /// <param name="contextBpmnProcess"><inheritdoc cref="IContextBpmnProcess"/>.</param>
+    /// <param name="nodeStateRegistry">Состояние узлов.</param>
     /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/>.</param>
     /// <returns><inheritdoc cref="BpmnNodeResult"/>.</returns>
     public Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken);
 
     /// <summary>
