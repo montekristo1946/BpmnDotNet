@@ -47,17 +47,14 @@ internal class EndEvent : IBpmnNode
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
-        if (contextBpmnProcess == null)
-        {
-            throw new ArgumentNullException(nameof(contextBpmnProcess));
-        }
+        ArgumentNullException.ThrowIfNull(processModel);
+        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
-        if (ActivityHandlerAsync == null)
-        {
-            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
-        }
+        var statusBpmnEngine = StatusNode.WorksNode;
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
-        StatusNode statusBpmnEngine;
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
@@ -75,6 +72,7 @@ internal class EndEvent : IBpmnNode
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
+        nodeStateRegistry[Id] = statusBpmnEngine;
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
