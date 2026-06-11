@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
@@ -47,18 +46,15 @@ internal class SendTask : IBpmnNode
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
-        if (contextBpmnProcess == null)
-        {
-            throw new ArgumentNullException(nameof(contextBpmnProcess));
-        }
+        ArgumentNullException.ThrowIfNull(processModel);
+        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
-        if (ActivityHandlerAsync == null)
-        {
-            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
-        }
+        var statusBpmnEngine = StatusNode.WorksNode;
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
-        StatusNode statusBpmnEngine;
-        Token[] nextTokens = [];
+        Token? nextToken = null;
         try
         {
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
@@ -70,10 +66,17 @@ internal class SendTask : IBpmnNode
                     $"[SendTask:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
-            nextTokens = nextNodes?.Select(p => new Token
+            var nexFlow = nextNodes.FirstOrDefault();
+            if (nexFlow is not null)
             {
-                CurrentNodeId = p.IdResource,
-            }).ToArray() ?? [];
+                nextToken = new Token
+                {
+                    CurrentNodeId = nexFlow.IdResource,
+                };
+
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
+            }
+
             statusBpmnEngine = StatusNode.NormalCompletedNode;
         }
         catch (Exception e)
@@ -82,10 +85,11 @@ internal class SendTask : IBpmnNode
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
+        nodeStateRegistry[Id] = statusBpmnEngine;
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
-            Tokens = nextTokens,
+            Tokens = nextToken is null ? Array.Empty<Token>() : new[] { nextToken },
         };
     }
 }

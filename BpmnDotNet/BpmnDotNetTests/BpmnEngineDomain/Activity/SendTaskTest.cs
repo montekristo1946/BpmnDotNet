@@ -24,7 +24,7 @@ public class SendTaskTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new SendTask(logger,handler,currentId);
+        var sut = new SendTask(logger, handler, currentId);
         IContextBpmnProcess? contextBpmnProcess = null;
 
         // Act & Assert
@@ -42,9 +42,9 @@ public class SendTaskTest
         IContextBpmnProcess contextBpmnProcess)
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => null!);
-        
+
         // Arrange
-        var sut = new SendTask(logger,handler,_fixture.Create<string>()) { ActivityHandlerAsync = null! };
+        var sut = new SendTask(logger, handler, _fixture.Create<string>()) { ActivityHandlerAsync = null! };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
@@ -57,11 +57,12 @@ public class SendTaskTest
     internal async Task ExecuteAsync_CallActivityHandlerAsync_CountCall()
     {
         int countCall = 0;
-        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>  {
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) =>
+        {
             countCall++;
             return Task.CompletedTask;
         });
-        var sut = new SendTask(Substitute.For<ILogger<SendTask>>(),handler,_fixture.Create<string>());
+        var sut = new SendTask(Substitute.For<ILogger<SendTask>>(), handler, _fixture.Create<string>());
 
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
@@ -82,17 +83,18 @@ public class SendTaskTest
     {
         // Arrange
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
-        var sut = new SendTask(logger,handler,currentId);
+        var sut = new SendTask(logger, handler, currentId);
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsBySource.TryAdd(currentId, nextNodes);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,  CancellationToken.None);
+        var result =
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
-        Assert.Equal(nextNodes.Length, result.Tokens.ToArray().Length);
+        Assert.Single(result.Tokens.ToArray());
 
         foreach (var token in result.Tokens)
         {
@@ -111,10 +113,11 @@ public class SendTaskTest
         // Arrange
         var expectedException = new InvalidOperationException("Test exception");
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
-        var sut = new SendTask(logger,handler,currentId) ;
+        var sut = new SendTask(logger, handler, currentId);
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+        var result =
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -143,16 +146,17 @@ public class SendTaskTest
         CancellationToken capturedToken = CancellationToken.None;
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((ctx, ct) =>
-        {        handlerCalled = true;
+        {
+            handlerCalled = true;
             capturedContext = ctx;
             capturedToken = ct;
             return Task.CompletedTask;
         });
         // Arrange
-        var sut = new SendTask(logger,handler,currentId) ;
+        var sut = new SendTask(logger, handler, currentId);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,  cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -170,13 +174,69 @@ public class SendTaskTest
     {
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         // Arrange
-        var sut = new SendTask(logger,handler,currentId) ;
+        var sut = new SendTask(logger, handler, currentId);
 
         // Act
-       var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode,res.Status);
+        Assert.Equal(StatusNode.FailedCompletedNode, res.Status);
         Assert.Empty(res.Tokens.ToArray());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_CheckFillNodeStateRegistry_NormalCompletedNode(
+        [Frozen] ILogger<SendTask> logger,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        DirectionFlow nextNode)
+    {
+        // Arrange
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
+        var sut = new SendTask(logger, handler, currentId);
+
+        var processModel = _fixture.Create<ProcessModel>();
+        processModel.FlowsBySource.TryAdd(currentId, [nextNode]);
+
+        // Act
+        var result =
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, _nodeStateRegistry.Count);
+        var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
+        Assert.True(stateSub);
+        Assert.Equal(StatusNode.NormalCompletedNode, statusNodeSub);
+        var stateFlow = _nodeStateRegistry.TryGetValue(nextNode.IdFlow, out var statusFlow);
+        Assert.True(stateFlow);
+        Assert.Equal(StatusNode.NormalCompletedNode, statusFlow);
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_CheckFillNodeStateRegistry_FailedCompletedNode(
+        [Frozen] ILogger<SendTask> logger,
+        string currentId,
+        IContextBpmnProcess contextBpmnProcess,
+        DirectionFlow nextNode)
+    {
+        // Arrange
+        var expectedException = new InvalidOperationException("Test exception");
+        var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
+        var sut = new SendTask(logger, handler, currentId);
+
+        var processModel = _fixture.Create<ProcessModel>();
+        processModel.FlowsBySource.TryAdd(currentId, [nextNode]);
+
+        // Act
+        var result =
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+
+        // Assert
+        Assert.Single(_nodeStateRegistry);
+        var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
+        Assert.True(stateSub);
+        Assert.Equal(StatusNode.FailedCompletedNode, statusNodeSub);
     }
 }
