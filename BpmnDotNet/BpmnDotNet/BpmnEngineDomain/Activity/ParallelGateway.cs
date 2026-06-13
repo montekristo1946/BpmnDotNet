@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
@@ -47,51 +46,89 @@ internal class ParallelGateway : IBpmnNode
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(processModel);
+        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
-        if (contextBpmnProcess == null)
-        {
-            throw new ArgumentNullException(nameof(contextBpmnProcess));
-        }
+        var statusBpmnEngine = StatusNode.WorksNode;
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
-        if (ActivityHandlerAsync == null)
-        {
-            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
-        }
-
-        StatusNode statusBpmnEngine;
         Token[] nextTokens = [];
         try
         {
-            //TODO: перед выполнением добавить проверить выполнили все входящие ноды.
-            
-            
+            var isFinishInputFlow = CheckCompletedAllInputFlow(nodeStateRegistry, processModel);
+            if (!isFinishInputFlow)
+            {
+                return new BpmnNodeResult()
+                {
+                    Status = statusBpmnEngine,
+                    Tokens = nextTokens,
+                };
+            }
+
             await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
             var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
 
             if (!isGetNextNodes || nextNodes is null || nextNodes.Length == 0)
             {
                 throw new InvalidDataException(
-                    $"[ServiceTask:ParallelGateway] FlowsBySource dictionary returned false, IdNode:{Id}");
+                    $"[ParallelGateway:ExecuteAsync] FlowsBySource dictionary returned false, IdNode:{Id}");
             }
 
-            nextTokens = nextNodes?.Select(p => new Token
+            nextTokens = nextNodes.Select(p => new Token
             {
                 CurrentNodeId = p.IdResource,
-            }).ToArray() ?? [];
+            }).ToArray();
+
+            foreach (var directionFlow in nextNodes)
+            {
+                nodeStateRegistry[directionFlow.IdFlow] = StatusNode.NormalCompletedNode;
+            }
+
             statusBpmnEngine = StatusNode.NormalCompletedNode;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[ServiceTask:ParallelGateway] Exception");
+            _logger.LogError(e, "[ParallelGateway:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
-        throw new NotImplementedException();
+        nodeStateRegistry[Id] = statusBpmnEngine;
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
             Tokens = nextTokens,
         };
+    }
+
+    /// <summary>
+    /// Проверит состояние веток до текущей ноды.
+    /// </summary>
+    /// <param name="nodeStateRegistry">История выполнения нод.</param>
+    /// <param name="processModel">Структура bpmn.</param>
+    /// <returns>Завершены все flow.</returns>
+    internal virtual bool CheckCompletedAllInputFlow(
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel)
+    {
+        var isGetTargetNodes = processModel.FlowsByTarget.TryGetValue(Id, out var targetFlows);
+
+        if (!isGetTargetNodes || targetFlows is null || targetFlows.Length == 0)
+        {
+            throw new InvalidDataException(
+                $"[ServiceTask:CheckInputFlow] FlowsBySource dictionary returned false, IdNode:{Id}");
+        }
+
+        foreach (var flow in targetFlows)
+        {
+            var isCheckFlow = nodeStateRegistry.TryGetValue(flow.IdFlow, out var statusNode);
+            if (!isCheckFlow || statusNode != StatusNode.NormalCompletedNode)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

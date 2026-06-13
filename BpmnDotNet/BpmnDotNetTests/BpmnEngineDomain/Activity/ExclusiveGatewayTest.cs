@@ -14,7 +14,7 @@ namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 public class ExclusiveGatewayTest
 {
     private readonly IFixture _fixture;
-    ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
+    private readonly ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
 
     public ExclusiveGatewayTest()
     {
