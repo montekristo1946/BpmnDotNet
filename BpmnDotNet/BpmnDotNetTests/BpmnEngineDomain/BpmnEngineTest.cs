@@ -116,7 +116,6 @@ public class BpmnEngineTest
     [InlineData("ServiceTaskFirstHandler")]
     [InlineData("GatewayFirstHandler")]
     [InlineData("SendTaskFirstHandler")]
-    [InlineData("ReceiveTaskFirstHandle")]
     [InlineData("Gateway_Second")]
     [InlineData("GatewayThirdHandler")]
     [InlineData("ServiceTaskSecondHandler")]
@@ -143,8 +142,38 @@ public class BpmnEngineTest
         var conditionRoute = new ConcurrentDictionary<string, string>();
         conditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_SendTaskFirstHandler");
 
+        contextBpmnProcess.ConditionRoute.Returns(conditionRoute);
+        var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
+
+        await res.ProcessTask.WaitAsync(cancellationToken.Token);
+
+        Assert.True(isCallMethod);
+    }
+    
+    [Fact]
+    public async Task StartProcessAsync_CheckReceiveTask_CallMethod()
+    {
+        var diagram = _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/diagram_1.bpmn");
+        var isCallMethod = false;
+        var handlers = new ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>>
+        {
+            ["ReceiveTaskFirstHandle"] = (ctx, ct) =>
+            {
+                isCallMethod = true;
+                return Task.CompletedTask;
+            },
+        };
+        var processModel = _processModelBuilder.Build(diagram, handlers);
+        using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
+        var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
+        var conditionRoute = new ConcurrentDictionary<string, string>();
+        conditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_ReceiveTaskFirstHandle");
+
+        var receivedMessage = new ConcurrentDictionary<string, object>();
+        receivedMessage["ReceiveTaskFirstHandle"] = new TaskCompletionSource<object>();
 
         contextBpmnProcess.ConditionRoute.Returns(conditionRoute);
+        contextBpmnProcess.ReceivedMessage.Returns(receivedMessage);
         var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
 
         await res.ProcessTask.WaitAsync(cancellationToken.Token);
