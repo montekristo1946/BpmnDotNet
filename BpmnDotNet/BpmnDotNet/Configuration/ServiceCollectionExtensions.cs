@@ -1,3 +1,5 @@
+using BpmnDotNet.HistoryDomain.Abstractions;
+
 namespace BpmnDotNet.Configuration;
 
 using System.Diagnostics.CodeAnalysis;

@@ -45,12 +45,14 @@ internal class EndEvent : IBpmnNode
         ProcessModel processModel,
         IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ConcurrentDictionary<string, string> errorRegistry,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(processModel);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
+        ArgumentNullException.ThrowIfNull(errorRegistry);
 
         var statusBpmnEngine = StatusNode.WorksNode;
         nodeStateRegistry[Id] = statusBpmnEngine;
@@ -70,6 +72,7 @@ internal class EndEvent : IBpmnNode
         {
             _logger.LogError(e, "[EndEvent:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
+            errorRegistry[Id] = e.Message;
         }
 
         nodeStateRegistry[Id] = statusBpmnEngine;

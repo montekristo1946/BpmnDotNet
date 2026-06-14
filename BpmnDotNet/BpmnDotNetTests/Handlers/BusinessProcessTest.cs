@@ -5,6 +5,7 @@ using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 

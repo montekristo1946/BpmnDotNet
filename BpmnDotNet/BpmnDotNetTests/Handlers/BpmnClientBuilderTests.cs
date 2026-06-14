@@ -5,6 +5,7 @@ using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using BpmnDotNetTests.Utils;
 
 namespace BpmnDotNetTests.Handlers;

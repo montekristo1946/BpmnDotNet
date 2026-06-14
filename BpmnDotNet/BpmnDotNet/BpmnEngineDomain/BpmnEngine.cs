@@ -17,11 +17,6 @@ internal class BpmnEngine : IBpmnEngine
     private Task? _threadBackground = null;
     private IContextBpmnProcess? _contextBpmnProcess = null;
 
-    /// <summary>
-    ///     Очередь для вызовов.
-    /// </summary>
-    private readonly ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
-
     public BpmnEngine(ILogger<BpmnEngine> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -61,6 +56,33 @@ internal class BpmnEngine : IBpmnEngine
         return Task.FromResult(jobStatus);
     }
 
+    /// <inheritdoc/>
+    public bool AddMessageToQueue(Type messageType, object message)
+    {
+        ArgumentNullException.ThrowIfNull(_contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(messageType);
+        ArgumentNullException.ThrowIfNull(message);
+        try
+        {
+            var idNode = GetIdNodeReceiveMessage(_contextBpmnProcess, messageType);
+            AddMessageToQueue(idNode, message, _contextBpmnProcess);
+
+            _eventQueue.Enqueue(new Token()
+            {
+                CurrentNodeId = idNode,
+            });
+
+            _semaphore.Release();
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[BpmnEngine:AddMessageToQueue] Exception");
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Найдет StartEventComponent в Nodes, запишет в очередь.
     /// </summary>
@@ -90,12 +112,17 @@ internal class BpmnEngine : IBpmnEngine
             contextBpmnProcess.IdBpmnProcess,
             contextBpmnProcess.TokenProcess);
 
+        ConcurrentDictionary<string, StatusNode> stateRegistry = new();
+        ConcurrentDictionary<string, string> errorRegistry = new();
+
         try
         {
             while (!ctsToken.IsCancellationRequested)
             {
                 await _semaphore.WaitAsync(ctsToken);
-                var isCompletedBackground = await RunEventLoopAsync(contextBpmnProcess, ctsToken, processModel);
+                var isCompletedBackground =
+                    await RunEventLoopAsync(contextBpmnProcess, processModel, stateRegistry, errorRegistry, _eventQueue,
+                        ctsToken);
                 if (isCompletedBackground)
                 {
                     return;
@@ -129,12 +156,15 @@ internal class BpmnEngine : IBpmnEngine
 
     private async Task<bool> RunEventLoopAsync(
         IContextBpmnProcess contextBpmnProcess,
-        CancellationToken ctsToken,
-        ProcessModel processModel)
+        ProcessModel processModel,
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ConcurrentDictionary<string, string> errorRegistry,
+        ConcurrentQueue<Token> eventQueue,
+        CancellationToken ctsToken)
     {
-        while (_eventQueue.Count > 0 && !ctsToken.IsCancellationRequested)
+        while (eventQueue.Count > 0 && !ctsToken.IsCancellationRequested)
         {
-            var resGetToken = _eventQueue.TryDequeue(out var token);
+            var resGetToken = eventQueue.TryDequeue(out var token);
             if (!resGetToken || token == null)
             {
                 _logger.LogError("[BpmnEngine:RunEventLoopAsync] No events queued");
@@ -144,7 +174,12 @@ internal class BpmnEngine : IBpmnEngine
             var currentId = token.CurrentNodeId;
             var node = processModel.Nodes[currentId];
 
-            var nodes = await node.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, ctsToken);
+            var nodes = await node.ExecuteAsync(
+                processModel,
+                contextBpmnProcess,
+                nodeStateRegistry,
+                errorRegistry,
+                ctsToken);
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
@@ -157,39 +192,12 @@ internal class BpmnEngine : IBpmnEngine
                 return true;
             }
 
-            nodes.Tokens.ToList().ForEach(p => _eventQueue.Enqueue(p));
+            nodes.Tokens.ToList().ForEach(eventQueue.Enqueue);
         }
 
         return false;
     }
 
-
-    /// <inheritdoc/>
-    public bool AddMessageToQueue(Type messageType, object message)
-    {
-        ArgumentNullException.ThrowIfNull(_contextBpmnProcess);
-        ArgumentNullException.ThrowIfNull(messageType);
-        ArgumentNullException.ThrowIfNull(message);
-        try
-        {
-            var idNode = GetIdNodeReceiveMessage(_contextBpmnProcess, messageType);
-            AddMessageToQueue(idNode, message, _contextBpmnProcess);
-
-            _eventQueue.Enqueue(new Token()
-            {
-                CurrentNodeId = idNode,
-            });
-
-            _semaphore.Release();
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[BpmnEngine:AddMessageToQueue] Exception");
-        }
-
-        return false;
-    }
 
     /// <summary>
     /// Добавит в словарь сообщение.

@@ -45,12 +45,14 @@ internal class ReceiveTask : IBpmnNode
         ProcessModel processModel,
         IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ConcurrentDictionary<string, string> errorRegistry,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(processModel);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
+        ArgumentNullException.ThrowIfNull(errorRegistry);
         var statusBpmnEngine = StatusNode.WorksNode;
         Token? nextToken = null;
         nodeStateRegistry[Id] = statusBpmnEngine;
@@ -114,6 +116,7 @@ internal class ReceiveTask : IBpmnNode
         {
             _logger.LogError(e, "[ReceiveTask:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
+            errorRegistry[Id] = e.Message;
         }
 
 

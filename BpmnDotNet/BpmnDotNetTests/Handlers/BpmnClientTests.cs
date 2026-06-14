@@ -3,6 +3,7 @@ using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using BpmnDotNetTests.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

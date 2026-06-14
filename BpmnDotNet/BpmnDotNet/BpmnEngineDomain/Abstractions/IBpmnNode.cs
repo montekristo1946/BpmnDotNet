@@ -20,13 +20,15 @@ internal interface IBpmnNode
     /// </summary>
     /// <param name="processModel"><inheritdoc cref="ProcessModel"/></param>
     /// <param name="context"><inheritdoc cref="IContextBpmnProcess"/>.</param>
-    /// <param name="nodeStateRegistry">Состояние узлов.</param>
+    /// <param name="nodeStateRegistry">Реестр состояние узлов.</param>
+    /// <param name="errorRegistry">Реестр сообщение ошибок.</param>
     /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/>.</param>
     /// <returns><inheritdoc cref="BpmnNodeResult"/>.</returns>
     public Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
         IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ConcurrentDictionary<string, string> errorRegistry,
         CancellationToken cancellationToken);
 
     /// <summary>

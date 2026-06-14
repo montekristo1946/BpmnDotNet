@@ -1,3 +1,5 @@
+using BpmnDotNet.HistoryDomain.Abstractions;
+
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;

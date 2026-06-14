@@ -1,3 +1,5 @@
+using BpmnDotNet.HistoryDomain.Abstractions;
+
 namespace BpmnDotNet.Handlers;
 
 using BpmnDotNet.Abstractions.Handlers;
