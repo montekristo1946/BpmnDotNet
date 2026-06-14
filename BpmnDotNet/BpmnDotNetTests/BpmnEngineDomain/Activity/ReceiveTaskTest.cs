@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.Xunit2;
 using BpmnDotNet.Abstractions.Context;
@@ -8,6 +9,7 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNetTests.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 
@@ -246,8 +248,7 @@ public class ReceiveTaskTest
         ProcessModel processModel,
         IContextBpmnProcess context,
         DirectionFlow[] nextNodes,
-        string currentId,
-        object message)
+        string currentId)
     {
         // Arrange
         var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
@@ -258,7 +259,7 @@ public class ReceiveTaskTest
 
         // Настройка AreAllPreviousNodesCompleted - возвращает true
         sut.AreAllPreviousNodesCompleted(
-                Arg.Any<ConcurrentDictionary<string, StatusNode>>(), 
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
                 Arg.Any<ProcessModel>(), Arg.Any<string>())
             .Returns(true);
 
@@ -281,4 +282,462 @@ public class ReceiveTaskTest
         Assert.NotEmpty(result.Tokens);
         await handler.Received(1).Invoke(context, Arg.Any<CancellationToken>());
     }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenPreviousNodesNotCompleted_ReturnsWorksNodeStatus(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка AreAllPreviousNodesCompleted - возвращает false
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(false);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.WorksNode, result.Status);
+        Assert.Empty(result.Tokens);
+        await handler.DidNotReceive().Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenMessageNotFound_ReturnsWorksNodeStatus(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка AreAllPreviousNodesCompleted - возвращает true
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка CheckForMessage - возвращает false
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(false);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.WorksNode, result.Status);
+        Assert.Empty(result.Tokens);
+        await handler.DidNotReceive().Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenProcessModelIsNull_ThrowsArgumentNullException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(null!, context, nodeStateRegistry));
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenContextIsNull_ThrowsArgumentNullException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null, nodeStateRegistry));
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenActivityHandlerIsNull_ThrowsArgumentNullException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        [Frozen] ConcurrentDictionary<string, object> receivedMessage,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        var property = typeof(ReceiveTask)
+            .GetProperty(nameof(ReceiveTask.ActivityHandlerAsync));
+        property!.SetValue(sut, null);
+
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            sut.ExecuteAsync(processModel, context, nodeStateRegistry));
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenNodeStateRegistryIsNull_ThrowsArgumentNullException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, context, null));
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenExceptionOccurs_ReturnsFailedStatus(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        DirectionFlow[] nextNodes,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("Test exception"));
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource
+        processModel.FlowsBySource.TryAdd(currentId, nextNodes);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Empty(result.Tokens);
+        logger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(o => o.ToString()!.Contains("[ReceiveTask:ExecuteAsync] Exception")),
+            Arg.Any<Exception>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenNoNextNodes_ThrowsInvalidDataException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Не добавляем currentId в FlowsBySource
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act & Assert
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Empty(result.Tokens);
+        logger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(o => o.ToString()!.Contains("[ReceiveTask:ExecuteAsync] Exception")),
+            Arg.Any<Exception>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenNextNodesIsNull_ThrowsInvalidDataException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource - добавляем null значение
+        processModel.FlowsBySource.TryAdd(currentId, null!);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act & Assert
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Empty(result.Tokens);
+        logger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(o => o.ToString()!.Contains("[ReceiveTask:ExecuteAsync] Exception")),
+            Arg.Any<Exception>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenNextNodesIsEmpty_ThrowsInvalidDataException(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource - добавляем пустой массив
+        processModel.FlowsBySource.TryAdd(currentId, Array.Empty<DirectionFlow>());
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act & Assert
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        Assert.NotNull(result);
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Empty(result.Tokens);
+        logger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(o => o.ToString()!.Contains("[ReceiveTask:ExecuteAsync] Exception")),
+            Arg.Any<Exception>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_UpdatesNodeStateRegistry_OnStartAndCompletion(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        DirectionFlow[] nextNodes,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource
+        processModel.FlowsBySource.TryAdd(currentId, nextNodes);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        // Assert
+        Assert.True(nodeStateRegistry.ContainsKey(currentId));
+        Assert.Equal(StatusNode.AllBpmnProcessCompleted, nodeStateRegistry[currentId]);
+
+        if (nextNodes.Length > 0)
+        {
+            Assert.True(nodeStateRegistry.ContainsKey(nextNodes[0].IdFlow));
+            Assert.Equal(StatusNode.NormalCompletedNode, nodeStateRegistry[nextNodes[0].IdFlow]);
+        }
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WhenExceptionOccurs_UpdatesNodeStateToFailed(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        DirectionFlow[] nextNodes,
+        string currentId)
+    {
+        // Arrange
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("Test exception"));
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource
+        processModel.FlowsBySource.TryAdd(currentId, nextNodes);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+
+        // Assert
+        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompletedNode, nodeStateRegistry[currentId]);
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    internal async Task ExecuteAsync_WithCancellationToken_CancelsOperation(
+        [Frozen] ILogger<ReceiveTask> logger,
+        [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        IContextBpmnProcess context,
+        DirectionFlow[] nextNodes,
+        string currentId)
+    {
+        // Arrange
+        var cts = new CancellationTokenSource();
+        var handler = Substitute.For<Func<IContextBpmnProcess, CancellationToken, Task>>();
+        handler.Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
+
+        // Настройка успешных проверок
+        sut.AreAllPreviousNodesCompleted(
+                Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
+                Arg.Any<ProcessModel>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        sut.CheckForMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<string>())
+            .Returns(true);
+
+        // Настройка FlowsBySource
+        processModel.FlowsBySource.TryAdd(currentId, nextNodes);
+
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        // Act
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry, cts.Token);
+
+        // Assert
+        Assert.NotNull(result);
+        await handler.Received(1).Invoke(context, cts.Token);
+    }
+
 }

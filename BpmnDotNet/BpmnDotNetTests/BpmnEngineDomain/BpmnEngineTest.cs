@@ -346,7 +346,8 @@ public class BpmnEngineTest
         
         var eventQueueField = typeof(BpmnEngine).GetField("_eventQueue", 
             BindingFlags.NonPublic | BindingFlags.Instance);
-        var eventQueue = (ConcurrentQueue<Token> )eventQueueField!.GetValue(sut);
+        Assert.NotNull(eventQueueField);
+        var eventQueue = (ConcurrentQueue<Token> )eventQueueField.GetValue(sut)!;
         Assert.NotNull(eventQueue);
         
         // Act

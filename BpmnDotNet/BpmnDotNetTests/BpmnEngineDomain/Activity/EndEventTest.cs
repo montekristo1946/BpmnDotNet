@@ -32,7 +32,7 @@ public class EndEventTest
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
             sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, CancellationToken.None));
 
-        Assert.Equal("contextBpmnProcess", exception.ParamName);
+        Assert.Equal("context", exception.ParamName);
     }
 
     [Theory]

@@ -6,17 +6,17 @@ namespace BpmnDotNet.BpmnEngineDomain.Dto;
 internal class Flow
 {
     /// <summary>
-    /// Gets or sets уникальный идентификатор.
+    /// Gets уникальный идентификатор.
     /// </summary>
-    public string Id { get; set; }
+    public string Id { get; init; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets iD узла из которого исходит стрелка.
+    /// Gets iD узла из которого исходит стрелка.
     /// </summary>
-    public string SourceId { get; set; }
+    public string SourceId { get; init; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets iD узла в который приходит стрелка.
+    /// Gets iD узла в который приходит стрелка.
     /// </summary>
-    public string TargetId { get; set; }
+    public string TargetId { get; init; } = string.Empty;
 }
