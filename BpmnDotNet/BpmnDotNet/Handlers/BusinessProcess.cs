@@ -253,7 +253,8 @@ internal class BusinessProcess : IBusinessProcess
 
     private bool AddMessageInContext(IContextBpmnProcess context, Type typeMessage, object? message)
     {
-        if (message is null)
+        throw new NotImplementedException();
+      /*  if (message is null)
         {
             _logger.LogWarning(
                 "[AddMessageInContext] received null message, IdBpmnProcess:{IdBpmnProcess}, TokenProcess:{TokenProcess}",
@@ -280,12 +281,13 @@ internal class BusinessProcess : IBusinessProcess
                 $"[AddMessageInContext] Fail Set {typeMessage}, From {context.IdBpmnProcess} {context.TokenProcess}");
         }
 
-        return true;
+        return true;*/
     }
 
     private Type GetTypeNameMessage(IContextBpmnProcess context, string nodeIdElement)
     {
-        var messageReceiveTask = context as IMessageReceiveTask;
+        throw new NotImplementedException();
+       /* var messageReceiveTask = context as IMessageReceiveTask;
 
         var dic = messageReceiveTask?.RegistrationMessagesType;
 
@@ -310,7 +312,7 @@ internal class BusinessProcess : IBusinessProcess
             throw new InvalidOperationException(textMessage);
         }
 
-        return typeName;
+        return typeName;*/
     }
 
     /// <summary>

@@ -141,8 +141,8 @@ public class BpmnEngineTest
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(500));
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
         var conditionRoute = new ConcurrentDictionary<string, string>();
-        conditionRoute.TryAdd("GatewayFirstHandler","Flow_in_SendTaskFirstHandler");
-   
+        conditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_SendTaskFirstHandler");
+
 
         contextBpmnProcess.ConditionRoute.Returns(conditionRoute);
         var res = await _bpmnEngine.StartProcessAsync(contextBpmnProcess, processModel, cancellationToken.Token);
@@ -151,8 +151,209 @@ public class BpmnEngineTest
 
         Assert.True(isCallMethod);
     }
-    
-  
-    
 
+
+    [Theory]
+    [InlineData("ExpectedNodeId")]
+    [InlineData("AnotherNodeId")]
+    public void GetIdNodeReceiveMessage_WhenMessageTypeExists_ReturnsIdNode(string expectedId)
+    {
+        // Arrange
+        var messageType = typeof(string);
+        var context = Substitute.For<IContextBpmnProcess>();
+
+        var dictionary = new ConcurrentDictionary<Type, string>();
+        dictionary.TryAdd(messageType, expectedId);
+
+        context.RegistrationMessagesType.Returns(dictionary);
+        context.IdBpmnProcess.Returns(_fixture.Create<string>());
+        context.TokenProcess.Returns(_fixture.Create<string>());
+
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+
+        // Act
+        var result = sut.GetIdNodeReceiveMessage(context, messageType);
+
+        // Assert
+        Assert.Equal(expectedId, result);
+    }
+
+    [Fact]
+    public void GetIdNodeReceiveMessage_WhenRegistrationMessagesTypeIsNull_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var messageType = typeof(string);
+        var context = Substitute.For<IContextBpmnProcess>();
+
+        context.RegistrationMessagesType.Returns((ConcurrentDictionary<Type, string>)null!);
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+
+        // Act & Assert
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => sut.GetIdNodeReceiveMessage(context, messageType));
+
+        Assert.Contains("Not find registrationMessagesType dictionary", exception.Message);
+        Assert.Contains(messageType.ToString(), exception.Message);
+        Assert.Contains("TestProcessId", exception.Message);
+        Assert.Contains("TestToken", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(false, null)]
+    [InlineData(false, "")]
+    [InlineData(false, " ")]
+    [InlineData(true, null)]
+    [InlineData(true, "")]
+    [InlineData(true, " ")]
+    public void GetIdNodeReceiveMessage_WhenMessageTypeNotFoundOrIdNodeInvalid_ThrowsInvalidOperationException(
+        bool addOtherType,
+        string? invalidIdNode)
+    {
+        // Arrange
+        var messageType = typeof(string);
+        var context = Substitute.For<IContextBpmnProcess>();
+
+        var dictionary = new ConcurrentDictionary<Type, string?>();
+
+        if (addOtherType)
+        {
+            dictionary.TryAdd(typeof(int), invalidIdNode);
+        }
+
+        if (invalidIdNode != null)
+        {
+            dictionary.TryAdd(messageType, invalidIdNode);
+        }
+
+        context.RegistrationMessagesType.Returns(dictionary!);
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+
+        // Act & Assert
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => sut.GetIdNodeReceiveMessage(context, messageType));
+
+        Assert.Contains("Not find registration messages type", exception.Message);
+        Assert.Contains(messageType.ToString(), exception.Message);
+        Assert.Contains("TestProcessId", exception.Message);
+        Assert.Contains("TestToken", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("NodeId1")]
+    [InlineData("NodeId2")]
+    public void AddMessageToQueue_WhenReceivedMessageExists_AddsMessageToDictionary(string idNode)
+    {
+        // Arrange
+        var message = new { Data = "test message" };
+        var context = Substitute.For<IContextBpmnProcess>();
+
+        var dictionary = new ConcurrentDictionary<string, object>();
+
+        context.ReceivedMessage.Returns(dictionary);
+        context.IdBpmnProcess.Returns(_fixture.Create<string>());
+        context.TokenProcess.Returns(_fixture.Create<string>());
+
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+
+        // Act
+        sut.AddMessageToQueue(idNode, message, context);
+
+        // Assert
+        Assert.True(dictionary.ContainsKey(idNode));
+        Assert.Equal(message, dictionary[idNode]);
+    }
+
+    [Fact]
+    public void AddMessageToQueue_WhenReceivedMessageIsNull_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var idNode = "TestNodeId";
+        var message = new { Data = "test message" };
+        var context = Substitute.For<IContextBpmnProcess>();
+
+        context.ReceivedMessage.Returns((ConcurrentDictionary<string, object>)null!);
+        context.IdBpmnProcess.Returns("TestProcessId");
+        context.TokenProcess.Returns("TestToken");
+
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => sut.AddMessageToQueue(idNode, message, context));
+
+        Assert.Contains("[BpmnEngine:AddMessageToQueue] Not find ReceivedMessage dictionary", exception.Message);
+        Assert.Contains("TestProcessId", exception.Message);
+        Assert.Contains("TestToken", exception.Message);
+    }
+    
+    
+    [Fact]
+    public void AddMessageToQueue_FullPass_CountSemaphoreCall()
+    {
+        // Arrange
+        var message = new { Data = "test message" };
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+        var semaphoreField = typeof(BpmnEngine).GetField("_semaphore", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut);
+        Assert.NotNull(semaphore);
+        
+        var context = Substitute.For<IContextBpmnProcess>();
+        
+        var contextField = typeof(BpmnEngine).GetField("_contextBpmnProcess", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        contextField?.SetValue(sut, context);
+        Assert.NotNull(context);
+        sut.GetIdNodeReceiveMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<Type>()).Returns(_fixture.Create<string>());
+        sut.AddMessageToQueue(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<IContextBpmnProcess>()).Returns(true);
+
+        // Act
+        var result = sut.AddMessageToQueue(typeof(string), message);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(1, semaphore.CurrentCount); // Семафор был освобожден
+        sut.Received(1).GetIdNodeReceiveMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<Type>());
+        sut.Received(1).AddMessageToQueue(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<IContextBpmnProcess>());
+    }
+    
+    [Fact]
+    public void AddMessageToQueue_CheckNextToken_CountToken()
+    {
+        // Arrange
+        var idNode = "TestNodeId";
+        var message = new { Data = "test message" };
+        var sut = Substitute.ForPartsOf<BpmnEngine>(Substitute.For<ILogger<BpmnEngine>>());
+        var semaphoreField = typeof(BpmnEngine).GetField("_semaphore", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut);
+        Assert.NotNull(semaphore);
+        
+        var context = Substitute.For<IContextBpmnProcess>();
+        
+        var contextField = typeof(BpmnEngine).GetField("_contextBpmnProcess", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        contextField?.SetValue(sut, context);
+        Assert.NotNull(context);
+        sut.GetIdNodeReceiveMessage(Arg.Any<IContextBpmnProcess>(), Arg.Any<Type>()).Returns(idNode);
+        sut.AddMessageToQueue(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<IContextBpmnProcess>()).Returns(true);
+
+        
+        var eventQueueField = typeof(BpmnEngine).GetField("_eventQueue", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var eventQueue = (ConcurrentQueue<Token> )eventQueueField!.GetValue(sut);
+        Assert.NotNull(eventQueue);
+        
+        // Act
+        _ = sut.AddMessageToQueue(typeof(string), message);
+
+        // Assert
+       Assert.Single(eventQueue);
+       Assert.Equal(idNode, eventQueue.First().CurrentNodeId);
+    }
 }
