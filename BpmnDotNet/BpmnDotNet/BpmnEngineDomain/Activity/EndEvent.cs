@@ -43,12 +43,12 @@ internal class EndEvent : IBpmnNode
     /// <inheritdoc/>
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
-        IContextBpmnProcess contextBpmnProcess,
+        IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(processModel);
-        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
@@ -57,7 +57,7 @@ internal class EndEvent : IBpmnNode
 
         try
         {
-            await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
+            await ActivityHandlerAsync(context, cancellationToken);
             var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
             if (isGetNextNodes || nextNodes is not null)
             {

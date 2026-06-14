@@ -42,12 +42,12 @@ internal class ExclusiveGateway : IBpmnNode
     /// <inheritdoc/>
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
-        IContextBpmnProcess contextBpmnProcess,
+        IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(processModel);
-        ArgumentNullException.ThrowIfNull(contextBpmnProcess);
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
 
@@ -57,7 +57,7 @@ internal class ExclusiveGateway : IBpmnNode
         Token? nextToken = null;
         try
         {
-            await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
+            await ActivityHandlerAsync(context, cancellationToken);
 
             var isGetCandidateNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var candidateNextNodes);
 
@@ -80,7 +80,7 @@ internal class ExclusiveGateway : IBpmnNode
             }
             else
             {
-                var idRouteFlow = GetRouteFlow(contextBpmnProcess, Id);
+                var idRouteFlow = GetRouteFlow(context, Id);
                 var isGetNextNodes = processModel.Flows.TryGetValue(idRouteFlow, out var flow);
                 if (!isGetNextNodes || flow is null)
                 {

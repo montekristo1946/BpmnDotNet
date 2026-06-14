@@ -40,4 +40,10 @@
         </PackageReference>
     </ItemGroup>
     
+
+
+    <ItemGroup>
+      <Folder Include="BpmnEngineDomain\Utils\" />
+    </ItemGroup>
+    
 </Project>

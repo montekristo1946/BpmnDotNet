@@ -14,7 +14,7 @@ public interface IMessageReceiveTask
     public ConcurrentDictionary<Type, string> RegistrationMessagesType { get; init; }
 
     /// <summary>
-    ///     Gets полученные сообщения. Где string - typeName, object - само Dto сообщения.
+    ///     Gets полученные сообщения. Где string - id node, object - само Dto сообщения.
     /// </summary>
     public ConcurrentDictionary<string, object> ReceivedMessage { get; init; }
 }

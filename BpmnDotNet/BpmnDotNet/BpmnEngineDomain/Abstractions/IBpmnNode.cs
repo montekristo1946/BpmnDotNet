@@ -19,13 +19,13 @@ internal interface IBpmnNode
     /// Метод вызова блока для engine.
     /// </summary>
     /// <param name="processModel"><inheritdoc cref="ProcessModel"/></param>
-    /// <param name="contextBpmnProcess"><inheritdoc cref="IContextBpmnProcess"/>.</param>
+    /// <param name="context"><inheritdoc cref="IContextBpmnProcess"/>.</param>
     /// <param name="nodeStateRegistry">Состояние узлов.</param>
     /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/>.</param>
     /// <returns><inheritdoc cref="BpmnNodeResult"/>.</returns>
     public Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
-        IContextBpmnProcess contextBpmnProcess,
+        IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken);
 

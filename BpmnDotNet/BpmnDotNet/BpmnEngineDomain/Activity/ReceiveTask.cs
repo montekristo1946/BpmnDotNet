@@ -43,50 +43,142 @@ internal class ReceiveTask : IBpmnNode
     /// <inheritdoc/>
     public async Task<BpmnNodeResult> ExecuteAsync(
         ProcessModel processModel,
-        IContextBpmnProcess contextBpmnProcess,
+        IContextBpmnProcess context,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
-       /* if (contextBpmnProcess == null)
-        {
-            throw new ArgumentNullException(nameof(contextBpmnProcess));
-        }
+        ArgumentNullException.ThrowIfNull(processModel);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
+        ArgumentNullException.ThrowIfNull(nodeStateRegistry);
+        var statusBpmnEngine = StatusNode.WorksNode;
+        Token? nextToken = null;
+        nodeStateRegistry[Id] = statusBpmnEngine;
 
-        if (ActivityHandlerAsync == null)
-        {
-            throw new ArgumentNullException(nameof(ActivityHandlerAsync));
-        }
-
-        StatusNode statusBpmnEngine;
-        Token[] nextTokens = [];
         try
         {
-            await ActivityHandlerAsync(contextBpmnProcess, cancellationToken);
-            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(currentId, out var nextNodes);
-            if (!isGetNextNodes)
+            var isAreAllPreviousNodesCompleted = AreAllPreviousNodesCompleted(nodeStateRegistry, processModel, Id);
+            if (!isAreAllPreviousNodesCompleted)
             {
-                _logger.LogWarning(
-                    "[ExclusiveGateway:ExecuteAsync] FlowsBySource dictionary returned false IdNode:{IdNode}",
-                    currentId);
+                _logger.LogDebug(
+                    "[ReceiveTask:ExecuteAsync] Not  all previous nodes completed, IdNode:{Id}; {IdBpmnProcess}:{TokenProcess}",
+                    Id,
+                    context.IdBpmnProcess,
+                    context.TokenProcess);
+
+                return new BpmnNodeResult()
+                {
+                    Status = statusBpmnEngine,
+                    Tokens = [],
+                };
             }
 
-            nextTokens = nextNodes?.Select(p => new Token
+            var isCheckMessage = CheckForMessage(context, Id);
+            if (!isCheckMessage)
             {
-                CurrentNodeId = p.IdResource,
-            }).ToArray() ?? [];
-            statusBpmnEngine = StatusNode.NormalCompletedNode;
+                _logger.LogDebug(
+                    "[ReceiveTask:ExecuteAsync]Message not found, IdNode:{Id}; {IdBpmnProcess}:{TokenProcess}",
+                    Id,
+                    context.IdBpmnProcess,
+                    context.TokenProcess);
+
+                return new BpmnNodeResult()
+                {
+                    Status = statusBpmnEngine,
+                    Tokens = [],
+                };
+            }
+
+            await ActivityHandlerAsync(context, cancellationToken);
+            var isGetNextNodes = processModel.FlowsBySource.TryGetValue(Id, out var nextNodes);
+            if (!isGetNextNodes || nextNodes is null || nextNodes.Length == 0)
+            {
+                throw new InvalidDataException(
+                    $"[ReceiveTask:ExecuteAsync] EndEvent must be the final event, IdNode:{Id}");
+            }
+
+            var nexFlow = nextNodes.FirstOrDefault();
+            if (nexFlow is not null)
+            {
+                nextToken = new Token
+                {
+                    CurrentNodeId = nexFlow.IdResource,
+                };
+
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
+            }
+
+            statusBpmnEngine = StatusNode.AllBpmnProcessCompleted;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
+            _logger.LogError(e, "[ReceiveTask:ExecuteAsync] Exception");
             statusBpmnEngine = StatusNode.FailedCompletedNode;
         }
 
+
+        nodeStateRegistry[Id] = statusBpmnEngine;
         return new BpmnNodeResult()
         {
             Status = statusBpmnEngine,
-            Tokens = nextTokens,
-        };*/
+            Tokens = nextToken is null ? Array.Empty<Token>() : new[] { nextToken },
+        };
+    }
+
+    /// <summary>
+    /// Проверяет наличие сообщения в контексте.
+    /// </summary>
+    /// <param name="context"><inheritdoc cref="IContextBpmnProcess"/></param>
+    /// <param name="idNode">Id node.</param>
+    /// <returns>Наличие сообщения.</returns>
+    internal virtual bool CheckForMessage(IContextBpmnProcess context, string idNode)
+    {
+        var messageReceiveTask = context as IMessageReceiveTask;
+
+        var dic = messageReceiveTask?.ReceivedMessage;
+
+        if (dic is null)
+        {
+            var textMessage =
+                $"[ReceiveTask:CheckForMessage] Not find ReceivedMessage dictionary" +
+                $"IdBpmnProcess {context.IdBpmnProcess} {context.TokenProcess}";
+            throw new InvalidOperationException(textMessage);
+        }
+
+        var isGetMessage = dic.TryGetValue(idNode, out var message);
+
+        return isGetMessage && message is not null;
+    }
+
+    /// <summary>
+    /// Проверит завершены ли все входящие ноды.
+    /// </summary>
+    /// <param name="nodeStateRegistry">Регистр завершеных нод.</param>
+    /// <param name="processModel"><inheritdoc cref="ProcessModel"/></param>
+    /// <param name="id">ID текущей ноды.</param>
+    /// <returns>Результат выполнения.</returns>
+    internal virtual bool AreAllPreviousNodesCompleted(
+        ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
+        ProcessModel processModel,
+        string id)
+    {
+        var isGetTargetNodes = processModel.FlowsByTarget.TryGetValue(id, out var targetFlows);
+
+        if (!isGetTargetNodes || targetFlows is null || targetFlows.Length == 0)
+        {
+            throw new InvalidDataException(
+                $"[ReceiveTask:AreAllPreviousNodesCompleted] FlowsBySource dictionary returned false, IdNode:{Id}");
+        }
+
+        foreach (var targetFlow in targetFlows)
+        {
+            var isFindSate = nodeStateRegistry.TryGetValue(targetFlow.IdFlow, out var sate);
+            if (!isFindSate || sate != StatusNode.NormalCompletedNode)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
