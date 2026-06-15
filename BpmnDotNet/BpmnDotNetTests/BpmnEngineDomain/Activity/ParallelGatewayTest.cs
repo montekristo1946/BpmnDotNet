@@ -12,9 +12,9 @@ namespace BpmnDotNetTests.BpmnEngineDomain.Activity;
 
 public class ParallelGatewayTest
 {
-    private readonly IFixture _fixture =  new Fixture();
+    private readonly IFixture _fixture = new Fixture();
     private readonly ConcurrentDictionary<string, StatusNode> _nodeStateRegistry = new();
-    
+
     [Theory]
     [AutoNSubstituteData]
     internal Task CheckCompletedAllInputFlow_CheckFindAllFlows_True(
@@ -28,19 +28,19 @@ public class ParallelGatewayTest
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsByTarget.TryAdd(currentId, lastNodes);
-        var nodeStateRegistry =  new ConcurrentDictionary<string, StatusNode>();
+        var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
         nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompletedNode);
         nodeStateRegistry.TryAdd(lastNodes[1].IdFlow, StatusNode.NormalCompletedNode);
         nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompletedNode);
-        
+
         // Act
-        var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry,processModel);
+        var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry, processModel);
 
         // Assert
         Assert.True(result);
         return Task.CompletedTask;
     }
-    
+
     [Theory]
     [AutoNSubstituteData]
     internal Task CheckCompletedAllInputFlow_CheckFindAllFlows_False(
@@ -54,19 +54,19 @@ public class ParallelGatewayTest
 
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsByTarget.TryAdd(currentId, lastNodes);
-        var nodeStateRegistry =  new ConcurrentDictionary<string, StatusNode>();
+        var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
         nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompletedNode);
         nodeStateRegistry.TryAdd(lastNodes[1].IdFlow, StatusNode.None);
         nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompletedNode);
-        
+
         // Act
-        var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry,processModel);
+        var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry, processModel);
 
         // Assert
         Assert.False(result);
         return Task.CompletedTask;
     }
-    
+
     [Theory]
     [AutoNSubstituteData]
     internal async Task ExecuteAsync_ShouldThrowArgumentNullException_WhenContextIsNull(
@@ -81,12 +81,12 @@ public class ParallelGatewayTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, [], CancellationToken.None));
 
         Assert.Equal("context", exception.ParamName);
     }
-    
-    
+
+
     [Theory]
     [AutoNSubstituteData]
     internal async Task ExecuteAsync_ShouldThrowArgumentNullException_WhenActivityHandlerIsNull(
@@ -101,11 +101,11 @@ public class ParallelGatewayTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
-    
+
     [Fact]
     internal async Task ExecuteAsync_CallActivityHandlerAsync_CountCall()
     {
@@ -117,7 +117,7 @@ public class ParallelGatewayTest
         });
         var sut = Substitute.ForPartsOf<ParallelGateway>(
             Substitute.For<ILogger<ParallelGateway>>(),
-            handler, 
+            handler,
             _fixture.Create<string>());
         sut.CheckCompletedAllInputFlow(
             Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
@@ -126,11 +126,12 @@ public class ParallelGatewayTest
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],
+            CancellationToken.None);
 
         Assert.Equal(1, countCall);
     }
-    
+
     [Theory]
     [AutoNSubstituteData]
     internal async Task ExecuteAsync_ShouldReturnCompletedStatusAndTokens_WhenNextNodesExist(
@@ -151,19 +152,19 @@ public class ParallelGatewayTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
-        Assert.Equal(nextNodes.Length,result.Tokens.Count());
+        Assert.Equal(nextNodes.Length, result.Tokens.Count());
 
         foreach (var token in result.Tokens)
         {
             Assert.Contains(nextNodes, n => n.IdResource == token.CurrentNodeId);
         }
     }
-    
-     [Theory]
+
+    [Theory]
     [AutoNSubstituteData]
     internal async Task ExecuteAsync_ShouldReturnFailedStatus_WhenActivityHandlerThrowsException(
         [Frozen] ILogger<ParallelGateway> logger,
@@ -178,10 +179,12 @@ public class ParallelGatewayTest
         sut.CheckCompletedAllInputFlow(
             Arg.Any<ConcurrentDictionary<string, StatusNode>>(),
             Arg.Any<ProcessModel>()).Returns(true);
+        ConcurrentDictionary<string, string> errorRegistry = new();
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, errorRegistry,
+                CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -193,6 +196,8 @@ public class ParallelGatewayTest
             Arg.Is<object>(o => o.ToString()!.Contains("[ParallelGateway:ExecuteAsync] Exception")),
             expectedException,
             Arg.Any<Func<object, Exception?, string>>());
+
+        Assert.Contains("Test exception", errorRegistry[currentId]);
     }
 
     [Theory]
@@ -223,7 +228,7 @@ public class ParallelGatewayTest
             Arg.Any<ProcessModel>()).Returns(true);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -247,7 +252,8 @@ public class ParallelGatewayTest
             Arg.Any<ProcessModel>()).Returns(true);
 
         // Act
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],
+            CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, res.Status);
@@ -274,19 +280,19 @@ public class ParallelGatewayTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
         Assert.Equal(4, _nodeStateRegistry.Count);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusNodeSub);
-        
+        Assert.Equal(StatusNode.NormalCompletedNode, statusNodeSub);
+
         var stateFlow = _nodeStateRegistry.TryGetValue(nextNodes[0].IdFlow, out var statusFlow);
         Assert.True(stateFlow);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusFlow);
+        Assert.Equal(StatusNode.NormalCompletedNode, statusFlow);
     }
-    
+
     [Theory]
     [AutoNSubstituteData]
     internal async Task ExecuteAsync_CheckFillNodeStateRegistry_FailedCompletedNode(
@@ -308,12 +314,12 @@ public class ParallelGatewayTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
         Assert.Single(_nodeStateRegistry);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.FailedCompletedNode,statusNodeSub);
+        Assert.Equal(StatusNode.FailedCompletedNode, statusNodeSub);
     }
 }

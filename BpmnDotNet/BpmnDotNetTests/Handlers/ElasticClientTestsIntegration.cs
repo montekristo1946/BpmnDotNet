@@ -4,6 +4,7 @@ using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNetTests.Handlers;

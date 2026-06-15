@@ -1,4 +1,5 @@
 using BpmnDotNet.HistoryDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 
 namespace BpmnDotNet.Handlers;
 
@@ -166,7 +167,9 @@ internal class BusinessProcess : IBusinessProcess
     /// <param name="ctsToken">ctsToken.</param>
     /// <returns><see cref="Task"/> representing the asynchronous operation.</returns>
     private async Task ThreadBackground(CancellationToken ctsToken)
-    {
+    { 
+        throw  new NotImplementedException();
+        /*
         _logger.LogDebug(
             "[ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
@@ -223,7 +226,7 @@ internal class BusinessProcess : IBusinessProcess
         _logger.LogDebug(
             "[BusinessProcess:ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
-            _contextBpmnProcess.TokenProcess);
+            _contextBpmnProcess.TokenProcess);*/
     }
 
     /// <summary>
@@ -231,7 +234,8 @@ internal class BusinessProcess : IBusinessProcess
     /// </summary>
     private void CheckMessagesStore()
     {
-        foreach (var nodeState in _nodeStateRegistry)
+        throw new NotImplementedException();
+       /* foreach (var nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.StatusType != StatusType.WaitingReceivedMessage)
             {
@@ -250,7 +254,7 @@ internal class BusinessProcess : IBusinessProcess
             {
                 NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
             }
-        }
+        }*/
     }
 
     private bool AddMessageInContext(IContextBpmnProcess context, Type typeMessage, object? message)
@@ -322,27 +326,28 @@ internal class BusinessProcess : IBusinessProcess
     /// </summary>
     private void UpdateParallelGatewayState()
     {
-        foreach (var nodeState in _nodeStateRegistry)
-        {
-            if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
-            {
-                continue;
-            }
-
-            var currentNode = GetIElement(nodeState.Key);
-            var incomingPath = GetIncomingPath(currentNode);
-
-            var checkCalls = incomingPath.All(p =>
-            {
-                var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
-                return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
-            });
-
-            if (checkCalls)
-            {
-                NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
-            }
-        }
+        throw new NotImplementedException();
+        // foreach (var nodeState in _nodeStateRegistry)
+        // {
+        //     if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
+        //     {
+        //         continue;
+        //     }
+        //
+        //     var currentNode = GetIElement(nodeState.Key);
+        //     var incomingPath = GetIncomingPath(currentNode);
+        //
+        //     var checkCalls = incomingPath.All(p =>
+        //     {
+        //         var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
+        //         return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
+        //     });
+        //
+        //     if (checkCalls)
+        //     {
+        //         NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
+        //     }
+        // }
     }
 
     private void AddStartEvent()
@@ -364,7 +369,8 @@ internal class BusinessProcess : IBusinessProcess
     /// <param name="ctsToken">CancellationToken.</param>
     private async Task ExecutionNodesAsync(string nodeId, CancellationToken ctsToken)
     {
-        var isForcedTermination = false;
+        throw  new NotImplementedException();
+       /* var isForcedTermination = false;
         try
         {
             var handler = GetHandler(nodeId);
@@ -401,7 +407,7 @@ internal class BusinessProcess : IBusinessProcess
 
             CheckFinalProcessing(nodeId, isForcedTermination);
             _eventsHolder.Set();
-        }
+        }*/
     }
 
     private void ErrorsRegistryUpdate(string nodeId, string message)
@@ -415,21 +421,22 @@ internal class BusinessProcess : IBusinessProcess
 
     private void NodeRegistryChangeState(string nodeId, StatusType staus)
     {
-        var stateNew = new NodeJobStatus
-        {
-            StatusType = staus,
-            IdNode = nodeId,
-        };
-
-        _nodeStateRegistry.AddOrUpdate(
-            nodeId,
-            _ => stateNew,
-            (keyOld, oldMessage) =>
-                new NodeJobStatus
-                {
-                    StatusType = staus,
-                    IdNode = keyOld,
-                });
+        throw new NotImplementedException();
+        // var stateNew = new NodeJobStatus
+        // {
+        //     StatusType = staus,
+        //     IdNode = nodeId,
+        // };
+        //
+        // _nodeStateRegistry.AddOrUpdate(
+        //     nodeId,
+        //     _ => stateNew,
+        //     (keyOld, oldMessage) =>
+        //         new NodeJobStatus
+        //         {
+        //             StatusType = staus,
+        //             IdNode = keyOld,
+        //         });
     }
 
     private IElement GetIElement(string nodeId)
@@ -531,22 +538,23 @@ internal class BusinessProcess : IBusinessProcess
 
     private IElement[] EliminateDuplicates(IElement[] nodes)
     {
-        var result = new List<IElement>();
-        foreach (var node in nodes)
-        {
-            var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
-
-            // случай когда параллельный шлюз уже запущен
-            if (resGet && nodeJobStatus is not null &&
-                nodeJobStatus.StatusType == StatusType.Works)
-            {
-                continue;
-            }
-
-            result.Add(node);
-        }
-
-        return result.ToArray();
+        throw new NotImplementedException();
+        // var result = new List<IElement>();
+        // foreach (var node in nodes)
+        // {
+        //     var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
+        //
+        //     // случай когда параллельный шлюз уже запущен
+        //     if (resGet && nodeJobStatus is not null &&
+        //         nodeJobStatus.StatusType == StatusType.Works)
+        //     {
+        //         continue;
+        //     }
+        //
+        //     result.Add(node);
+        // }
+        //
+        // return result.ToArray();
     }
 
     private Func<IContextBpmnProcess, CancellationToken, Task> GetHandler(string nodeIdElement)

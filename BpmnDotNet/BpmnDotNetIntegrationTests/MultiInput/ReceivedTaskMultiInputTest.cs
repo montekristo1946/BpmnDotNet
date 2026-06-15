@@ -4,6 +4,7 @@ using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Configuration;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using BpmnDotNetIntegrationTests.Context;
 using BpmnDotNetIntegrationTests.Messages;
 using Microsoft.Extensions.DependencyInjection;

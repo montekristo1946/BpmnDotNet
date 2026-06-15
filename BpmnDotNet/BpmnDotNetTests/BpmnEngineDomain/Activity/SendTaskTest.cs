@@ -29,7 +29,7 @@ public class SendTaskTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess!, _nodeStateRegistry, [],CancellationToken.None));
 
         Assert.Equal("context", exception.ParamName);
     }
@@ -48,7 +48,7 @@ public class SendTaskTest
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None));
+            sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],CancellationToken.None));
 
         Assert.Equal("ActivityHandlerAsync", exception.ParamName);
     }
@@ -67,7 +67,7 @@ public class SendTaskTest
         var processModel = _fixture.Create<ProcessModel>();
         var contextBpmnProcess = Substitute.For<IContextBpmnProcess>();
 
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,[]);
 
         Assert.Equal(1, countCall);
     }
@@ -90,7 +90,7 @@ public class SendTaskTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
@@ -114,10 +114,11 @@ public class SendTaskTest
         var expectedException = new InvalidOperationException("Test exception");
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => throw expectedException);
         var sut = new SendTask(logger, handler, currentId);
-
+        ConcurrentDictionary<string, string> errorRegistry = new();
+        
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, errorRegistry, CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -129,6 +130,8 @@ public class SendTaskTest
             Arg.Is<object>(o => o.ToString()!.Contains("[SendTask:ExecuteAsync] Exception")),
             expectedException,
             Arg.Any<Func<object, Exception?, string>>());
+        
+        Assert.Contains("Test exception", errorRegistry[currentId]);
     }
 
     [Theory]
@@ -156,7 +159,7 @@ public class SendTaskTest
         var sut = new SendTask(logger, handler, currentId);
 
         // Act
-        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, cancellationToken);
+        await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],cancellationToken);
 
         // Assert
         Assert.True(handlerCalled);
@@ -177,7 +180,7 @@ public class SendTaskTest
         var sut = new SendTask(logger, handler, currentId);
 
         // Act
-        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+        var res = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,[], CancellationToken.None);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, res.Status);
@@ -201,7 +204,7 @@ public class SendTaskTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],CancellationToken.None);
 
         // Assert
         Assert.Equal(2, _nodeStateRegistry.Count);
@@ -231,7 +234,7 @@ public class SendTaskTest
 
         // Act
         var result =
-            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, CancellationToken.None);
+            await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [],CancellationToken.None);
 
         // Assert
         Assert.Single(_nodeStateRegistry);

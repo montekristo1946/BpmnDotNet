@@ -1,3 +1,5 @@
+using BpmnDotNet.HistoryDomain.Dto;
+
 namespace BpmnDotNet.ElasticClientDomain.Abstractions;
 
 using BpmnDotNet.Dto;

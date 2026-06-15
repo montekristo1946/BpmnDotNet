@@ -2,6 +2,7 @@ using AutoFixture;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Dto;
 using BpmnDotNetTests.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

@@ -8,6 +8,7 @@ using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Handlers;
 using AutoFixture;
 using BpmnDotNet.Dto;
+using BpmnDotNet.HistoryDomain.Dto;
 using NSubstitute;
 
 namespace BpmnDotNet.Arm.Core.Tests.Handlers;
@@ -634,7 +635,7 @@ public class SvgConstructorTests
         // Arrange
         var statuses = new[]
         {
-            new Dto.NodeJobStatus
+            new NodeJobStatus
             {
                 IdNode = "task_1",
                 StatusType = statusType

@@ -1,8 +1,8 @@
+namespace BpmnDotNet.HistoryDomain.Abstractions;
+
 using System.Collections.Concurrent;
 using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
-
-namespace BpmnDotNet.HistoryDomain.Abstractions;
 
 /// <summary>
 /// Запишет NodeJobStatus в хранилище отчетов.

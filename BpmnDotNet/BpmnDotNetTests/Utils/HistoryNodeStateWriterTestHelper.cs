@@ -1,4 +1,5 @@
 using BpmnDotNet.Dto;
+using BpmnDotNet.HistoryDomain.Dto;
 
 namespace BpmnDotNetTests.Utils;
 

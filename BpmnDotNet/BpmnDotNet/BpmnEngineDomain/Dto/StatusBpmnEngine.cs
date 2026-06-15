@@ -1,5 +1,6 @@
 namespace BpmnDotNet.BpmnEngineDomain.Dto;
 
+//TODO: Видимо не пригодилось.
 /// <summary>
 /// Состояния BpmnEngine.
 /// </summary>

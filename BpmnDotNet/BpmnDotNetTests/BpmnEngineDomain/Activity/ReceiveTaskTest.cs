@@ -274,7 +274,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.NotNull(result);
@@ -307,7 +307,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.NotNull(result);
@@ -344,7 +344,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.NotNull(result);
@@ -366,7 +366,7 @@ public class ReceiveTaskTest
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(null!, context, nodeStateRegistry));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(null!, context, nodeStateRegistry,[]));
     }
 
     [Theory]
@@ -382,7 +382,7 @@ public class ReceiveTaskTest
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null, nodeStateRegistry));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null, nodeStateRegistry,[]));
     }
 
     [Theory]
@@ -406,7 +406,7 @@ public class ReceiveTaskTest
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            sut.ExecuteAsync(processModel, context, nodeStateRegistry));
+            sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]));
     }
 
     [Theory]
@@ -422,7 +422,7 @@ public class ReceiveTaskTest
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, context, null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, context, null!,[]));
     }
 
     [Theory]
@@ -459,7 +459,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.NotNull(result);
@@ -503,9 +503,10 @@ public class ReceiveTaskTest
 
         context.IdBpmnProcess.Returns("TestProcessId");
         context.TokenProcess.Returns("TestToken");
-
+        ConcurrentDictionary<string, string> errorRegistry = new();
+        
         // Act & Assert
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,errorRegistry);
 
         Assert.NotNull(result);
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -551,7 +552,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act & Assert
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         Assert.NotNull(result);
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -597,7 +598,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act & Assert
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         Assert.NotNull(result);
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -644,7 +645,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.True(nodeStateRegistry.ContainsKey(currentId));
@@ -691,7 +692,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
         Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
@@ -733,7 +734,7 @@ public class ReceiveTaskTest
         context.TokenProcess.Returns("TestToken");
 
         // Act
-        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry, cts.Token);
+        var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry, [],cts.Token);
 
         // Assert
         Assert.NotNull(result);

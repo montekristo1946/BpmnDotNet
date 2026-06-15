@@ -1,3 +1,5 @@
+using BpmnDotNet.HistoryDomain.Dto;
+
 namespace BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 
 using BpmnDotNet.Arm.Core.Common;

@@ -1,5 +1,6 @@
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain;
+using BpmnDotNet.HistoryDomain.Dto;
 
 namespace BpmnDotNetTests.ElasticClientDomain;
 

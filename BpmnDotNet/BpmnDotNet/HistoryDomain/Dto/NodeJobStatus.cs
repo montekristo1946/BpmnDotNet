@@ -1,4 +1,6 @@
-namespace BpmnDotNet.Dto;
+using BpmnDotNet.BpmnEngineDomain.Dto;
+
+namespace BpmnDotNet.HistoryDomain.Dto;
 
 /// <summary>
 ///     Состояние узлов на Bpmn схеме.
@@ -13,5 +15,5 @@ public class NodeJobStatus
     /// <summary>
     ///     Gets состояние ноды на Bpmn схеме.
     /// </summary>
-    public StatusType StatusType { get; init; } = StatusType.None;
+    public StatusNode StatusType { get; init; } = StatusNode.None;
 }

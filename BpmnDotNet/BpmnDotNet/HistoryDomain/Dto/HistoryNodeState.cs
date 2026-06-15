@@ -1,4 +1,4 @@
-namespace BpmnDotNet.Dto;
+namespace BpmnDotNet.HistoryDomain.Dto;
 
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.
