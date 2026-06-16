@@ -159,7 +159,7 @@ public class ExclusiveGatewayTest
         var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,  [], CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
+        Assert.Equal(StatusNode.NormalCompleted, result.Status);
         Assert.Single(result.Tokens.ToArray());
 
         foreach (var token in result.Tokens)
@@ -187,7 +187,7 @@ public class ExclusiveGatewayTest
         var result = await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
+        Assert.Equal(StatusNode.NormalCompleted, result.Status);
         Assert.Single(result.Tokens.ToArray());
 
         foreach (var token in result.Tokens)
@@ -214,7 +214,7 @@ public class ExclusiveGatewayTest
         var result = await sut.ExecuteAsync(processModel, contextBpmnProcess,_nodeStateRegistry,errorRegistry,   CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
 
         logger.Received(1).Log(
@@ -249,10 +249,10 @@ public class ExclusiveGatewayTest
         Assert.Equal(2, _nodeStateRegistry.Count);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusNodeSub);
+        Assert.Equal(StatusNode.NormalCompleted,statusNodeSub);
         var stateFlow = _nodeStateRegistry.TryGetValue(nextNode.IdFlow, out var statusFlow);
         Assert.True(stateFlow);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusFlow);
+        Assert.Equal(StatusNode.NormalCompleted,statusFlow);
     }
     
     [Theory]
@@ -281,10 +281,10 @@ public class ExclusiveGatewayTest
         Assert.Equal(2, _nodeStateRegistry.Count);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusNodeSub);
+        Assert.Equal(StatusNode.NormalCompleted,statusNodeSub);
         var stateFlow = _nodeStateRegistry.TryGetValue(nextFlow.Id, out var statusFlow);
         Assert.True(stateFlow);
-        Assert.Equal(StatusNode.NormalCompletedNode,statusFlow);
+        Assert.Equal(StatusNode.NormalCompleted,statusFlow);
     }
     
     [Theory]
@@ -311,7 +311,7 @@ public class ExclusiveGatewayTest
         Assert.Single(_nodeStateRegistry);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.FailedCompletedNode,statusNodeSub);
+        Assert.Equal(StatusNode.FailedCompleted,statusNodeSub);
     }
     
 }

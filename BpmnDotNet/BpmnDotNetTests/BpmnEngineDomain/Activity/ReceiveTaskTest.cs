@@ -31,7 +31,7 @@ public class ReceiveTaskTest
 
         foreach (var nextNode in nextNodes)
         {
-            nodeStateRegistry.TryAdd(nextNode.IdFlow, StatusNode.NormalCompletedNode);
+            nodeStateRegistry.TryAdd(nextNode.IdFlow, StatusNode.NormalCompleted);
         }
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
@@ -60,7 +60,7 @@ public class ReceiveTaskTest
         // Первый узел завершен
         if (nextNodes.Length > 0)
         {
-            nodeStateRegistry.TryAdd(nextNodes[0].IdFlow, StatusNode.NormalCompletedNode);
+            nodeStateRegistry.TryAdd(nextNodes[0].IdFlow, StatusNode.NormalCompleted);
         }
 
         // Остальные узлы имеют незавершенный статус
@@ -157,7 +157,7 @@ public class ReceiveTaskTest
         // Добавляем только первый узел в реестр
         if (nextNodes.Length > 0)
         {
-            nodeStateRegistry.TryAdd(nextNodes[0].IdFlow, StatusNode.NormalCompletedNode);
+            nodeStateRegistry.TryAdd(nextNodes[0].IdFlow, StatusNode.NormalCompleted);
         }
         // Остальные узлы отсутствуют в реестре
 
@@ -311,7 +311,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.WorksNode, result.Status);
+        Assert.Equal(StatusNode.Works, result.Status);
         Assert.Empty(result.Tokens);
         await handler.DidNotReceive().Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>());
     }
@@ -348,7 +348,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.WorksNode, result.Status);
+        Assert.Equal(StatusNode.Works, result.Status);
         Assert.Empty(result.Tokens);
         await handler.DidNotReceive().Invoke(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>());
     }
@@ -463,7 +463,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
         logger.Received(1).Log(
             LogLevel.Error,
@@ -509,7 +509,7 @@ public class ReceiveTaskTest
         var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,errorRegistry);
 
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
         logger.Received(1).Log(
             LogLevel.Error,
@@ -555,7 +555,7 @@ public class ReceiveTaskTest
         var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
         logger.Received(1).Log(
             LogLevel.Error,
@@ -601,7 +601,7 @@ public class ReceiveTaskTest
         var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
         logger.Received(1).Log(
             LogLevel.Error,
@@ -654,7 +654,7 @@ public class ReceiveTaskTest
         if (nextNodes.Length > 0)
         {
             Assert.True(nodeStateRegistry.ContainsKey(nextNodes[0].IdFlow));
-            Assert.Equal(StatusNode.NormalCompletedNode, nodeStateRegistry[nextNodes[0].IdFlow]);
+            Assert.Equal(StatusNode.NormalCompleted, nodeStateRegistry[nextNodes[0].IdFlow]);
         }
     }
 
@@ -695,8 +695,8 @@ public class ReceiveTaskTest
         var result = await sut.ExecuteAsync(processModel, context, nodeStateRegistry,[]);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
-        Assert.Equal(StatusNode.FailedCompletedNode, nodeStateRegistry[currentId]);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, nodeStateRegistry[currentId]);
     }
 
     [Theory]

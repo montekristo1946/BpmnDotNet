@@ -54,7 +54,7 @@ internal class EndEvent : IBpmnNode
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(errorRegistry);
 
-        var statusBpmnEngine = StatusNode.WorksNode;
+        var statusBpmnEngine = StatusNode.Works;
         nodeStateRegistry[Id] = statusBpmnEngine;
 
         try
@@ -71,7 +71,7 @@ internal class EndEvent : IBpmnNode
         catch (Exception e)
         {
             _logger.LogError(e, "[EndEvent:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedCompletedNode;
+            statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
 

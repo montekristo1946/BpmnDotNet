@@ -1,8 +1,9 @@
+using BpmnDotNet.HistoryDomain.Abstractions;
+
 namespace BpmnDotNet.BpmnEngineDomain;
 
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
-using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Activity;
 using BpmnDotNet.BpmnEngineDomain.Dto;
@@ -14,12 +15,16 @@ internal class BpmnEngine : IBpmnEngine
     private readonly ILogger<BpmnEngine> _logger;
     private readonly SemaphoreSlim _semaphore = new(0, 1);
     private readonly ConcurrentQueue<Token> _eventQueue = new();
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private Task? _threadBackground = null;
     private IContextBpmnProcess? _contextBpmnProcess = null;
+    private long _timeInitInstanse = -1;
 
-    public BpmnEngine(ILogger<BpmnEngine> logger)
+    public BpmnEngine(ILogger<BpmnEngine> logger, IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _historyNodeStateWriter =
+            historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
     }
 
     /// <inheritdoc/>
@@ -44,6 +49,7 @@ internal class BpmnEngine : IBpmnEngine
         _contextBpmnProcess = contextBpmnProcess;
         CreateStartToken(processModel);
         _semaphore.Release();
+        _timeInitInstanse = DateTime.Now.Ticks;
         _threadBackground = Task.Run(() => ThreadBackground(processModel, contextBpmnProcess, ct), ct);
         var jobStatus = new BusinessProcessJobStatusV2
         {
@@ -133,19 +139,26 @@ internal class BpmnEngine : IBpmnEngine
         {
             _logger.LogDebug("[BpmnEngine:ThreadBackground] Event loop cancelled");
 
-            // TODO: Присваиваем статус процесса Failed.
+            var idProcess = $"{contextBpmnProcess.IdBpmnProcess}_{contextBpmnProcess.TokenProcess}";
+            stateRegistry[idProcess] = StatusNode.FailedCompleted;
             return;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[BpmnEngine:ThreadBackground] Exception");
-
-            // TODO: Присваиваем статус процесса Failed.
+            var idProcess = $"{contextBpmnProcess.IdBpmnProcess}_{contextBpmnProcess.TokenProcess}";
+            stateRegistry[idProcess] = StatusNode.FailedCompleted;
+            errorRegistry[idProcess] = e.Message;
             return;
         }
         finally
         {
-            // TODO: Записывать состояния всего процесса в базу данных.
+            await _historyNodeStateWriter.SetStateProcessAsync(
+                contextBpmnProcess.IdBpmnProcess,
+                contextBpmnProcess.TokenProcess,
+                stateRegistry,
+                errorRegistry,
+                _timeInitInstanse);
         }
 
         _logger.LogDebug(
@@ -185,9 +198,14 @@ internal class BpmnEngine : IBpmnEngine
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
             }
 
-            // TODO: Делать snapshot _nodeStateRegistry в ElasticSearch
+            await _historyNodeStateWriter.SetStateProcessAsync(
+                contextBpmnProcess.IdBpmnProcess,
+                contextBpmnProcess.TokenProcess,
+                nodeStateRegistry,
+                errorRegistry,
+                _timeInitInstanse);
 
-            if (nodes.Status == StatusNode.FailedCompletedNode || nodes.Status == StatusNode.AllBpmnProcessCompleted)
+            if (nodes.Status == StatusNode.FailedCompleted || nodes.Status == StatusNode.AllBpmnProcessCompleted)
             {
                 return true;
             }

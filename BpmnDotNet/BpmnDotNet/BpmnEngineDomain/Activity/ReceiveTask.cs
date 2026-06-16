@@ -53,7 +53,7 @@ internal class ReceiveTask : IBpmnNode
         ArgumentNullException.ThrowIfNull(ActivityHandlerAsync);
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(errorRegistry);
-        var statusBpmnEngine = StatusNode.WorksNode;
+        var statusBpmnEngine = StatusNode.Works;
         Token? nextToken = null;
         nodeStateRegistry[Id] = statusBpmnEngine;
 
@@ -107,7 +107,7 @@ internal class ReceiveTask : IBpmnNode
                     CurrentNodeId = nexFlow.IdResource,
                 };
 
-                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompleted;
             }
 
             statusBpmnEngine = StatusNode.AllBpmnProcessCompleted;
@@ -115,7 +115,7 @@ internal class ReceiveTask : IBpmnNode
         catch (Exception e)
         {
             _logger.LogError(e, "[ReceiveTask:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedCompletedNode;
+            statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
 
@@ -176,7 +176,7 @@ internal class ReceiveTask : IBpmnNode
         foreach (var targetFlow in targetFlows)
         {
             var isFindSate = nodeStateRegistry.TryGetValue(targetFlow.IdFlow, out var sate);
-            if (!isFindSate || sate != StatusNode.NormalCompletedNode)
+            if (!isFindSate || sate != StatusNode.NormalCompleted)
             {
                 return false;
             }

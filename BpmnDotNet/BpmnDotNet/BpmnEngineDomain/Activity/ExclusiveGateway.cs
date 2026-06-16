@@ -53,7 +53,7 @@ internal class ExclusiveGateway : IBpmnNode
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(errorRegistry);
 
-        var statusBpmnEngine = StatusNode.WorksNode;
+        var statusBpmnEngine = StatusNode.Works;
         nodeStateRegistry[Id] = statusBpmnEngine;
 
         Token? nextToken = null;
@@ -78,7 +78,7 @@ internal class ExclusiveGateway : IBpmnNode
                 {
                     CurrentNodeId = nexFlow.IdResource,
                 };
-                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompleted;
             }
             else
             {
@@ -94,15 +94,15 @@ internal class ExclusiveGateway : IBpmnNode
                 {
                     CurrentNodeId = flow.TargetId,
                 };
-                nodeStateRegistry[idRouteFlow] = StatusNode.NormalCompletedNode;
+                nodeStateRegistry[idRouteFlow] = StatusNode.NormalCompleted;
             }
 
-            statusBpmnEngine = StatusNode.NormalCompletedNode;
+            statusBpmnEngine = StatusNode.NormalCompleted;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[ExclusiveGateway:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedCompletedNode;
+            statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
 

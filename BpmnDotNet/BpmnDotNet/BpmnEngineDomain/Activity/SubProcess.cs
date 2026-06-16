@@ -53,7 +53,7 @@ internal class SubProcess : IBpmnNode
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(errorRegistry);
 
-        var statusBpmnEngine = StatusNode.WorksNode;
+        var statusBpmnEngine = StatusNode.Works;
         nodeStateRegistry[Id] = statusBpmnEngine;
 
         Token? nextToken = null;
@@ -76,15 +76,15 @@ internal class SubProcess : IBpmnNode
                     CurrentNodeId = nexFlow.IdResource,
                 };
 
-                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompletedNode;
+                nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompleted;
             }
 
-            statusBpmnEngine = StatusNode.NormalCompletedNode;
+            statusBpmnEngine = StatusNode.NormalCompleted;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[SubProcess:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedCompletedNode;
+            statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
 

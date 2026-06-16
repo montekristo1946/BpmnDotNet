@@ -80,13 +80,13 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
 
     private ProcessStatus CalculateProcessingStaus(NodeJobStatus[] nodeJobStatus)
     {
-        var errors = nodeJobStatus.FirstOrDefault(p => p.StatusType == StatusNode.FailedCompletedNode);
+        var errors = nodeJobStatus.FirstOrDefault(p => p.StatusType == StatusNode.FailedCompleted);
         if (errors is not null)
         {
             return ProcessStatus.Error;
         }
 
-        var worksNode = nodeJobStatus.FirstOrDefault(p => p.StatusType == StatusNode.WorksNode);
+        var worksNode = nodeJobStatus.FirstOrDefault(p => p.StatusType == StatusNode.Works);
         if (worksNode is not null)
         {
             return ProcessStatus.Works;

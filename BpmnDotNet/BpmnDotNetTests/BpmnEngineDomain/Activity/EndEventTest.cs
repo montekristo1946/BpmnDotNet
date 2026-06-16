@@ -94,7 +94,7 @@ public class EndEventTest
             await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens.ToArray());
     }
 
@@ -117,7 +117,7 @@ public class EndEventTest
             await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry,errorRegistry, CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
 
         logger.Received(1).Log(
@@ -229,6 +229,6 @@ public class EndEventTest
         Assert.Single(_nodeStateRegistry);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.FailedCompletedNode, statusNodeSub);
+        Assert.Equal(StatusNode.FailedCompleted, statusNodeSub);
     }
 }

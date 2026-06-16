@@ -53,7 +53,7 @@ internal class ParallelGateway : IBpmnNode
         ArgumentNullException.ThrowIfNull(nodeStateRegistry);
         ArgumentNullException.ThrowIfNull(errorRegistry);
 
-        var statusBpmnEngine = StatusNode.WorksNode;
+        var statusBpmnEngine = StatusNode.Works;
         nodeStateRegistry[Id] = statusBpmnEngine;
 
         Token[] nextTokens = [];
@@ -85,15 +85,15 @@ internal class ParallelGateway : IBpmnNode
 
             foreach (var directionFlow in nextNodes)
             {
-                nodeStateRegistry[directionFlow.IdFlow] = StatusNode.NormalCompletedNode;
+                nodeStateRegistry[directionFlow.IdFlow] = StatusNode.NormalCompleted;
             }
 
-            statusBpmnEngine = StatusNode.NormalCompletedNode;
+            statusBpmnEngine = StatusNode.NormalCompleted;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[ParallelGateway:ExecuteAsync] Exception");
-            statusBpmnEngine = StatusNode.FailedCompletedNode;
+            statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
 
@@ -126,7 +126,7 @@ internal class ParallelGateway : IBpmnNode
         foreach (var flow in targetFlows)
         {
             var isCheckFlow = nodeStateRegistry.TryGetValue(flow.IdFlow, out var statusNode);
-            if (!isCheckFlow || statusNode != StatusNode.NormalCompletedNode)
+            if (!isCheckFlow || statusNode != StatusNode.NormalCompleted)
             {
                 return false;
             }

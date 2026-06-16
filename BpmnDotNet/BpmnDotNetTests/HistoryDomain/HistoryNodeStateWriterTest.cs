@@ -26,7 +26,7 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
         nodeStateRegistry.TryAdd("Node2", StatusNode.AllBpmnProcessCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
@@ -68,9 +68,9 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
-        nodeStateRegistry.TryAdd("Node2", StatusNode.FailedCompletedNode);
-        nodeStateRegistry.TryAdd("Node3", StatusNode.WorksNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
+        nodeStateRegistry.TryAdd("Node2", StatusNode.FailedCompleted);
+        nodeStateRegistry.TryAdd("Node3", StatusNode.Works);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         
@@ -104,8 +104,8 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
-        nodeStateRegistry.TryAdd("Node2", StatusNode.WorksNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
+        nodeStateRegistry.TryAdd("Node2", StatusNode.Works);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         
@@ -139,7 +139,7 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
         nodeStateRegistry.TryAdd("Node2", StatusNode.AllBpmnProcessCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
@@ -209,7 +209,7 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         
@@ -438,7 +438,7 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         
@@ -476,7 +476,7 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         errorRegistry.TryAdd("Error1", "First error");
@@ -516,9 +516,9 @@ public class HistoryNodeStateWriterTest
         var sut = new HistoryNodeStateWriter(elasticClient, logger);
         
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompletedNode);
-        nodeStateRegistry.TryAdd("Node2", StatusNode.WorksNode);
-        nodeStateRegistry.TryAdd("Node3", StatusNode.FailedCompletedNode);
+        nodeStateRegistry.TryAdd("Node1", StatusNode.NormalCompleted);
+        nodeStateRegistry.TryAdd("Node2", StatusNode.Works);
+        nodeStateRegistry.TryAdd("Node3", StatusNode.FailedCompleted);
         
         var errorRegistry = new ConcurrentDictionary<string, string>();
         
@@ -537,9 +537,9 @@ public class HistoryNodeStateWriterTest
         await elasticClient.Received(1).SetDataAsync(
             Arg.Is<HistoryNodeState>(state =>
                 state.NodeStaus.Length == 3 &&
-                state.NodeStaus.Any(n => n.IdNode == "Node1" && n.StatusType == StatusNode.NormalCompletedNode) &&
-                state.NodeStaus.Any(n => n.IdNode == "Node2" && n.StatusType == StatusNode.WorksNode) &&
-                state.NodeStaus.Any(n => n.IdNode == "Node3" && n.StatusType == StatusNode.FailedCompletedNode)));
+                state.NodeStaus.Any(n => n.IdNode == "Node1" && n.StatusType == StatusNode.NormalCompleted) &&
+                state.NodeStaus.Any(n => n.IdNode == "Node2" && n.StatusType == StatusNode.Works) &&
+                state.NodeStaus.Any(n => n.IdNode == "Node3" && n.StatusType == StatusNode.FailedCompleted)));
     }
 
 }

@@ -13,17 +13,17 @@ public enum StatusNode
     /// <summary>
     ///     Сейчас выполняется.
     /// </summary>
-    WorksNode = 1,
+    Works = 1,
 
     /// <summary>
     ///     Удачно завершен.
     /// </summary>
-    NormalCompletedNode = 2,
+    NormalCompleted = 2,
 
     /// <summary>
     ///     Не удачно завершен.
     /// </summary>
-    FailedCompletedNode = 3,
+    FailedCompleted = 3,
 
     /// <summary>
     /// Завершен весь процесс bpmn.

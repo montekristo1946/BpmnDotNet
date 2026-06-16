@@ -29,9 +29,9 @@ public class ParallelGatewayTest
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsByTarget.TryAdd(currentId, lastNodes);
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompletedNode);
-        nodeStateRegistry.TryAdd(lastNodes[1].IdFlow, StatusNode.NormalCompletedNode);
-        nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompleted);
+        nodeStateRegistry.TryAdd(lastNodes[1].IdFlow, StatusNode.NormalCompleted);
+        nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompleted);
 
         // Act
         var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry, processModel);
@@ -55,9 +55,9 @@ public class ParallelGatewayTest
         var processModel = _fixture.Create<ProcessModel>();
         processModel.FlowsByTarget.TryAdd(currentId, lastNodes);
         var nodeStateRegistry = new ConcurrentDictionary<string, StatusNode>();
-        nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd(lastNodes[0].IdFlow, StatusNode.NormalCompleted);
         nodeStateRegistry.TryAdd(lastNodes[1].IdFlow, StatusNode.None);
-        nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompletedNode);
+        nodeStateRegistry.TryAdd(lastNodes[2].IdFlow, StatusNode.NormalCompleted);
 
         // Act
         var result = sut.CheckCompletedAllInputFlow(nodeStateRegistry, processModel);
@@ -155,7 +155,7 @@ public class ParallelGatewayTest
             await sut.ExecuteAsync(processModel, contextBpmnProcess, _nodeStateRegistry, [], CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.NormalCompletedNode, result.Status);
+        Assert.Equal(StatusNode.NormalCompleted, result.Status);
         Assert.Equal(nextNodes.Length, result.Tokens.Count());
 
         foreach (var token in result.Tokens)
@@ -187,7 +187,7 @@ public class ParallelGatewayTest
                 CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, result.Status);
+        Assert.Equal(StatusNode.FailedCompleted, result.Status);
         Assert.Empty(result.Tokens);
 
         logger.Received(1).Log(
@@ -256,7 +256,7 @@ public class ParallelGatewayTest
             CancellationToken.None);
 
         // Assert
-        Assert.Equal(StatusNode.FailedCompletedNode, res.Status);
+        Assert.Equal(StatusNode.FailedCompleted, res.Status);
         Assert.Empty(res.Tokens.ToArray());
     }
 
@@ -286,11 +286,11 @@ public class ParallelGatewayTest
         Assert.Equal(4, _nodeStateRegistry.Count);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.NormalCompletedNode, statusNodeSub);
+        Assert.Equal(StatusNode.NormalCompleted, statusNodeSub);
 
         var stateFlow = _nodeStateRegistry.TryGetValue(nextNodes[0].IdFlow, out var statusFlow);
         Assert.True(stateFlow);
-        Assert.Equal(StatusNode.NormalCompletedNode, statusFlow);
+        Assert.Equal(StatusNode.NormalCompleted, statusFlow);
     }
 
     [Theory]
@@ -320,6 +320,6 @@ public class ParallelGatewayTest
         Assert.Single(_nodeStateRegistry);
         var stateSub = _nodeStateRegistry.TryGetValue(sut.Id, out var statusNodeSub);
         Assert.True(stateSub);
-        Assert.Equal(StatusNode.FailedCompletedNode, statusNodeSub);
+        Assert.Equal(StatusNode.FailedCompleted, statusNodeSub);
     }
 }
