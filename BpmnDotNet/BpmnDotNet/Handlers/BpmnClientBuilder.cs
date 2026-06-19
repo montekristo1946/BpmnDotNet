@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -19,31 +21,31 @@ internal static class BpmnClientBuilder
     /// </summary>
     /// <param name="pathDiagram">Путь до диаграмм.</param>
     /// <param name="loggerFactory">ILoggerFactory.</param>
-    /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="elasticClient">IElasticClientSetDataAsync.</param>
     /// <param name="historyNodeStateWriter">IHistoryNodeStateWriter.</param>
     /// <param name="descriptionWriteService">IDescriptionWriteService.</param>
     /// <param name="serializerProcessSection">IXmlSerializationProcessSection.</param>
     /// <param name="serializerDiagramSection">IXmlSerializationBpmnDiagramSection.</param>
+    /// <param name="processModelBuilder"><see cref="IProcessModelBuilder"/>.</param>
     /// <returns>IBpmnClient.</returns>
     public static IBpmnClient Build(
         string pathDiagram,
         ILoggerFactory loggerFactory,
-        IPathFinder pathFinder,
         IElasticClientSetDataAsync elasticClient,
         IHistoryNodeStateWriter historyNodeStateWriter,
         IDescriptionWriteService descriptionWriteService,
         IXmlSerializationProcessSection serializerProcessSection,
-        IXmlSerializationBpmnDiagramSection serializerDiagramSection)
+        IXmlSerializationBpmnDiagramSection serializerDiagramSection,
+        IProcessModelBuilder processModelBuilder)
     {
         ArgumentNullException.ThrowIfNull(pathDiagram);
         ArgumentNullException.ThrowIfNull(loggerFactory);
-        ArgumentNullException.ThrowIfNull(pathFinder);
         ArgumentNullException.ThrowIfNull(elasticClient);
         ArgumentNullException.ThrowIfNull(historyNodeStateWriter);
         ArgumentNullException.ThrowIfNull(descriptionWriteService);
         ArgumentNullException.ThrowIfNull(serializerProcessSection);
         ArgumentNullException.ThrowIfNull(serializerDiagramSection);
+        ArgumentNullException.ThrowIfNull(processModelBuilder);
 
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = allBpmnFiles.Select(serializerProcessSection.LoadXmlProcessSection).ToArray();
@@ -51,9 +53,9 @@ internal static class BpmnClientBuilder
         return new BpmnClient(
             businessProcessDtos,
             loggerFactory,
-            pathFinder,
             historyNodeStateWriter,
-            descriptionWriteService);
+            descriptionWriteService,
+            processModelBuilder);
     }
 
     /// <summary>

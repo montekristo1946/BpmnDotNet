@@ -17,7 +17,16 @@ internal class ReceiveTaskFirstHandle : IBpmnHandler
     }
 
     public string TaskDefinitionId { get; init; } = nameof(ReceiveTaskFirstHandle);
-    public string Description { get; init; } =   "Осмоторщик обязан тщательно проверять сцепные устройства вагонов перед отправкой.\nНельзя принимать вагоны с признаками подтекания топлива или смазочных материалов.\nВсе замечания по техническому состоянию следует немедленно докладывать старшему мастеру.\nОсмотр должен проводиться согласно установленному регламенту и требованиям безопасности.\nПрофессионализм и внимательность — ключевые качества осмоторщика вагонов";
+
+    public string Description { get; init; } = """
+                                               Осмоторщик обязан тщательно проверять сцепные устройства вагонов перед отправкой.
+                                               Нельзя принимать вагоны с признаками подтекания топлива или смазочных материалов.
+                                               Все замечания по техническому состоянию следует немедленно докладывать старшему 
+                                                мастеру.
+                                               Осмотр должен проводиться согласно установленному регламенту и требованиям
+                                                безопасности.
+                                               Профессионализм и внимательность — ключевые качества осмоторщика вагонов";
+                                               """;
 
     public async Task ActivityHandlerAsync(IContextBpmnProcess context, CancellationToken ctsToken)
     {
@@ -28,7 +37,7 @@ internal class ReceiveTaskFirstHandle : IBpmnHandler
             return;
         }
 
-        var resGet = cont.ReceivedMessage.TryGetValue(typeof(MessageExampleFirst), out var messageExampleFirst);
+        var resGet = cont.ReceivedMessage.TryGetValue(TaskDefinitionId, out var messageExampleFirst);
         if (!resGet || messageExampleFirst is null)
             throw new OperationCanceledException("Fail try Get key messageExampleFirst");
 

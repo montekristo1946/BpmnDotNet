@@ -6,9 +6,7 @@ using BpmnDotNet.Abstractions.Elements;
 /// Node в объектовом виде, ParallelGateway.
 /// </summary>
 /// <param name="id">ID.</param>
-/// <param name="incoming">Входные Flow.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class ParallelGatewayComponent(string id, string[] incoming, string[] outgoing) : IElement
+public class ParallelGatewayComponent(string id) : IElement
 {
     /// <summary>
     /// Gets iD.

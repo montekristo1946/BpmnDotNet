@@ -1,6 +1,7 @@
 ﻿using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.Configuration;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;

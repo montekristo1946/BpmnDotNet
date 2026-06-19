@@ -1,5 +1,3 @@
-using BpmnDotNet.HistoryDomain.Abstractions;
-
 namespace BpmnDotNet.BpmnEngineDomain;
 
 using System.Collections.Concurrent;
@@ -7,6 +5,7 @@ using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Activity;
 using BpmnDotNet.BpmnEngineDomain.Dto;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc cref="StartProcessAsync" />
@@ -19,6 +18,10 @@ internal class BpmnEngine : IBpmnEngine
     private Task? _threadBackground = null;
     private IContextBpmnProcess? _contextBpmnProcess = null;
     private long _timeInitInstanse = -1;
+    private CancellationTokenSource? _ctsBpmnEngine;
+    private int _disposed = 0;
+    private int _isProcessCancel = 0;
+
 
     public BpmnEngine(ILogger<BpmnEngine> logger, IHistoryNodeStateWriter historyNodeStateWriter)
     {
@@ -28,16 +31,24 @@ internal class BpmnEngine : IBpmnEngine
     }
 
     /// <inheritdoc/>
-    public Task<BusinessProcessJobStatusV2> StartProcessAsync(
+    public bool IsProcessCancel
+    {
+        get => Interlocked.CompareExchange(ref _isProcessCancel, 0, 0) == 1;
+        private set => Interlocked.Exchange(ref _isProcessCancel, value ? 1 : 0);
+    }
+
+
+    /// <inheritdoc/>
+    public Task<BusinessProcessJobStatus> StartProcessAsync(
         IContextBpmnProcess contextBpmnProcess,
         ProcessModel processModel,
-        CancellationToken ct)
+        CancellationToken externalCt)
     {
         ArgumentNullException.ThrowIfNull(contextBpmnProcess);
         ArgumentNullException.ThrowIfNull(processModel);
-        if (ct == CancellationToken.None)
+        if (externalCt == CancellationToken.None)
         {
-            throw new ArgumentNullException(nameof(ct));
+            throw new ArgumentNullException(nameof(externalCt));
         }
 
         if (_threadBackground != null)
@@ -46,12 +57,16 @@ internal class BpmnEngine : IBpmnEngine
                 "[BpmnEngine:StartProcessAsync] The thread background has already been started.");
         }
 
+        _ctsBpmnEngine = CancellationTokenSource.CreateLinkedTokenSource(externalCt);
         _contextBpmnProcess = contextBpmnProcess;
         CreateStartToken(processModel);
         _semaphore.Release();
         _timeInitInstanse = DateTime.Now.Ticks;
-        _threadBackground = Task.Run(() => ThreadBackground(processModel, contextBpmnProcess, ct), ct);
-        var jobStatus = new BusinessProcessJobStatusV2
+        _threadBackground = Task.Run(
+            () => ThreadBackground(processModel, contextBpmnProcess, _ctsBpmnEngine.Token),
+            _ctsBpmnEngine.Token);
+
+        var jobStatus = new BusinessProcessJobStatus
         {
             IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
             TokenProcess = contextBpmnProcess.TokenProcess,
@@ -87,6 +102,43 @@ internal class BpmnEngine : IBpmnEngine
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_ctsBpmnEngine != null)
+            {
+                await _ctsBpmnEngine.CancelAsync();
+            }
+
+            _semaphore.Release();
+
+            if (_threadBackground != null)
+            {
+                try
+                {
+                    await _threadBackground.WaitAsync(TimeSpan.FromSeconds(5));
+                }
+                catch (AggregateException ex) when (
+                    ex.InnerExceptions.All(e => e is OperationCanceledException))
+                {
+                    _logger.LogWarning("[BpmnEngine:Dispose] OperationCanceledException");
+                }
+            }
+        }
+        finally
+        {
+            _ctsBpmnEngine?.Dispose();
+            _semaphore?.Dispose();
+        }
     }
 
     /// <summary>
@@ -127,8 +179,14 @@ internal class BpmnEngine : IBpmnEngine
             {
                 await _semaphore.WaitAsync(ctsToken);
                 var isCompletedBackground =
-                    await RunEventLoopAsync(contextBpmnProcess, processModel, stateRegistry, errorRegistry, _eventQueue,
+                    await RunEventLoopAsync(
+                        contextBpmnProcess,
+                        processModel,
+                        stateRegistry,
+                        errorRegistry,
+                        _eventQueue,
                         ctsToken);
+
                 if (isCompletedBackground)
                 {
                     return;
@@ -159,6 +217,7 @@ internal class BpmnEngine : IBpmnEngine
                 stateRegistry,
                 errorRegistry,
                 _timeInitInstanse);
+            IsProcessCancel = true;
         }
 
         _logger.LogDebug(

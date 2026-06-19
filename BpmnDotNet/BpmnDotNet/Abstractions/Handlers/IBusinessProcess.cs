@@ -1,7 +1,7 @@
 namespace BpmnDotNet.Abstractions.Handlers;
 
 using BpmnDotNet.Dto;
-
+/*
 /// <summary>
 /// BusinessProcess. Для внутреннего тестирования.
 /// </summary>
@@ -25,4 +25,4 @@ internal interface IBusinessProcess : IDisposable
     /// Завершить работу.
     /// </summary>
     public void ForceCancel();
-}
+}*/

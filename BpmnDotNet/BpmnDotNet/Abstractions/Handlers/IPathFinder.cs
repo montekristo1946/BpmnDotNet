@@ -2,7 +2,7 @@ namespace BpmnDotNet.Abstractions.Handlers;
 
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
-
+/*
 /// <summary>
 /// Инструмент поиска путей дальнейшего выполнения процесса.
 /// </summary>
@@ -31,4 +31,4 @@ internal interface IPathFinder
     /// <param name="currentNode">Текущая нода.</param>
     /// <returns>Flow следующие ноды.</returns>
     public string GetConditionRouteWithExclusiveGateWay(IExclusiveGateWayRoute context, IElement currentNode);
-}
+}*/

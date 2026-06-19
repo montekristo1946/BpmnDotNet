@@ -10,7 +10,7 @@ using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
-
+/*
 /// <inheritdoc cref="IBusinessProcess" />
 internal class BusinessProcess : IBusinessProcess
 {
@@ -226,7 +226,7 @@ internal class BusinessProcess : IBusinessProcess
         _logger.LogDebug(
             "[BusinessProcess:ThreadBackground] End business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
-            _contextBpmnProcess.TokenProcess);*/
+            _contextBpmnProcess.TokenProcess);
     }
 
     /// <summary>
@@ -254,7 +254,7 @@ internal class BusinessProcess : IBusinessProcess
             {
                 NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
             }
-        }*/
+        }
     }
 
     private bool AddMessageInContext(IContextBpmnProcess context, Type typeMessage, object? message)
@@ -287,7 +287,7 @@ internal class BusinessProcess : IBusinessProcess
                 $"[AddMessageInContext] Fail Set {typeMessage}, From {context.IdBpmnProcess} {context.TokenProcess}");
         }
 
-        return true;*/
+        return true;
     }
 
     private Type GetTypeNameMessage(IContextBpmnProcess context, string nodeIdElement)
@@ -318,7 +318,7 @@ internal class BusinessProcess : IBusinessProcess
             throw new InvalidOperationException(textMessage);
         }
 
-        return typeName;*/
+        return typeName;
     }
 
     /// <summary>
@@ -407,7 +407,7 @@ internal class BusinessProcess : IBusinessProcess
 
             CheckFinalProcessing(nodeId, isForcedTermination);
             _eventsHolder.Set();
-        }*/
+        }
     }
 
     private void ErrorsRegistryUpdate(string nodeId, string message)
@@ -574,4 +574,4 @@ internal class BusinessProcess : IBusinessProcess
         _logger.LogDebug("[MoqHandler] Calling handler");
         return Task.CompletedTask;
     }
-}
+}*/

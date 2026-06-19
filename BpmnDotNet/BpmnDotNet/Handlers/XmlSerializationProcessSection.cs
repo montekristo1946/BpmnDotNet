@@ -77,10 +77,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private IElement CreateSubProcess(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
-
-        return new SubProcessComponent(id, incoming, outgoing);
+        return new SubProcessComponent(id);
     }
 
     private ServiceTaskComponent CreateServiceTask(XmlNode elements)
@@ -91,7 +88,7 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
 
     private ReceiveTaskComponent CreateReceiveTask(XmlNode elements)
     {
-        var id = GetId(elements); 
+        var id = GetId(elements);
         return new ReceiveTaskComponent(id);
     }
 
@@ -104,10 +101,8 @@ internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
     private ParallelGatewayComponent CreateParallelGateway(XmlNode elements)
     {
         var id = GetId(elements);
-        var outgoing = GetOutGoing(elements, id);
-        var incoming = GetIncoming(elements, id);
 
-        return new ParallelGatewayComponent(id, incoming, outgoing);
+        return new ParallelGatewayComponent(id);
     }
 
     private ExclusiveGatewayComponent CreateExclusiveGateway(XmlNode elements)

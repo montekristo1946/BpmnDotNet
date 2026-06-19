@@ -1,12 +1,15 @@
-using BpmnDotNet.HistoryDomain.Abstractions;
-
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Dto;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.Dto;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />
@@ -25,35 +28,35 @@ internal class BpmnClient : IBpmnClient
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
     private readonly ILogger<BpmnClient> _logger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IPathFinder _pathFinder;
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private readonly IDescriptionWriteService _descriptionWriteService;
+    private readonly IProcessModelBuilder _processModelBuilder;
     private readonly TimeSpan _delayClearOldProcess;
-    private volatile bool _disposed;
+    private int _disposed = 0;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BpmnClient"/> class.
     /// </summary>
     /// <param name="businessProcessDtos">BpmnProcessDtos.</param>
     /// <param name="loggerFactory">ILoggerFactory.</param>
-    /// <param name="pathFinder">IPathFinder.</param>
     /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
     /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполнения.</param>
+    /// <param name="processModelBuilder"><see cref="IProcessModelBuilder"/>.</param>
     /// <param name="delayClearOldProcess">Интервал очистки исполненных тасков. </param>
     public BpmnClient(
         BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
-        IPathFinder pathFinder,
         IHistoryNodeStateWriter historyNodeStateWriter,
         IDescriptionWriteService descriptionWriteService,
+        IProcessModelBuilder processModelBuilder,
         TimeSpan delayClearOldProcess = default)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        _pathFinder = pathFinder ?? throw new ArgumentNullException(nameof(pathFinder));
         _historyNodeStateWriter =
             historyNodeStateWriter ?? throw new ArgumentNullException(nameof(historyNodeStateWriter));
         _descriptionWriteService =
             descriptionWriteService ?? throw new ArgumentNullException(nameof(descriptionWriteService));
+        _processModelBuilder = processModelBuilder ?? throw new ArgumentNullException(nameof(processModelBuilder));
         _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
@@ -65,29 +68,19 @@ internal class BpmnClient : IBpmnClient
     }
 
     /// <inheritdoc/>
-    public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout)
+    public async Task<BusinessProcessJobStatus> StartNewProcessAsync(
+        IContextBpmnProcess context,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
-        var logger = _loggerFactory.CreateLogger<BusinessProcess>();
+
+        var logger = _loggerFactory.CreateLogger<BpmnEngine>();
+        var processInstance = new BpmnEngine(logger, _historyNodeStateWriter);
         var bpmnShema = GetBpmnShema(_bpmnProcessDtos, context.IdBpmnProcess);
+        var processModel = _processModelBuilder.Build(bpmnShema, _handlers);
+        var retValue = await processInstance.StartProcessAsync(context, processModel, cancellationToken);
 
-        var processInstance = new BusinessProcess(
-            context,
-            logger,
-            bpmnShema,
-            _pathFinder,
-            _handlers,
-            timeout,
-            _historyNodeStateWriter);
-
-        var retValue = processInstance.StartBusinessProcess();
-
-        var resAdd = BpmnProcesses.TryAdd((context.IdBpmnProcess, context.TokenProcess), retValue);
-        if (resAdd is false)
-        {
-            throw new InvalidOperationException(
-                $"[BpmnClient:StartNewProcess] Fail Init new process {context.IdBpmnProcess}, {context.TokenProcess}");
-        }
+        BpmnProcesses[(context.IdBpmnProcess, context.TokenProcess)] = retValue;
 
         return retValue;
     }
@@ -146,73 +139,66 @@ internal class BpmnClient : IBpmnClient
         ArgumentNullException.ThrowIfNull(message);
 
         var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
-        if (!resGet || bpmn is null || bpmn.Process is null
-            || bpmn.StatusType == StatusType.Completed
-            || bpmn.StatusType == StatusType.Failed)
+        if (!resGet || bpmn is null || bpmn.Process.IsProcessCancel)
         {
             throw new InvalidOperationException(
-                $"[SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
+                $"[BpmnClient:SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
         }
 
         var resAdd = bpmn.Process.AddMessageToQueue(messageType, message);
         if (!resAdd)
         {
             throw new InvalidOperationException(
-                $"[SendMessage] Not Add message : {idBpmnProcess} {tokenProcess} {messageType}");
+                $"[BpmnClient:SendMessage] Not Add message : {idBpmnProcess} {tokenProcess} {messageType}");
         }
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        if (_disposed)
+        if (Interlocked.Exchange(ref _disposed, 1) == 1)
         {
             return;
         }
 
-        _disposed = true;
-        ClearBpmnProcessesDictionary(true);
-
-        _cts?.Cancel();
+        await ClearBpmnProcessesDictionaryAsync(true);
+        await _cts.CancelAsync();
 
         try
         {
-            if (!_cleanerTask.Wait(_delayClearOldProcess))
-            {
-                _logger?.LogWarning("[Dispose] Cleaner task timed out");
-            }
+            await _cleanerTask.WaitAsync(TimeSpan.FromSeconds(5));
         }
         catch (OperationCanceledException)
         {
-            _logger?.LogWarning("[Dispose] Task was canceled (OperationCanceledException)");
+            _logger.LogWarning("[BpmnClient:Dispose] OperationCanceledException");
         }
         catch (AggregateException agg)
             when (agg.InnerExceptions.All(e => e is OperationCanceledException or TaskCanceledException))
         {
-            _logger?.LogWarning("[Dispose] Task was canceled (AggregateException)");
+            _logger.LogWarning("[BpmnClient:Dispose] Task was canceled (AggregateException)");
         }
 
         _cleanerTask.Dispose();
-        _cts?.Dispose();
+        _cts.Dispose();
     }
 
     /// <summary>
     /// Очистит кэш от завершенных процессов.
     /// </summary>
     /// <param name="isForce">Форсированный запуск.</param>
-    internal void ClearBpmnProcessesDictionary(bool isForce = false)
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    internal async Task ClearBpmnProcessesDictionaryAsync(bool isForce = false)
     {
         foreach (var status in BpmnProcesses.Values)
         {
-            if (status.StatusType != StatusType.Completed
-                && status.StatusType != StatusType.Failed
-                && !isForce)
+            var process = status.Process;
+            if (!process.IsProcessCancel && !isForce)
             {
                 continue;
             }
 
             var resRemote = BpmnProcesses.TryRemove((status.IdBpmnProcess, status.TokenProcess), out var processJob);
-            if (!resRemote)
+            if (!resRemote || processJob is null || processJob.Process is null)
             {
                 _logger.LogWarning(
                     "Could not delete the process {IdBpmnProcess} {TokenProcess}",
@@ -221,13 +207,12 @@ internal class BpmnClient : IBpmnClient
             }
             else
             {
-                processJob?.Process?.ForceCancel();
-                processJob?.Process?.Dispose();
+                await processJob.Process.DisposeAsync();
+
                 _logger.LogDebug(
-                    "Delete the process {IdBpmnProcess} {TokenProcess} {StatusType}",
+                    "Delete the process {IdBpmnProcess} {TokenProcess}",
                     status.IdBpmnProcess,
-                    status.TokenProcess,
-                    status.StatusType);
+                    status.TokenProcess);
             }
         }
     }
@@ -240,7 +225,7 @@ internal class BpmnClient : IBpmnClient
             {
                 await Task.Delay(delay, cts);
 
-                ClearBpmnProcessesDictionary();
+                await ClearBpmnProcessesDictionaryAsync();
             }
         }
         catch (OperationCanceledException)

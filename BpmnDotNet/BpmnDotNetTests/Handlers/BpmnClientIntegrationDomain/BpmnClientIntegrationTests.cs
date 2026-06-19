@@ -1,4 +1,5 @@
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.Configuration;
 using BpmnDotNet.ElasticClientDomain;
 using BpmnDotNet.ElasticClientDomain.Abstractions;

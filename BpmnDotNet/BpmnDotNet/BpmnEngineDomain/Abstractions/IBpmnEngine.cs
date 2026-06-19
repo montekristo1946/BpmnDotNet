@@ -6,8 +6,13 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 /// <summary>
 /// Движок выполнения Bpmn.
 /// </summary>
-internal interface IBpmnEngine
+internal interface IBpmnEngine : IAsyncDisposable
 {
+    /// <summary>
+    /// Gets a value indicating whether процесс завершен.
+    /// </summary>
+    public bool IsProcessCancel { get; }
+
     /// <summary>
     /// Запустить процесс.
     /// </summary>
@@ -15,7 +20,7 @@ internal interface IBpmnEngine
     /// <param name="processModel">ProcessModel.</param>
     /// <param name="ct">CancellationToken.</param>
     /// <returns>BusinessProcessJobStatus.</returns>
-    public Task<BusinessProcessJobStatusV2> StartProcessAsync(
+    public Task<BusinessProcessJobStatus> StartProcessAsync(
         IContextBpmnProcess contextBpmnProcess,
         ProcessModel processModel,
         CancellationToken ct);

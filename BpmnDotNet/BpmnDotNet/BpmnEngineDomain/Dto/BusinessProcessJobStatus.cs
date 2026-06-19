@@ -1,17 +1,12 @@
-namespace BpmnDotNet.Dto;
+namespace BpmnDotNet.BpmnEngineDomain.Dto;
 
-using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 /// <summary>
 /// Экземпляр описывающий запущенный процесс.
 /// </summary>
 public class BusinessProcessJobStatus
 {
-    /// <summary>
-    /// Gets or sets текущее состояние.
-    /// </summary>
-    public StatusType StatusType { get; set; } = StatusType.None;
-
     /// <summary>
     /// Gets iD Bpmn процесса из схемы bpmn.
     /// </summary>
@@ -30,5 +25,5 @@ public class BusinessProcessJobStatus
     /// <summary>
     /// Gets инстанс процесса.
     /// </summary>
-    internal IBusinessProcess Process { get; init; } = null!;
+    internal IBpmnEngine Process { get; init; } = null!;
 }

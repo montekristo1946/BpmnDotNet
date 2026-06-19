@@ -17,12 +17,12 @@ internal class ContextData : IContextBpmnProcess
 
     /// <inheritdoc />
     public ConcurrentDictionary<string, string> ConditionRoute { get; init; } = new();
+    
+    /// <inheritdoc />
+    public ConcurrentDictionary<Type, string> RegistrationMessagesType { get; init; } = new();
 
     /// <inheritdoc />
-    public ConcurrentDictionary<string, Type> RegistrationMessagesType { get; init; } = new();
-
-    /// <inheritdoc />
-    public ConcurrentDictionary<Type, object> ReceivedMessage { get; init; } = new();
+    public ConcurrentDictionary<string, object>  ReceivedMessage { get; init; } = new();
     
     /// <summary>
     /// Тестовое поле.

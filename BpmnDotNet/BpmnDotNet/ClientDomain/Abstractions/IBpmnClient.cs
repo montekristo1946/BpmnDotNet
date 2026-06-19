@@ -1,20 +1,21 @@
-namespace BpmnDotNet.Abstractions.Handlers;
+namespace BpmnDotNet.ClientDomain.Abstractions;
 
 using BpmnDotNet.Abstractions.Context;
-using BpmnDotNet.Dto;
+using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 
 /// <summary>
 /// Реализация клиента.
 /// </summary>
-public interface IBpmnClient : IDisposable
+public interface IBpmnClient : IAsyncDisposable
 {
     /// <summary>
     ///     Запуск процесса.
     /// </summary>
-    /// <param name="context">Контекст операции.</param>
-    /// <param name="timeout">Выделенное время на весь процесс.</param>
-    /// <returns>BusinessProcessJobStatus.</returns>
-    public BusinessProcessJobStatus StartNewProcess(IContextBpmnProcess context, TimeSpan timeout);
+    /// <param name="context"><see cref="IContextBpmnProcess"/>.</param>
+    /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
+    /// <returns><see cref="BusinessProcessJobStatus"/></returns>
+    public Task<BusinessProcessJobStatus> StartNewProcessAsync(IContextBpmnProcess context, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Регистрация handlers.

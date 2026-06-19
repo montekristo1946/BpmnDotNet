@@ -51,7 +51,7 @@ public class BpmnClientTests
         
        var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-       _bpmnClient.ClearBpmnProcessesDictionary();
+       _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
        Assert.True(resAdd);
        Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
@@ -73,7 +73,7 @@ public class BpmnClientTests
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionary();
+        _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
         Assert.True(resAdd);
         Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
@@ -95,7 +95,7 @@ public class BpmnClientTests
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionary(true);
+        _bpmnClient.ClearBpmnProcessesDictionaryAsync(true);
        
         Assert.True(resAdd);
         Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
@@ -117,7 +117,7 @@ public class BpmnClientTests
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionary();
+        _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
         Assert.True(resAdd);
         Assert.Single(_bpmnClient.BpmnProcesses.Keys);
