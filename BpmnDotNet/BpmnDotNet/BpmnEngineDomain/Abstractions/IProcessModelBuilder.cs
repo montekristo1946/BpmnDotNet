@@ -1,3 +1,5 @@
+using BpmnDotNet.Dto;
+
 namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 using System.Collections.Concurrent;

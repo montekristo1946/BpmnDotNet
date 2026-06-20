@@ -78,6 +78,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="BpmnValidator\" />
       <Folder Include="Handlers\BpmnClientIntegrationDomain\BpmnSource\" />
     </ItemGroup>
 

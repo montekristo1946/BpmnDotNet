@@ -50,12 +50,15 @@ internal static class BpmnClientBuilder
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = allBpmnFiles.Select(serializerProcessSection.LoadXmlProcessSection).ToArray();
         WriteBpmnInElastic(allBpmnFiles, elasticClient, serializerDiagramSection);
-        return new BpmnClient(
-            businessProcessDtos,
+        var client = new BpmnClient(
             loggerFactory,
             historyNodeStateWriter,
             descriptionWriteService,
             processModelBuilder);
+
+        client.FillingBusinessProcessDtos(businessProcessDtos);
+        client.StartCleanerBackgroundThead();
+        return client;
     }
 
     /// <summary>

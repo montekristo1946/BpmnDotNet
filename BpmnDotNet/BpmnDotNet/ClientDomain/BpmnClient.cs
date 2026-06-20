@@ -22,9 +22,7 @@ internal class BpmnClient : IBpmnClient
         BpmnProcesses = new();
 
     private readonly ConcurrentDictionary<string, BpmnProcessDto> _bpmnProcessDtos = new();
-    private readonly Task _cleanerTask;
     private readonly CancellationTokenSource _cts = new();
-
     private readonly ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> _handlers = new();
     private readonly ILogger<BpmnClient> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -33,18 +31,17 @@ internal class BpmnClient : IBpmnClient
     private readonly IProcessModelBuilder _processModelBuilder;
     private readonly TimeSpan _delayClearOldProcess;
     private int _disposed = 0;
+    private Task? _cleanerTask = null;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BpmnClient"/> class.
     /// </summary>
-    /// <param name="businessProcessDtos">BpmnProcessDtos.</param>
     /// <param name="loggerFactory">ILoggerFactory.</param>
     /// <param name="historyNodeStateWriter">Сервис для записи истории.</param>
     /// <param name="descriptionWriteService">Сервис для регистрации дискрипторов блоков выполнения.</param>
     /// <param name="processModelBuilder"><see cref="IProcessModelBuilder"/>.</param>
     /// <param name="delayClearOldProcess">Интервал очистки исполненных тасков. </param>
     public BpmnClient(
-        BpmnProcessDto[] businessProcessDtos,
         ILoggerFactory loggerFactory,
         IHistoryNodeStateWriter historyNodeStateWriter,
         IDescriptionWriteService descriptionWriteService,
@@ -57,14 +54,46 @@ internal class BpmnClient : IBpmnClient
         _descriptionWriteService =
             descriptionWriteService ?? throw new ArgumentNullException(nameof(descriptionWriteService));
         _processModelBuilder = processModelBuilder ?? throw new ArgumentNullException(nameof(processModelBuilder));
-        _ = businessProcessDtos ?? throw new ArgumentNullException(nameof(businessProcessDtos));
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
 
-        FillingBusinessProcessDtos(businessProcessDtos);
 
         _delayClearOldProcess = delayClearOldProcess == TimeSpan.Zero ? TimeSpan.FromSeconds(1) : delayClearOldProcess;
+    }
+
+    /// <summary>
+    /// Запустить фоновый поток очистки кэша.
+    /// </summary>
+    public void StartCleanerBackgroundThead()
+    {
         _cleanerTask = Task.Run(() => CleaningBpmnProcesses(_cts.Token, _delayClearOldProcess), _cts.Token);
+    }
+
+    /// <summary>
+    /// Зальет BpmnProcessDto в кэш.
+    /// </summary>
+    /// <param name="businessProcessDtos"><see cref="BpmnProcessDto"/>.</param>
+    public void FillingBusinessProcessDtos(BpmnProcessDto[] businessProcessDtos)
+    {
+        foreach (var businessProcessDto in businessProcessDtos)
+        {
+            if (_bpmnProcessDtos.TryGetValue(businessProcessDto.IdBpmnProcess, out var existingProcess))
+            {
+                _logger.LogError(
+                    "Failed to load process with ID {IdBpmnProcess}. A process with this ID already exists. " +
+                    "Existing process: {ExistingProcessDescription}, New process: {NewProcessDescription}.",
+                    businessProcessDto.IdBpmnProcess,
+                    existingProcess.IdBpmnProcess ?? "Empty IdBpmnProcess",
+                    businessProcessDto.IdBpmnProcess ?? "Empty IdBpmnProcess");
+                throw new InvalidOperationException($"Fail, duplicate key load {businessProcessDto.IdBpmnProcess}");
+            }
+
+            var resAdd = _bpmnProcessDtos.TryAdd(businessProcessDto.IdBpmnProcess, businessProcessDto);
+            if (resAdd is false)
+            {
+                throw new InvalidOperationException($"Fail load {businessProcessDto.IdBpmnProcess}");
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -122,7 +151,7 @@ internal class BpmnClient : IBpmnClient
             }
 
             _descriptionWriteService.AddDescription(handler.TaskDefinitionId, handler.Description);
-            _logger?.LogInformation(
+            _logger.LogInformation(
                 $"[BpmnClient:RegisterHandlers] Registration completed; Handler:{handler.GetType().Name}; TaskDefinitionId: {taskDefinitionId}");
         }
 
@@ -139,7 +168,7 @@ internal class BpmnClient : IBpmnClient
         ArgumentNullException.ThrowIfNull(message);
 
         var resGet = BpmnProcesses.TryGetValue((idBpmnProcess, tokenProcess), out var bpmn);
-        if (!resGet || bpmn is null || bpmn.Process.IsProcessCancel)
+        if (!resGet || bpmn is null || bpmn?.Process is null || bpmn.Process.IsProcessCancel)
         {
             throw new InvalidOperationException(
                 $"[BpmnClient:SendMessage] Not find bpmnProcesses: {idBpmnProcess} {tokenProcess}");
@@ -166,7 +195,10 @@ internal class BpmnClient : IBpmnClient
 
         try
         {
-            await _cleanerTask.WaitAsync(TimeSpan.FromSeconds(5));
+            if (_cleanerTask is not null)
+            {
+                await _cleanerTask.WaitAsync(TimeSpan.FromSeconds(5));
+            }
         }
         catch (OperationCanceledException)
         {
@@ -178,7 +210,7 @@ internal class BpmnClient : IBpmnClient
             _logger.LogWarning("[BpmnClient:Dispose] Task was canceled (AggregateException)");
         }
 
-        _cleanerTask.Dispose();
+        _cleanerTask?.Dispose();
         _cts.Dispose();
     }
 
@@ -187,7 +219,7 @@ internal class BpmnClient : IBpmnClient
     /// </summary>
     /// <param name="isForce">Форсированный запуск.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    internal async Task ClearBpmnProcessesDictionaryAsync(bool isForce = false)
+    internal virtual async Task ClearBpmnProcessesDictionaryAsync(bool isForce = false)
     {
         foreach (var status in BpmnProcesses.Values)
         {
@@ -217,7 +249,13 @@ internal class BpmnClient : IBpmnClient
         }
     }
 
-    private async Task CleaningBpmnProcesses(CancellationToken cts, TimeSpan delay)
+    /// <summary>
+    /// Фоновая очистка кэша.
+    /// </summary>
+    /// <param name="cts"><see cref="CancellationToken"/>.</param>
+    /// <param name="delay"><see cref="TimeSpan"/>.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    internal virtual async Task CleaningBpmnProcesses(CancellationToken cts, TimeSpan delay)
     {
         try
         {
@@ -238,30 +276,14 @@ internal class BpmnClient : IBpmnClient
         }
     }
 
-    private void FillingBusinessProcessDtos(BpmnProcessDto[] businessProcessDtos)
-    {
-        foreach (var businessProcessDto in businessProcessDtos)
-        {
-            if (_bpmnProcessDtos.TryGetValue(businessProcessDto.IdBpmnProcess, out var existingProcess))
-            {
-                _logger.LogError(
-                    "Failed to load process with ID {IdBpmnProcess}. A process with this ID already exists. " +
-                    "Existing process: {ExistingProcessDescription}, New process: {NewProcessDescription}.",
-                    businessProcessDto.IdBpmnProcess,
-                    existingProcess.IdBpmnProcess ?? "Empty IdBpmnProcess",
-                    businessProcessDto.IdBpmnProcess ?? "Empty IdBpmnProcess");
-                throw new InvalidOperationException($"Fail, duplicate key load {businessProcessDto.IdBpmnProcess}");
-            }
 
-            var resAdd = _bpmnProcessDtos.TryAdd(businessProcessDto.IdBpmnProcess, businessProcessDto);
-            if (resAdd is false)
-            {
-                throw new InvalidOperationException($"Fail load {businessProcessDto.IdBpmnProcess}");
-            }
-        }
-    }
-
-    private BpmnProcessDto GetBpmnShema(
+    /// <summary>
+    /// Запрос BpmnProcessDto с логированием.
+    /// </summary>
+    /// <param name="bpmnProcessDtos">Словарь локального кэширования.</param>
+    /// <param name="idBpmnProcess">id процесса.</param>
+    /// <returns><see cref="BpmnProcessDto"/>.</returns>
+    internal BpmnProcessDto GetBpmnShema(
         ConcurrentDictionary<string, BpmnProcessDto> bpmnProcessDtos,
         string idBpmnProcess)
     {

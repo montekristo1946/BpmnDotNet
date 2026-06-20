@@ -1,3 +1,5 @@
+using BpmnDotNet.Dto;
+
 namespace BpmnDotNet.Handlers;
 
 using System.Xml;

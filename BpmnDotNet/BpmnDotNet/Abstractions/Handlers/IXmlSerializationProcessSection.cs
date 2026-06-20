@@ -1,3 +1,5 @@
+using BpmnDotNet.Dto;
+
 namespace BpmnDotNet.Abstractions.Handlers;
 
 using BpmnDotNet.Abstractions.Elements;

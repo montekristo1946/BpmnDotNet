@@ -4,6 +4,7 @@ using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.HistoryDomain.Abstractions;

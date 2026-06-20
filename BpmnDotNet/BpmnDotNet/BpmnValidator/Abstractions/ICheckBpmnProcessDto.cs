@@ -1,4 +1,6 @@
-namespace BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.Dto;
+
+namespace BpmnDotNet.BpmnValidator.Abstractions;
 
 using BpmnDotNet.Abstractions.Elements;
 

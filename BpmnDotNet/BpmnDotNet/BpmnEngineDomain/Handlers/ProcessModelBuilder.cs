@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.Dto;
 
 namespace BpmnDotNet.BpmnEngineDomain.Handlers;
 
