@@ -1,12 +1,12 @@
-using BpmnDotNet.HistoryDomain.Dto;
-
 namespace BpmnDotNet.Arm.Core.SvgDomain.Service;
 
 using BpmnDotNet.Arm.Core.Common;
 using BpmnDotNet.Arm.Core.SvgDomain.Abstractions;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
+using BpmnDotNet.HistoryDomain.Dto;
 
 /// <inheritdoc />
 public class SvgConstructor : ISvgConstructor
@@ -489,17 +489,15 @@ public class SvgConstructor : ISvgConstructor
     /// <returns>Цвет.</returns>
     internal virtual string GetColor(string shapeId, NodeJobStatus[] nodeJobStatus)
     {
-        var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.StatusType ?? StatusType.None;
+        var state = nodeJobStatus.FirstOrDefault(s => s.IdNode == shapeId)?.StatusType ?? StatusNode.None;
 
         return state switch
         {
-            StatusType.None => ColorBpmnSvg.DefaultColor,
-            StatusType.Pending => ColorBpmnSvg.Running,
-            StatusType.Works => ColorBpmnSvg.Running,
-            StatusType.Completed => ColorBpmnSvg.Completed,
-            StatusType.Failed => ColorBpmnSvg.Error,
-            StatusType.WaitingCompletedWays => ColorBpmnSvg.Running,
-            StatusType.WaitingReceivedMessage => ColorBpmnSvg.Running,
+            StatusNode.None => ColorBpmnSvg.DefaultColor,
+            StatusNode.Works => ColorBpmnSvg.Running,
+            StatusNode.NormalCompleted => ColorBpmnSvg.Completed,
+            StatusNode.FailedCompleted => ColorBpmnSvg.Error,
+            StatusNode.AllBpmnProcessCompleted => ColorBpmnSvg.Completed,
             _ => throw new ArgumentOutOfRangeException(),
         };
     }

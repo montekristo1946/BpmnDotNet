@@ -1,3 +1,4 @@
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain;
 using BpmnDotNet.HistoryDomain.Dto;
@@ -14,7 +15,6 @@ public class StringUtilsTest
     [InlineData(typeof(HistoryNodeState), "historynodestate")]
     [InlineData(typeof(NodeJobStatus), "nodejobstatus")]
     [InlineData(typeof(ProcessStatus), "processstatus")]
-    [InlineData(typeof(StatusType), "statustype")]
     public void CreateIndexName_ShouldReturnCorrectName(Type type, string expected)
     {
         // Act

@@ -9,6 +9,7 @@ using BpmnDotNet.BpmnEngineDomain.Activity;
 using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.BpmnEngineDomain.Handlers;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -22,6 +23,7 @@ public class BpmnEngineTest
     private readonly ILogger<BpmnEngine> _logger;
     private readonly Fixture _fixture;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
 
     public BpmnEngineTest()
     {
@@ -29,7 +31,8 @@ public class BpmnEngineTest
         _loggerFactory = Substitute.For<ILoggerFactory>();
         _processModelBuilder = new ProcessModelBuilder(_loggerFactory);
         _logger = Substitute.For<ILogger<BpmnEngine>>();
-        _bpmnEngine = new BpmnEngine(_logger);
+        _historyNodeStateWriter= Substitute.For<IHistoryNodeStateWriter>();
+        _bpmnEngine = new BpmnEngine(_logger,_historyNodeStateWriter);
         _fixture = new Fixture();
     }
 

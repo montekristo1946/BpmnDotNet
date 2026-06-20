@@ -111,32 +111,31 @@ internal class SampleService
     public void StressTest()
     {
       
-        // var startID = 1;
-        //
-        // var totalCount = 10000;
-        // var batchSize = 10;
-        // var sw = new Stopwatch();
-        // var testTime = DateTime.Now;
-        // sw.Restart();
-        // for (int i = 0; i < totalCount; i += batchSize)
-        // {
-        //     var currentBatchSize = Math.Min(batchSize, totalCount - i);
-        //     var tasks = new List<Task>();
-        //     // Обработка текущей партии
-        //     for (int j = i; j < i + currentBatchSize; j++)
-        //     {
-        //         var tokenId = startID + j;
-        //         var timeout = TimeSpan.FromMinutes(10);
-        //         var contextData = CreateContextData(tokenId,testTime);
-        //         var taskNode = _bpmnClient.StartNewProcess(contextData, timeout);
-        //
-        //         tasks.Add(taskNode.ProcessTask);
-        //     }
-        //     Task.WaitAll(tasks.ToArray());
-        //     Console.WriteLine($"--- Партия ---  {i}");
-        // }
-        // sw.Stop();
-        // Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
-        throw new NotImplementedException();
+        var startID = 1;
+        
+        var totalCount = 10000;
+        var batchSize = 10;
+        var sw = new Stopwatch();
+        var testTime = DateTime.Now;
+        sw.Restart();
+        for (int i = 0; i < totalCount; i += batchSize)
+        {
+            var currentBatchSize = Math.Min(batchSize, totalCount - i);
+            var tasks = new List<Task>();
+            // Обработка текущей партии
+            for (int j = i; j < i + currentBatchSize; j++)
+            {
+                var tokenId = startID + j;
+                var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+                var contextData = CreateContextData(tokenId,testTime);
+                var taskNode = _bpmnClient.StartNewProcessAsync(contextData, cts.Token);
+        
+                tasks.Add(taskNode.Result.ProcessTask);
+            }
+            Task.WaitAll(tasks.ToArray());
+            Console.WriteLine($"--- Партия ---  {i}");
+        }
+        sw.Stop();
+        Console.WriteLine($"elapsed time: {sw.ElapsedMilliseconds} ms");
     }
 }

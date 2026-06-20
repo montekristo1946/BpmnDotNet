@@ -97,7 +97,7 @@ internal class ProcessModelBuilder : IProcessModelBuilder
 
         if (!res || handler is null)
         {
-            _logger.LogWarning(
+            _logger.LogDebug(
                 "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
             handler = MoqHandler;
         }

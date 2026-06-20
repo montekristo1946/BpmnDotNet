@@ -1,5 +1,3 @@
-using BpmnDotNet.HistoryDomain.Dto;
-
 namespace BpmnDotNet.Arm.Core.UiDomain.Services;
 
 using BpmnDotNet.Arm.Core.Common;
@@ -8,6 +6,7 @@ using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

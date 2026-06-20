@@ -58,7 +58,8 @@ public class BpmnClientIntegrationTests
             TestValue = string.Empty,
         };
         
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(5));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
         
         Assert.Equal("Competed TestActivity", contextData.TestValue);
@@ -82,10 +83,12 @@ public class BpmnClientIntegrationTests
             TestValue = string.Empty,
         };
         
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(5));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
+       
         
-        bpmnClient.Dispose();
+        await bpmnClient.DisposeAsync();
         Assert.Equal("Competed TestActivity", contextData.TestValue);
     }
     
@@ -108,10 +111,12 @@ public class BpmnClientIntegrationTests
             TestValue = string.Empty,
         };
         
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(5));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
         
-        bpmnClient.Dispose();
+        
+        await bpmnClient.DisposeAsync();
         Assert.Equal("Competed TestActivity", contextData.TestValue);
     }
     

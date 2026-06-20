@@ -7,6 +7,7 @@ using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.Abstractions;
 using BpmnDotNet.Handlers;
 using AutoFixture;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.HistoryDomain.Dto;
 using NSubstitute;
@@ -623,14 +624,12 @@ public class SvgConstructorTests
     }
 
     [Theory]
-    [InlineData(BpmnDotNet.Dto.StatusType.None, "#22242a")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Pending, "#238ff0")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Works, "#238ff0")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Completed, "#028515")]
-    [InlineData(BpmnDotNet.Dto.StatusType.Failed, "#f34848")]
-    [InlineData(BpmnDotNet.Dto.StatusType.WaitingCompletedWays, "#238ff0")]
-    [InlineData(BpmnDotNet.Dto.StatusType.WaitingReceivedMessage, "#238ff0")]
-    public void GetColor_ShouldReturn_ExpectedColorForStatus(BpmnDotNet.Dto.StatusType statusType, string expectedColor)
+    [InlineData(StatusNode.None, "#22242a")]
+    [InlineData(StatusNode.Works, "#238ff0")]
+    [InlineData(StatusNode.NormalCompleted, "#028515")]
+    [InlineData(StatusNode.FailedCompleted, "#f34848")]
+    [InlineData(StatusNode.AllBpmnProcessCompleted, "#028515")]
+    public void GetColor_ShouldReturn_ExpectedColorForStatus(StatusNode statusType, string expectedColor)
     {
         // Arrange
         var statuses = new[]
@@ -714,7 +713,7 @@ public class SvgConstructorTests
 
         var nodeJobStatus = new[]
         {
-            new NodeJobStatus { IdNode = "service_1", StatusType = StatusType.Pending }
+            new NodeJobStatus { IdNode = "service_1", StatusType = StatusNode.Works }
         };
 
         // Act
@@ -811,12 +810,12 @@ public class SvgConstructorTests
 
         var nodeJobStatus = new[]
         {
-            new NodeJobStatus { IdNode = shape.BpmnElement, StatusType = StatusType.Pending }
+            new NodeJobStatus { IdNode = shape.BpmnElement, StatusType = StatusNode.Works }
         };
 
         // Act
         var result = svgConstructor.CreateColorShapes(
-            new[] { shape },
+            [shape],
             nodeJobStatus,
             100,
             100,

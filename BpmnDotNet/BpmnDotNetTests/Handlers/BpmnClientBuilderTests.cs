@@ -3,6 +3,7 @@ using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.HistoryDomain.Abstractions;
@@ -20,12 +21,12 @@ public class BpmnClientBuilderTests : IDisposable
     private readonly IFixture _fixture;
     private readonly string _tempDirectory;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IPathFinder _pathFinder;
     private readonly IElasticClientSetDataAsync _elasticClient;
     private readonly IHistoryNodeStateWriter _historyNodeStateWriter;
     private readonly IDescriptionWriteService _descriptionWriteService;
     private readonly IXmlSerializationProcessSection _serializerProcessSection;
     private IXmlSerializationBpmnDiagramSection _serializerDiagramSection;
+    private readonly IProcessModelBuilder _processModelBuilder;
 
     public BpmnClientBuilderTests()
     {
@@ -36,13 +37,13 @@ public class BpmnClientBuilderTests : IDisposable
         Directory.CreateDirectory(_tempDirectory);
         
         _loggerFactory = Substitute.For<ILoggerFactory>();
-        _pathFinder = Substitute.For<IPathFinder>();
         _elasticClient = Substitute.For<IElasticClientSetDataAsync>();
         _historyNodeStateWriter = Substitute.For<IHistoryNodeStateWriter>();
         _descriptionWriteService = Substitute.For<IDescriptionWriteService>();
         _elasticClient.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
         _serializerProcessSection= Substitute.For<IXmlSerializationProcessSection>();
         _serializerDiagramSection = Substitute.For<IXmlSerializationBpmnDiagramSection>();
+        _processModelBuilder = Substitute.For<IProcessModelBuilder>();
         
         var logger = Substitute.For<ILogger>();
         _loggerFactory.CreateLogger(Arg.Any<string>()).Returns(logger);
@@ -97,15 +98,17 @@ public class BpmnClientBuilderTests : IDisposable
         _elasticClient.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
 
         // Act
-        using var result = BpmnClientBuilder.Build(
+         var result = BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
-            _pathFinder,
             _elasticClient,
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection);
+            _serializerDiagramSection,
+            _processModelBuilder);
+         
+         result.DisposeAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -150,16 +153,17 @@ public class BpmnClientBuilderTests : IDisposable
         _elasticClient.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
 
         // Act
-        using var result = BpmnClientBuilder.Build(
+        var result = BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
-            _pathFinder,
             _elasticClient,
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection);
-
+            _serializerDiagramSection,
+            _processModelBuilder);
+        await result.DisposeAsync();
+        
         // Assert
         Assert.NotNull(result);
         Assert.Equal(fileCount, diagramCallCount);
@@ -179,18 +183,18 @@ public class BpmnClientBuilderTests : IDisposable
              BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
-            _pathFinder,
             _elasticClient,
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection));
+            _serializerDiagramSection,
+            _processModelBuilder));
             
         Assert.Contains($"[GetAllFiles] Not found files in diagram {_tempDirectory}:*.bpmn.", exception.Message);
     }
     
     [Fact]
-    public void Build_ShouldProcessOnlyBpmnFiles_WhenOtherFilesExist()
+    public async Task Build_ShouldProcessOnlyBpmnFiles_WhenOtherFilesExist()
     {
         // Arrange
         const int bpmnFileCount = 2;
@@ -223,16 +227,17 @@ public class BpmnClientBuilderTests : IDisposable
         _elasticClient.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
 
         // Act
-        using var result = BpmnClientBuilder.Build(
+        await using  var result = BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
-            _pathFinder,
             _elasticClient,
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection);
+            _serializerDiagramSection,
+            _processModelBuilder);
 
+        
         // Assert
         Assert.NotNull(result);
         Assert.Equal(bpmnFileCount, diagramCallCount);
@@ -273,15 +278,15 @@ public class BpmnClientBuilderTests : IDisposable
         _elasticClient.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
 
         // Act
-        using var result = BpmnClientBuilder.Build(
+        await using  var result = BpmnClientBuilder.Build(
             _tempDirectory,
             _loggerFactory,
-            _pathFinder,
             _elasticClient,
             _historyNodeStateWriter,
             _descriptionWriteService,
             _serializerProcessSection,
-            _serializerDiagramSection);
+            _serializerDiagramSection,
+            _processModelBuilder);
 
         // Assert
         Assert.NotNull(result);

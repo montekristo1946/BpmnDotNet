@@ -1,6 +1,8 @@
 using AutoFixture;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Handlers;
 using BpmnDotNet.HistoryDomain.Abstractions;
@@ -14,115 +16,114 @@ public class BpmnClientTests
 {
     private readonly BpmnProcessDto[] _businessProcessDtos;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly  IPathFinder _pathFinder;
     private readonly   IHistoryNodeStateWriter _historyNodeStateWriter;
     private readonly IDescriptionWriteService _descriptionWriteService;
     private BpmnClient _bpmnClient;
     private readonly IFixture _fixture;
+    private readonly IBpmnEngine  _bpmnEngine;
+    private readonly IProcessModelBuilder _processModelBuilder;
+  
     
     public BpmnClientTests()
     {
         _businessProcessDtos = new BpmnProcessDto[]{};
         _loggerFactory  = Substitute.For<ILoggerFactory>();
-        _pathFinder = Substitute.For<IPathFinder>();
+        _bpmnEngine = Substitute.For<IBpmnEngine>();
         _historyNodeStateWriter = Substitute.For<IHistoryNodeStateWriter>();
         _descriptionWriteService = Substitute.For<IDescriptionWriteService>();
+        _processModelBuilder= Substitute.For<IProcessModelBuilder>();
         _bpmnClient = new BpmnClient(
             _businessProcessDtos,
             _loggerFactory,
-            _pathFinder,
             _historyNodeStateWriter,
             _descriptionWriteService,
+            _processModelBuilder,
             TimeSpan.FromMilliseconds(1000));
         _fixture = new Fixture();
     }
 
     [Fact]
-    public void ClearBpmnProcessesDictionary_FullPassNormalFinalizedProcess_CountProcessInBpmnProcesses()
+    public async Task ClearBpmnProcessesDictionary_FullPassNormalFinalizedProcess_CountProcessInBpmnProcesses()
     {
         var idBpmnProcess = Guid.NewGuid().ToString();
         var tokenProcess = Guid.NewGuid().ToString();
         var newBusinessProcess = new BusinessProcessJobStatus()
         {
-            StatusType = StatusType.Completed,
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess
         };
         
        var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-       _bpmnClient.ClearBpmnProcessesDictionaryAsync();
+       await _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
        Assert.True(resAdd);
        Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
        
-       _bpmnClient.Dispose();
+       await _bpmnClient.DisposeAsync();
     }
     
     [Fact]
-    public void ClearBpmnProcessesDictionary_NoNormalCompletedFinalizedProcess_CountProcessInBpmnProcesses()
+    public async Task ClearBpmnProcessesDictionary_NoNormalCompletedFinalizedProcess_CountProcessInBpmnProcesses()
     {
         var idBpmnProcess = Guid.NewGuid().ToString();
         var tokenProcess = Guid.NewGuid().ToString();
         var newBusinessProcess = new BusinessProcessJobStatus()
         {
-            StatusType = StatusType.Failed,
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess
         };
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionaryAsync();
+        await _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
         Assert.True(resAdd);
         Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
        
-        _bpmnClient.Dispose();
+        await _bpmnClient.DisposeAsync();
     }
     
     [Fact]
-    public void ClearBpmnProcessesDictionary_CheckForceCall_CountProcessInBpmnProcesses()
+    public async Task ClearBpmnProcessesDictionary_CheckForceCall_CountProcessInBpmnProcesses()
     {
         var idBpmnProcess = Guid.NewGuid().ToString();
         var tokenProcess = Guid.NewGuid().ToString();
         var newBusinessProcess = new BusinessProcessJobStatus()
         {
-            StatusType = StatusType.Pending,
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess
         };
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionaryAsync(true);
+        await _bpmnClient.ClearBpmnProcessesDictionaryAsync(true);
        
         Assert.True(resAdd);
         Assert.Empty(_bpmnClient.BpmnProcesses.Keys);
        
-        _bpmnClient.Dispose();
+        await _bpmnClient.DisposeAsync();
     }
     
     [Fact]
-    public void ClearBpmnProcessesDictionary_CheckWaitPending_CountProcessInBpmnProcesses()
+    public async Task ClearBpmnProcessesDictionary_CheckWaitPending_CountProcessInBpmnProcesses()
     {
         var idBpmnProcess = Guid.NewGuid().ToString();
         var tokenProcess = Guid.NewGuid().ToString();
         var newBusinessProcess = new BusinessProcessJobStatus()
         {
-            StatusType = StatusType.Pending,
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess
         };
         
         var resAdd = _bpmnClient.BpmnProcesses.TryAdd((idBpmnProcess, tokenProcess), newBusinessProcess);
 
-        _bpmnClient.ClearBpmnProcessesDictionaryAsync();
+        await _bpmnClient.ClearBpmnProcessesDictionaryAsync();
        
         Assert.True(resAdd);
         Assert.Single(_bpmnClient.BpmnProcesses.Keys);
        
-        _bpmnClient.Dispose();
+        await _bpmnClient.DisposeAsync();
     }
     
     [Fact]
@@ -134,7 +135,7 @@ public class BpmnClientTests
         var messageType = typeof(string);
         var message = _fixture.Create<string>();
         
-        var mockProcess = Substitute.For<IBusinessProcess>();
+        var mockProcess = Substitute.For<IBpmnEngine>();
         mockProcess.AddMessageToQueue(messageType, message).Returns(true);
         
         BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, mockProcess, _bpmnClient);
@@ -155,16 +156,15 @@ public class BpmnClientTests
         var messageType = typeof(int);
         var message = _fixture.Create<int>();
         
-        var mockProcess = Substitute.For<IBusinessProcess>();
-        mockProcess.AddMessageToQueue(messageType, message).Returns(true);
+        _bpmnEngine.AddMessageToQueue(Arg.Any<Type>(), Arg.Any<object>()).Returns(true);
         
-        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, mockProcess, _bpmnClient);
+        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, _bpmnEngine, _bpmnClient);
         
         // Act
         _bpmnClient.SendMessage(idBpmnProcess, tokenProcess, messageType, message);
         
         // Assert
-        mockProcess.Received(1).AddMessageToQueue(messageType, message);
+        _bpmnEngine.Received(1).AddMessageToQueue(messageType, message);
     }
     
     [Fact]
@@ -176,16 +176,16 @@ public class BpmnClientTests
         var messageType = typeof(decimal);
         var message = _fixture.Create<decimal>();
         
-        var mockProcess = Substitute.For<IBusinessProcess>();
-        mockProcess.AddMessageToQueue(Arg.Any<Type>(), Arg.Any<object>()).Returns(true);
+     
+        _bpmnEngine.AddMessageToQueue(Arg.Any<Type>(), Arg.Any<object>()).Returns(true);
         
-        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, mockProcess, _bpmnClient);
+        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, _bpmnEngine, _bpmnClient);
         
         // Act
         _bpmnClient.SendMessage(idBpmnProcess, tokenProcess, messageType, message);
         
         // Assert
-        mockProcess.Received(1).AddMessageToQueue(
+        _bpmnEngine.Received(1).AddMessageToQueue(
             Arg.Is<Type>(t => t == messageType),
             Arg.Is<object>(o => o.Equals(message)));
     }
@@ -256,10 +256,9 @@ public class BpmnClientTests
         var messageType = typeof(string);
         var message = _fixture.Create<string>();
         
-        var mockProcess = Substitute.For<IBusinessProcess>();
-        mockProcess.AddMessageToQueue(messageType, message).Returns(false);
+        _bpmnEngine.AddMessageToQueue(Arg.Any<Type>(), Arg.Any<object>()).Returns(false);
         
-        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, mockProcess,_bpmnClient);
+        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, _bpmnEngine,_bpmnClient);
         
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
@@ -277,11 +276,11 @@ public class BpmnClientTests
         var messageType = typeof(string);
         var message = _fixture.Create<string>();
         
-        var mockProcess = Substitute.For<IBusinessProcess>();
-        mockProcess.When(x => x.AddMessageToQueue(messageType, message))
+  
+        _bpmnEngine.When(x => x.AddMessageToQueue(messageType, message))
             .Do(x => throw new InvalidOperationException("Test error from process"));
         
-        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, mockProcess,_bpmnClient);
+        BpmnClientTestHelper.AddProcessToStore(idBpmnProcess, tokenProcess, _bpmnEngine,_bpmnClient);
         
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
@@ -301,8 +300,8 @@ public class BpmnClientTests
         var message1 = _fixture.Create<string>();
         var message2 = _fixture.Create<string>();
         
-        var mockProcess1 = Substitute.For<IBusinessProcess>();
-        var mockProcess2 = Substitute.For<IBusinessProcess>();
+        var mockProcess1 = Substitute.For<IBpmnEngine>();
+        var mockProcess2 = Substitute.For<IBpmnEngine>();
         
         mockProcess1.AddMessageToQueue(messageType, message1).Returns(true);
         mockProcess2.AddMessageToQueue(messageType, message2).Returns(true);
@@ -330,8 +329,8 @@ public class BpmnClientTests
         var message1 = _fixture.Create<string>();
         var message2 = _fixture.Create<string>();
         
-        var mockProcess1 = Substitute.For<IBusinessProcess>();
-        var mockProcess2 = Substitute.For<IBusinessProcess>();
+        var mockProcess1 = Substitute.For<IBpmnEngine>();
+        var mockProcess2 = Substitute.For<IBpmnEngine>();
         
         mockProcess1.AddMessageToQueue(messageType, message1).Returns(true);
         mockProcess2.AddMessageToQueue(messageType, message2).Returns(true);

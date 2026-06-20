@@ -189,7 +189,7 @@ internal class BpmnEngine : IBpmnEngine
 
                 if (isCompletedBackground)
                 {
-                    return;
+                    break;
                 }
             }
         }
@@ -199,7 +199,6 @@ internal class BpmnEngine : IBpmnEngine
 
             var idProcess = $"{contextBpmnProcess.IdBpmnProcess}_{contextBpmnProcess.TokenProcess}";
             stateRegistry[idProcess] = StatusNode.FailedCompleted;
-            return;
         }
         catch (Exception e)
         {
@@ -207,7 +206,6 @@ internal class BpmnEngine : IBpmnEngine
             var idProcess = $"{contextBpmnProcess.IdBpmnProcess}_{contextBpmnProcess.TokenProcess}";
             stateRegistry[idProcess] = StatusNode.FailedCompleted;
             errorRegistry[idProcess] = e.Message;
-            return;
         }
         finally
         {
@@ -244,7 +242,17 @@ internal class BpmnEngine : IBpmnEngine
             }
 
             var currentId = token.CurrentNodeId;
+            _logger.LogDebug("[BpmnEngine:RunEventLoopAsync] Init Current Id: {CurrentId}", currentId);
+
             var node = processModel.Nodes[currentId];
+            nodeStateRegistry[currentId] = StatusNode.Works;
+
+            await _historyNodeStateWriter.SetStateProcessAsync(
+                contextBpmnProcess.IdBpmnProcess,
+                contextBpmnProcess.TokenProcess,
+                nodeStateRegistry,
+                errorRegistry,
+                _timeInitInstanse);
 
             var nodes = await node.ExecuteAsync(
                 processModel,
