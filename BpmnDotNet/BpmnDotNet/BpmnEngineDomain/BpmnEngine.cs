@@ -23,6 +23,11 @@ internal class BpmnEngine : IBpmnEngine
     private int _isProcessCancel = 0;
 
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BpmnEngine"/> class.
+    /// </summary>
+    /// <param name="logger"><see cref="ILogger"/>.</param>
+    /// <param name="historyNodeStateWriter"><see cref="IHistoryNodeStateWriter"/>.</param>
     public BpmnEngine(ILogger<BpmnEngine> logger, IHistoryNodeStateWriter historyNodeStateWriter)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -160,7 +165,14 @@ internal class BpmnEngine : IBpmnEngine
         _eventQueue.Enqueue(startToken);
     }
 
-    private async Task ThreadBackground(
+    /// <summary>
+    /// Фоновый процесс.
+    /// </summary>
+    /// <param name="processModel"><see cref="ProcessModel"/>.</param>
+    /// <param name="contextBpmnProcess"><see cref="IContextBpmnProcess"/>.</param>
+    /// <param name="ctsToken"><see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    internal async Task ThreadBackground(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
         CancellationToken ctsToken)
@@ -224,7 +236,17 @@ internal class BpmnEngine : IBpmnEngine
             contextBpmnProcess.TokenProcess);
     }
 
-    private async Task<bool> RunEventLoopAsync(
+    /// <summary>
+    /// Цикл обхода дерева bpmn.
+    /// </summary>
+    /// <param name="contextBpmnProcess"><see cref="IContextBpmnProcess"/>.</param>
+    /// <param name="processModel"><see cref="ProcessModel"/>.</param>
+    /// <param name="nodeStateRegistry">Регистр состояния нод.</param>
+    /// <param name="errorRegistry">Регистр ошибок.</param>
+    /// <param name="eventQueue">Ноды на запуск.</param>
+    /// <param name="ctsToken"><see cref="CancellationToken"/>.</param>
+    /// <returns>Завершен bpmn процесс.</returns>
+    internal virtual async Task<bool> RunEventLoopAsync(
         IContextBpmnProcess contextBpmnProcess,
         ProcessModel processModel,
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
