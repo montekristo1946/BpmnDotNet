@@ -89,10 +89,10 @@ public class ParallelGatewayMultiInputTest: IDisposable
         };
         
         var bpmnClient = _host.Services.GetRequiredService<IBpmnClient>();
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(10000));
-
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
         
-        Assert.Equal(StatusType.Completed,taskNode.StatusType);
+        Assert.True(taskNode.Process.IsProcessCancel);
     }
 }

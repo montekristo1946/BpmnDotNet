@@ -1,3 +1,5 @@
+namespace BpmnDotNet.Handlers;
+
 using System.Runtime.CompilerServices;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
@@ -5,11 +7,6 @@ using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.Logging;
-
-[assembly: InternalsVisibleTo("BpmnDotNetTests")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-
-namespace BpmnDotNet.Handlers;
 
 /// <summary>
 /// BpmnClientBuilder.

@@ -173,15 +173,22 @@ internal class ReceiveTask : IBpmnNode
                 $"[ReceiveTask:AreAllPreviousNodesCompleted] FlowsBySource dictionary returned false, IdNode:{Id}");
         }
 
+        if (targetFlows.Length > 1)
+        {
+            _logger.LogWarning(
+                "[ReceiveTask:AreAllPreviousNodesCompleted] many input nodes, there should be one. {id}",
+                id);
+        }
+
         foreach (var targetFlow in targetFlows)
         {
             var isFindSate = nodeStateRegistry.TryGetValue(targetFlow.IdFlow, out var sate);
-            if (!isFindSate || sate != StatusNode.NormalCompleted)
+            if (isFindSate && sate == StatusNode.NormalCompleted)
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }

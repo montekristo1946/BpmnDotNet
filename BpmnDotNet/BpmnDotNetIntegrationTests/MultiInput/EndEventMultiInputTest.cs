@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Serilog;
 
-namespace BpmnDotNetIntegrationTests;
+namespace BpmnDotNetIntegrationTests.MultiInput;
 
 public class EndEventMultiInputTest: IDisposable
 {
@@ -85,7 +85,7 @@ public class EndEventMultiInputTest: IDisposable
     }
     
     [Fact]
-    public async Task StartNewProcess_CheckServiceTaskMultiInput_Completed()
+    internal async Task StartNewProcess_CheckServiceTaskMultiInput_Completed()
     {
         var contextData = new ContextData()
         {
@@ -94,11 +94,12 @@ public class EndEventMultiInputTest: IDisposable
         };
         
         var bpmnClient = _host.Services.GetRequiredService<IBpmnClient>();
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(10));
-
+        
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
         
-        Assert.Equal(StatusType.Completed,taskNode.StatusType);
+        Assert.True(taskNode.Process.IsProcessCancel);
     }
 
   

@@ -4,11 +4,6 @@
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_1teov36</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
-      <bpmn:incoming>Flow_1teov36</bpmn:incoming>
-      <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
-      <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1teov36" sourceRef="StartEvent_1" targetRef="GatewayFirstHandler" />
     <bpmn:endEvent id="Event_0eidb3m">
       <bpmn:incoming>Flow_18u8e4n</bpmn:incoming>
@@ -21,6 +16,11 @@
       <bpmn:outgoing>Flow_18u8e4n</bpmn:outgoing>
     </bpmn:receiveTask>
     <bpmn:sequenceFlow id="Flow_18u8e4n" sourceRef="ReceivedTaskHandler" targetRef="Event_0eidb3m" />
+    <bpmn:exclusiveGateway id="GatewayFirstHandler" name="GatewayFirstHandler">
+      <bpmn:incoming>Flow_1teov36</bpmn:incoming>
+      <bpmn:outgoing>Flow_in_SendTaskFirstHandler</bpmn:outgoing>
+      <bpmn:outgoing>Flow_in_ReceiveTaskFirstHandle</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ReceivedTaskMultiInputTest">
@@ -33,12 +33,12 @@
           <dc:Bounds x="278" y="65" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0eidb3m_di" bpmnElement="Event_0eidb3m">
+        <dc:Bounds x="752" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1iha9dz_di" bpmnElement="ReceivedTaskHandler">
         <dc:Bounds x="530" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0eidb3m_di" bpmnElement="Event_0eidb3m">
-        <dc:Bounds x="752" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1teov36_di" bpmnElement="Flow_1teov36">
         <di:waypoint x="218" y="120" />

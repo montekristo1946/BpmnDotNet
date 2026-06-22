@@ -57,7 +57,6 @@ internal class BpmnClient : IBpmnClient
 
         _logger = _loggerFactory.CreateLogger<BpmnClient>();
 
-
         _delayClearOldProcess = delayClearOldProcess == TimeSpan.Zero ? TimeSpan.FromSeconds(1) : delayClearOldProcess;
     }
 

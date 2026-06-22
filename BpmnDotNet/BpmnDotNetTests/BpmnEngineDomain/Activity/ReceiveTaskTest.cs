@@ -46,13 +46,12 @@ public class ReceiveTaskTest
 
     [Theory]
     [AutoNSubstituteData]
-    internal void AreAllPreviousNodesCompleted_WhenAnyNodeNotCompleted_ReturnsFalse(
+    internal void AreAllPreviousNodesCompleted_WhenAnyNodeNotCompleted_ReturnsTrue(
         [Frozen] ILogger<ReceiveTask> logger,
         [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         ProcessModel processModel,
         DirectionFlow[] nextNodes,
-        string currentId,
-        StatusNode notCompletedStatus)
+        string currentId)
     {
         // Arrange
         processModel.FlowsByTarget.TryAdd(currentId, nextNodes);
@@ -66,7 +65,7 @@ public class ReceiveTaskTest
         // Остальные узлы имеют незавершенный статус
         for (int i = 1; i < nextNodes.Length; i++)
         {
-            nodeStateRegistry.TryAdd(nextNodes[i].IdFlow, notCompletedStatus);
+            nodeStateRegistry.TryAdd(nextNodes[i].IdFlow, StatusNode.Works);
         }
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
@@ -76,7 +75,7 @@ public class ReceiveTaskTest
         var result = sut.AreAllPreviousNodesCompleted(nodeStateRegistry, processModel, currentId);
 
         // Assert
-        Assert.False(result);
+        Assert.True(result);
     }
 
     [Theory]
@@ -144,7 +143,7 @@ public class ReceiveTaskTest
 
     [Theory]
     [AutoNSubstituteData]
-    internal void AreAllPreviousNodesCompleted_WhenSomeNodeStateMissing_ReturnsFalse(
+    internal void AreAllPreviousNodesCompleted_WhenSomeNodeStateMissing_ReturnsTrue(
         [Frozen] ILogger<ReceiveTask> logger,
         [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         ProcessModel processModel,
@@ -168,7 +167,7 @@ public class ReceiveTaskTest
         var result = sut.AreAllPreviousNodesCompleted(nodeStateRegistry, processModel, currentId);
 
         // Assert
-        Assert.False(result);
+        Assert.True(result);
     }
 
     [Theory]
