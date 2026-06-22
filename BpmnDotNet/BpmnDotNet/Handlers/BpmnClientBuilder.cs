@@ -1,3 +1,5 @@
+using BpmnDotNet.BpmnValidator.Abstractions;
+
 namespace BpmnDotNet.Handlers;
 
 using System.Runtime.CompilerServices;
@@ -24,6 +26,7 @@ internal static class BpmnClientBuilder
     /// <param name="serializerProcessSection">IXmlSerializationProcessSection.</param>
     /// <param name="serializerDiagramSection">IXmlSerializationBpmnDiagramSection.</param>
     /// <param name="processModelBuilder"><see cref="IProcessModelBuilder"/>.</param>
+    /// <param name="checkBpmnProcessDto"><see cref="ICheckBpmnProcessDto"/>.</param>
     /// <returns>IBpmnClient.</returns>
     public static IBpmnClient Build(
         string pathDiagram,
@@ -33,7 +36,8 @@ internal static class BpmnClientBuilder
         IDescriptionWriteService descriptionWriteService,
         IXmlSerializationProcessSection serializerProcessSection,
         IXmlSerializationBpmnDiagramSection serializerDiagramSection,
-        IProcessModelBuilder processModelBuilder)
+        IProcessModelBuilder processModelBuilder,
+        ICheckBpmnProcessDto checkBpmnProcessDto)
     {
         ArgumentNullException.ThrowIfNull(pathDiagram);
         ArgumentNullException.ThrowIfNull(loggerFactory);
@@ -43,9 +47,12 @@ internal static class BpmnClientBuilder
         ArgumentNullException.ThrowIfNull(serializerProcessSection);
         ArgumentNullException.ThrowIfNull(serializerDiagramSection);
         ArgumentNullException.ThrowIfNull(processModelBuilder);
+        ArgumentNullException.ThrowIfNull(checkBpmnProcessDto);
 
         var allBpmnFiles = GetAllFiles(pathDiagram);
         var businessProcessDtos = allBpmnFiles.Select(serializerProcessSection.LoadXmlProcessSection).ToArray();
+        businessProcessDtos.ToList().ForEach(checkBpmnProcessDto.Check);
+
         WriteBpmnInElastic(allBpmnFiles, elasticClient, serializerDiagramSection);
         var client = new BpmnClient(
             loggerFactory,

@@ -1,6 +1,6 @@
-using BpmnDotNet.Abstractions.Elements;
-
 namespace BpmnDotNet.Dto;
+
+using BpmnDotNet.Abstractions.Elements;
 
 /// <summary>
 /// Дто описывающая в объектном виде  структуру bpmn документа.

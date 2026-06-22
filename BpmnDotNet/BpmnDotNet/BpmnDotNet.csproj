@@ -40,4 +40,12 @@
         </PackageReference>
     </ItemGroup>
     
+
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Options">
+        <HintPath>..\..\..\..\..\..\home\user\.nuget\packages\microsoft.extensions.options\10.0.6\lib\net10.0\Microsoft.Extensions.Options.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    
 </Project>

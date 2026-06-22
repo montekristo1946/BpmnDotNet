@@ -4,6 +4,7 @@ using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnValidator.Abstractions;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
@@ -28,6 +29,7 @@ public class BpmnClientBuilderTests : IDisposable
     private readonly IXmlSerializationProcessSection _serializerProcessSection;
     private IXmlSerializationBpmnDiagramSection _serializerDiagramSection;
     private readonly IProcessModelBuilder _processModelBuilder;
+    private readonly ICheckBpmnProcessDto _bpmnProcessDto;
 
     public BpmnClientBuilderTests()
     {
@@ -45,6 +47,7 @@ public class BpmnClientBuilderTests : IDisposable
         _serializerProcessSection= Substitute.For<IXmlSerializationProcessSection>();
         _serializerDiagramSection = Substitute.For<IXmlSerializationBpmnDiagramSection>();
         _processModelBuilder = Substitute.For<IProcessModelBuilder>();
+        _bpmnProcessDto = Substitute.For<ICheckBpmnProcessDto>();
         
         var logger = Substitute.For<ILogger>();
         _loggerFactory.CreateLogger(Arg.Any<string>()).Returns(logger);
@@ -107,7 +110,8 @@ public class BpmnClientBuilderTests : IDisposable
             _descriptionWriteService,
             _serializerProcessSection,
             _serializerDiagramSection,
-            _processModelBuilder);
+            _processModelBuilder,
+            _bpmnProcessDto);
          
          result.DisposeAsync();
 
@@ -162,7 +166,8 @@ public class BpmnClientBuilderTests : IDisposable
             _descriptionWriteService,
             _serializerProcessSection,
             _serializerDiagramSection,
-            _processModelBuilder);
+            _processModelBuilder,
+            _bpmnProcessDto);
         await result.DisposeAsync();
         
         // Assert
@@ -189,7 +194,8 @@ public class BpmnClientBuilderTests : IDisposable
             _descriptionWriteService,
             _serializerProcessSection,
             _serializerDiagramSection,
-            _processModelBuilder));
+            _processModelBuilder,
+            _bpmnProcessDto));
             
         Assert.Contains($"[GetAllFiles] Not found files in diagram {_tempDirectory}:*.bpmn.", exception.Message);
     }
@@ -236,7 +242,8 @@ public class BpmnClientBuilderTests : IDisposable
             _descriptionWriteService,
             _serializerProcessSection,
             _serializerDiagramSection,
-            _processModelBuilder);
+            _processModelBuilder,
+            _bpmnProcessDto);
 
         
         // Assert
@@ -287,7 +294,8 @@ public class BpmnClientBuilderTests : IDisposable
             _descriptionWriteService,
             _serializerProcessSection,
             _serializerDiagramSection,
-            _processModelBuilder);
+            _processModelBuilder,
+            _bpmnProcessDto);
 
         // Assert
         Assert.NotNull(result);

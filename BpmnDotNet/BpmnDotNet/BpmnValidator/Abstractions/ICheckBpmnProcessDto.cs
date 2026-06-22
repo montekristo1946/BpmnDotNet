@@ -2,7 +2,7 @@ using BpmnDotNet.Dto;
 
 namespace BpmnDotNet.BpmnValidator.Abstractions;
 
-using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 
 /// <summary>
 /// Проверка Bpmn в объектном виде.
@@ -12,6 +12,6 @@ internal interface ICheckBpmnProcessDto
     /// <summary>
     /// Запустить проверку.
     /// </summary>
-    /// <param name="bpmnProcess">BpmnProcessDto.</param>
+    /// <param name="bpmnProcess"><see cref="BpmnProcessDto"/>.</param>
     public void Check(BpmnProcessDto bpmnProcess);
 }
