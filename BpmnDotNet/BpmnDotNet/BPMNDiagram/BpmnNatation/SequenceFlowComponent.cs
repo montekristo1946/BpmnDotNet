@@ -17,11 +17,6 @@ public class SequenceFlowComponent(string id, string sourceId, string targetId)
     public string IdElement { get; } = id;
 
     /// <summary>
-    /// Gets elementType.
-    /// </summary>
-    public ElementType ElementType { get; } = ElementType.SequenceFlow;
-
-    /// <summary>
     /// Gets входные Flow.
     /// </summary>
     public string SourceId { get; } = sourceId;

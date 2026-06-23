@@ -1,9 +1,7 @@
-using BpmnDotNet.BPMNDiagram.BpmnNatation;
-
 namespace BpmnDotNet.BpmnValidator;
 
 using BpmnDotNet.Abstractions.Elements;
-using BpmnDotNet.BpmnEngineDomain.Activity;
+using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnValidator.Abstractions;
 using BpmnDotNet.Dto;
 
@@ -16,6 +14,53 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         var elementsFromBody = bpmnProcess.ElementsFromBody;
         var idBpmn = bpmnProcess.IdBpmnProcess;
         HasStartAndEndEvents(elementsFromBody, idBpmn);
+        HasOneTarget(elementsFromBody, idBpmn);
+    }
+
+
+    /// <summary>
+    /// Элементы с одним выходом.
+    /// </summary>
+    /// <param name="elements"><see cref="IElement"/>.</param>
+    /// <param name="idBpmn">id bpmn.</param>
+    /// <exception cref="NotImplementedException"><see cref="NotImplementedException"/>.</exception>
+    internal void HasOneTarget(IElement[] elements, string idBpmn)
+    {
+        var flows = elements.OfType<SequenceFlowComponent>().ToArray();
+        foreach (var element in elements)
+        {
+            var result = element switch
+            {
+                StartEventComponent startEvent => CheckTargetPathOneWay(startEvent.IdElement, flows),
+                EndEventComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
+                ReceiveTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
+                SendTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
+                ServiceTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
+                SubProcessComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
+
+                ParallelGatewayComponent => true,
+                ExclusiveGatewayComponent => true,
+                SequenceFlowComponent => true,
+
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(elements),
+                    $"[CheckBpmnProcessDto:HasOneTarget] Unsupported element type: {element.GetType().Name}"),
+            };
+            if (!result)
+            {
+                throw new InvalidDataException(
+                    $"[CheckBpmnProcessDto:HasOneTarget] {idBpmn} Outgoing elements must have exactly one target element. {element.IdElement}");
+            }
+        }
+    }
+
+    private bool CheckTargetPathOneWay(string id, SequenceFlowComponent[] flows)
+    {
+        var countSource = flows.Count(p => p.SourceId == id);
+
+        const int countValide = 1;
+
+        return countSource == countValide;
     }
 
     /// <summary>

@@ -12,9 +12,4 @@ public class SendTaskComponent(string id) : IElement
     /// Gets iD.
     /// </summary>
     public string IdElement { get; } = id;
-
-    /// <summary>
-    /// Gets elementType.
-    /// </summary>
-    public ElementType ElementType { get; } = ElementType.SendTask;
 }

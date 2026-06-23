@@ -12,9 +12,4 @@ internal class EndEventComponent(string id) : IElement
     /// Gets id.
     /// </summary>
     public string IdElement { get; } = id;
-
-    /// <summary>
-    /// Gets elementType.
-    /// </summary>
-    public ElementType ElementType { get; } = ElementType.EndEvent;
 }

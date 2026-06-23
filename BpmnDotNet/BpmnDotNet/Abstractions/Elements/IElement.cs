@@ -11,9 +11,4 @@ public interface IElement
     ///     Gets id.
     /// </summary>
     string IdElement { get; }
-
-    /// <summary>
-    ///     Gets тип Элемента.
-    /// </summary>
-    ElementType ElementType { get; }
 }
