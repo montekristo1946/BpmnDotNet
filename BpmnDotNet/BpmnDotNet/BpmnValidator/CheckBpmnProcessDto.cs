@@ -32,7 +32,6 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
             var result = element switch
             {
                 StartEventComponent startEvent => CheckTargetPathOneWay(startEvent.IdElement, flows),
-                EndEventComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
                 ReceiveTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
                 SendTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
                 ServiceTaskComponent endEvent => CheckTargetPathOneWay(endEvent.IdElement, flows),
@@ -41,6 +40,7 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
                 ParallelGatewayComponent => true,
                 ExclusiveGatewayComponent => true,
                 SequenceFlowComponent => true,
+                EndEventComponent => true,
 
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(elements),
