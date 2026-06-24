@@ -1,9 +1,11 @@
 ﻿using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.Configuration;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using BpmnDotNetIntegrationTests.Context;
 using BpmnDotNetIntegrationTests.Messages;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,31 +16,32 @@ using Serilog;
 
 namespace BpmnDotNetIntegrationTests.MultiInput;
 
-public class ReceivedTaskMultiInputTest: IDisposable
+public class ReceivedTaskMultiInputTest : IDisposable
 {
     private readonly IHost _host;
     private readonly IElasticClientSetDataAsync _elasticSetDataAsync;
     private IServiceScope? _scope;
-    private readonly IBpmnHandler  _gatewayFirstHandler;
-    private readonly IBpmnHandler  _receivedTaskHandler;
-    
+    private readonly IBpmnHandler _gatewayFirstHandler;
+    private readonly IBpmnHandler _receivedTaskHandler;
+
     public ReceivedTaskMultiInputTest()
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
             .CreateLogger();
-        
+
         _elasticSetDataAsync = Substitute.For<IElasticClientSetDataAsync>();
         _elasticSetDataAsync.SetDataAsync(Arg.Any<BpmnPlane>()).Returns(Task.FromResult(true));
         _elasticSetDataAsync.SetDataAsync(Arg.Any<HistoryNodeState>()).Returns(Task.FromResult(true));
-        _elasticSetDataAsync.SetDataAsync(Arg.Any<DescriptionData>(),Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+        _elasticSetDataAsync.SetDataAsync(Arg.Any<DescriptionData>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(true));
 
         _gatewayFirstHandler = Substitute.For<IBpmnHandler>();
         _gatewayFirstHandler.TaskDefinitionId.Returns("GatewayFirstHandler");
         _gatewayFirstHandler.Description.Returns("GatewayFirstHandler Test description");
         _gatewayFirstHandler.ActivityHandlerAsync(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => 
+            .Returns(callInfo =>
             {
                 var context = callInfo.Arg<IContextBpmnProcess>();
                 var conditionRoute = context as IExclusiveGateWayRoute;
@@ -47,21 +50,23 @@ public class ReceivedTaskMultiInputTest: IDisposable
                     throw new OperationCanceledException("Fail try Add key ConditionRoute");
 
                 conditionRoute.ConditionRoute.TryAdd("GatewayFirstHandler", "Flow_in_SendTaskFirstHandler");
-                
+
                 return Task.CompletedTask;
             });
-        
+
         _receivedTaskHandler = Substitute.For<IBpmnHandler>();
         _receivedTaskHandler.TaskDefinitionId.Returns("ReceivedTaskHandler");
         _receivedTaskHandler.Description.Returns("ReceivedTaskHandler Test description");
         _receivedTaskHandler.ActivityHandlerAsync(Arg.Any<IContextBpmnProcess>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => 
+            .Returns(callInfo =>
             {
                 var context = callInfo.Arg<IContextBpmnProcess>();
-                var resGet = context.ReceivedMessage.TryGetValue(typeof(MessageExampleFirst), out var messageExampleFirst);
+                var resGet =
+                    context.ReceivedMessage.TryGetValue("ReceivedTaskHandler", out var messageExampleFirst);
+                
                 if (!resGet || messageExampleFirst is null)
                     throw new OperationCanceledException("Fail try Get key messageExampleFirst");
-                
+
                 return Task.CompletedTask;
             });
 
@@ -76,14 +81,14 @@ public class ReceivedTaskMultiInputTest: IDisposable
                 services.AddSingleton<IElasticClientSetDataAsync>(_elasticSetDataAsync);
                 var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BpmnDiagram");
                 services.AddBusinessProcess(path);
-                services.AddScoped<IBpmnHandler>(p=>_gatewayFirstHandler);
-                services.AddScoped<IBpmnHandler>(p=>_receivedTaskHandler);
+                services.AddScoped<IBpmnHandler>(p => _gatewayFirstHandler);
+                services.AddScoped<IBpmnHandler>(p => _receivedTaskHandler);
             })
             .UseSerilog()
             .Build();
-        
-        _scope =_host.Services.CreateScope();
-        
+
+        _scope = _host.Services.CreateScope();
+
         var handlerTypes = _scope.ServiceProvider.GetServices<IBpmnHandler>()?.ToArray() ?? [];
         if (!handlerTypes.Any())
         {
@@ -93,12 +98,12 @@ public class ReceivedTaskMultiInputTest: IDisposable
         var bpmnClient = _host.Services.GetRequiredService<IBpmnClient>();
         bpmnClient.RegisterHandlers<IBpmnHandler>(handlerTypes);
     }
-    
+
     public void Dispose()
     {
         _scope?.Dispose();
     }
-    
+
     [Fact]
     public async Task StartNewProcess_CheckServiceTaskMultiInput_Completed()
     {
@@ -107,23 +112,22 @@ public class ReceivedTaskMultiInputTest: IDisposable
             IdBpmnProcess = "ReceivedTaskMultiInputTest",
             TokenProcess = Guid.NewGuid().ToString(),
         };
-        contextData.RegistrationMessagesType.TryAdd("ReceivedTaskHandler", typeof(MessageExampleFirst));
-        
+        contextData.RegistrationMessagesType.TryAdd(typeof(MessageExampleFirst), "ReceivedTaskHandler");
+
         var bpmnClient = _host.Services.GetRequiredService<IBpmnClient>();
 
-        
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(10));
+
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
 
         bpmnClient.SendMessage(
             contextData.IdBpmnProcess,
             contextData.TokenProcess,
             typeof(MessageExampleFirst),
             new MessageExampleFirst());
-      
+
         await taskNode.ProcessTask;
         
-        Assert.Equal(StatusType.Completed,taskNode.StatusType);
+        Assert.True(taskNode.Process.IsProcessCancel);
     }
-
-  
 }

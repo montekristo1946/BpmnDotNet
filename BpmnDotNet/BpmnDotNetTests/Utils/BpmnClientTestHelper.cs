@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.Handlers;
 
@@ -17,13 +19,12 @@ internal static class BpmnClientTestHelper
                ?? throw new InvalidOperationException("Cannot get BpmnProcesses field");
     }
     
-    internal static void AddProcessToStore(string idBpmnProcess, string tokenProcess, IBusinessProcess? process, BpmnClient bpmnClient)
+    internal static void AddProcessToStore(string idBpmnProcess, string tokenProcess, IBpmnEngine? process, BpmnClient bpmnClient)
     {
         var processes = GetBpmnProcessesDictionary(bpmnClient);
         
         var jobStatus = new BusinessProcessJobStatus
         {
-            StatusType = StatusType.Works,
             IdBpmnProcess = idBpmnProcess,
             TokenProcess = tokenProcess,
             Process = process!

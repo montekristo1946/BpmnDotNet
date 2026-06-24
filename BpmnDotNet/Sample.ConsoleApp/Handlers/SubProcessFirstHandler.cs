@@ -1,6 +1,7 @@
 using System.Globalization;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.ClientDomain.Abstractions;
 using Microsoft.Extensions.Logging;
 using Sample.ConsoleApp.Context;
 
@@ -26,9 +27,9 @@ internal class SubProcessFirstHandler : IBpmnHandler
     {
         _logger.LogDebug("[SubProcessFirstHandler:AsyncJobHandler] SubProcessFirstHandler run ");
 
-        var timeout = TimeSpan.FromMinutes(10);
+
         var contextSubProcess = CreateContextSubProcess();
-        var taskNode = _bpmnClient.StartNewProcess(contextSubProcess, timeout);
+        var taskNode = await _bpmnClient.StartNewProcessAsync(contextSubProcess, ctsToken);
         
         await taskNode.ProcessTask;
 

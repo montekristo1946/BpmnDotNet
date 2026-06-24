@@ -1,3 +1,6 @@
+using BpmnDotNet.HistoryDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
+
 namespace BpmnDotNet.Handlers;
 
 using System.Collections.Concurrent;
@@ -7,7 +10,7 @@ using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using Microsoft.Extensions.Logging;
-
+/*
 /// <inheritdoc cref="IBusinessProcess" />
 internal class BusinessProcess : IBusinessProcess
 {
@@ -164,7 +167,9 @@ internal class BusinessProcess : IBusinessProcess
     /// <param name="ctsToken">ctsToken.</param>
     /// <returns><see cref="Task"/> representing the asynchronous operation.</returns>
     private async Task ThreadBackground(CancellationToken ctsToken)
-    {
+    { 
+        throw  new NotImplementedException();
+        /*
         _logger.LogDebug(
             "[ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
             _contextBpmnProcess.IdBpmnProcess,
@@ -229,7 +234,8 @@ internal class BusinessProcess : IBusinessProcess
     /// </summary>
     private void CheckMessagesStore()
     {
-        foreach (var nodeState in _nodeStateRegistry)
+        throw new NotImplementedException();
+       /* foreach (var nodeState in _nodeStateRegistry)
         {
             if (nodeState.Value.StatusType != StatusType.WaitingReceivedMessage)
             {
@@ -253,7 +259,8 @@ internal class BusinessProcess : IBusinessProcess
 
     private bool AddMessageInContext(IContextBpmnProcess context, Type typeMessage, object? message)
     {
-        if (message is null)
+        throw new NotImplementedException();
+      /*  if (message is null)
         {
             _logger.LogWarning(
                 "[AddMessageInContext] received null message, IdBpmnProcess:{IdBpmnProcess}, TokenProcess:{TokenProcess}",
@@ -285,7 +292,8 @@ internal class BusinessProcess : IBusinessProcess
 
     private Type GetTypeNameMessage(IContextBpmnProcess context, string nodeIdElement)
     {
-        var messageReceiveTask = context as IMessageReceiveTask;
+        throw new NotImplementedException();
+       /* var messageReceiveTask = context as IMessageReceiveTask;
 
         var dic = messageReceiveTask?.RegistrationMessagesType;
 
@@ -318,27 +326,28 @@ internal class BusinessProcess : IBusinessProcess
     /// </summary>
     private void UpdateParallelGatewayState()
     {
-        foreach (var nodeState in _nodeStateRegistry)
-        {
-            if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
-            {
-                continue;
-            }
-
-            var currentNode = GetIElement(nodeState.Key);
-            var incomingPath = GetIncomingPath(currentNode);
-
-            var checkCalls = incomingPath.All(p =>
-            {
-                var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
-                return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
-            });
-
-            if (checkCalls)
-            {
-                NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
-            }
-        }
+        throw new NotImplementedException();
+        // foreach (var nodeState in _nodeStateRegistry)
+        // {
+        //     if (nodeState.Value.StatusType != StatusType.WaitingCompletedWays)
+        //     {
+        //         continue;
+        //     }
+        //
+        //     var currentNode = GetIElement(nodeState.Key);
+        //     var incomingPath = GetIncomingPath(currentNode);
+        //
+        //     var checkCalls = incomingPath.All(p =>
+        //     {
+        //         var resGet = _nodeStateRegistry.TryGetValue(p, out var nodeJobStatus);
+        //         return resGet && nodeJobStatus is not null && nodeJobStatus.StatusType == StatusType.Completed;
+        //     });
+        //
+        //     if (checkCalls)
+        //     {
+        //         NodeRegistryChangeState(nodeState.Key, StatusType.Pending);
+        //     }
+        // }
     }
 
     private void AddStartEvent()
@@ -360,7 +369,8 @@ internal class BusinessProcess : IBusinessProcess
     /// <param name="ctsToken">CancellationToken.</param>
     private async Task ExecutionNodesAsync(string nodeId, CancellationToken ctsToken)
     {
-        var isForcedTermination = false;
+        throw  new NotImplementedException();
+       /* var isForcedTermination = false;
         try
         {
             var handler = GetHandler(nodeId);
@@ -411,21 +421,22 @@ internal class BusinessProcess : IBusinessProcess
 
     private void NodeRegistryChangeState(string nodeId, StatusType staus)
     {
-        var stateNew = new NodeJobStatus
-        {
-            StatusType = staus,
-            IdNode = nodeId,
-        };
-
-        _nodeStateRegistry.AddOrUpdate(
-            nodeId,
-            _ => stateNew,
-            (keyOld, oldMessage) =>
-                new NodeJobStatus
-                {
-                    StatusType = staus,
-                    IdNode = keyOld,
-                });
+        throw new NotImplementedException();
+        // var stateNew = new NodeJobStatus
+        // {
+        //     StatusType = staus,
+        //     IdNode = nodeId,
+        // };
+        //
+        // _nodeStateRegistry.AddOrUpdate(
+        //     nodeId,
+        //     _ => stateNew,
+        //     (keyOld, oldMessage) =>
+        //         new NodeJobStatus
+        //         {
+        //             StatusType = staus,
+        //             IdNode = keyOld,
+        //         });
     }
 
     private IElement GetIElement(string nodeId)
@@ -506,42 +517,44 @@ internal class BusinessProcess : IBusinessProcess
 
     private string[] GetOutgoingPath(IElement currentNode)
     {
-        if (currentNode is IOutgoingPath outgoingPath)
-        {
-            return outgoingPath.Outgoing;
-        }
+        // if (currentNode is IOutgoingPath outgoingPath)
+        // {
+        //     return outgoingPath.Outgoing;
+        // }
 
+        throw new NotImplementedException();
         return [];
     }
 
     private string[] GetIncomingPath(IElement currentNode)
     {
-        if (currentNode is IIncomingPath incomingPath)
-        {
-            return incomingPath.Incoming;
-        }
-
+        // if (currentNode is IIncomingPath incomingPath)
+        // {
+        //     return incomingPath.Incoming;
+        // }
+        throw new NotImplementedException();
         return [];
     }
 
     private IElement[] EliminateDuplicates(IElement[] nodes)
     {
-        var result = new List<IElement>();
-        foreach (var node in nodes)
-        {
-            var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
-
-            // случай когда параллельный шлюз уже запущен
-            if (resGet && nodeJobStatus is not null &&
-                nodeJobStatus.StatusType == StatusType.Works)
-            {
-                continue;
-            }
-
-            result.Add(node);
-        }
-
-        return result.ToArray();
+        throw new NotImplementedException();
+        // var result = new List<IElement>();
+        // foreach (var node in nodes)
+        // {
+        //     var resGet = _nodeStateRegistry.TryGetValue(node.IdElement, out var nodeJobStatus);
+        //
+        //     // случай когда параллельный шлюз уже запущен
+        //     if (resGet && nodeJobStatus is not null &&
+        //         nodeJobStatus.StatusType == StatusType.Works)
+        //     {
+        //         continue;
+        //     }
+        //
+        //     result.Add(node);
+        // }
+        //
+        // return result.ToArray();
     }
 
     private Func<IContextBpmnProcess, CancellationToken, Task> GetHandler(string nodeIdElement)
@@ -561,4 +574,4 @@ internal class BusinessProcess : IBusinessProcess
         _logger.LogDebug("[MoqHandler] Calling handler");
         return Task.CompletedTask;
     }
-}
+}*/

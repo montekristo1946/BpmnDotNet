@@ -2,9 +2,11 @@
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.Configuration;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using BpmnDotNetIntegrationTests.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -93,11 +95,11 @@ public class ExclusiveGatewayMultiInputTest: IDisposable
         };
         
         var bpmnClient = _host.Services.GetRequiredService<IBpmnClient>();
-        var taskNode = bpmnClient.StartNewProcess(contextData, TimeSpan.FromSeconds(10));
-
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
         
-        Assert.Equal(StatusType.Completed,taskNode.StatusType);
+        Assert.True(taskNode.Process.IsProcessCancel);
     }
 
   

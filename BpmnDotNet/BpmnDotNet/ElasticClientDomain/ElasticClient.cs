@@ -1,4 +1,6 @@
-﻿namespace BpmnDotNet.ElasticClientDomain;
+﻿using BpmnDotNet.HistoryDomain.Dto;
+
+namespace BpmnDotNet.ElasticClientDomain;
 
 using System.Text.Json;
 using BpmnDotNet.BPMNDiagram;

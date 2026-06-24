@@ -4,6 +4,7 @@ using BpmnDotNet.Arm.Core.UiDomain.Abstractions;
 using BpmnDotNet.Arm.Core.UiDomain.Dto;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />

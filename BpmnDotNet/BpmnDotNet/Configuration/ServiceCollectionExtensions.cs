@@ -1,3 +1,10 @@
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Handlers;
+using BpmnDotNet.BpmnValidator;
+using BpmnDotNet.BpmnValidator.Abstractions;
+using BpmnDotNet.ClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Abstractions;
+
 namespace BpmnDotNet.Configuration;
 
 using System.Diagnostics.CodeAnalysis;
@@ -28,35 +35,33 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IHistoryNodeStateWriter, HistoryNodeStateWriter>();
         services.AddSingleton<IDescriptionWriteService, DescriptionWriteService>();
-        services.AddSingleton<IPathFinder>(options =>
-        {
-            var loggerFactory = options.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger<PathFinder>();
-
-            return new PathFinder(logger);
-        });
         services.AddSingleton<IXmlSerializationProcessSection, XmlSerializationProcessSection>();
         services.AddSingleton<IXmlSerializationBpmnDiagramSection, XmlSerializationBpmnDiagramSection>();
+        services.AddSingleton<IProcessModelBuilder, ProcessModelBuilder>();
+        services.AddSingleton<ICheckBpmnProcessDto, CheckBpmnProcessDto>();
 
         services.AddSingleton<IBpmnClient>(options =>
         {
             var loggerFactory = options.GetRequiredService<ILoggerFactory>();
-            var pathFinder = options.GetRequiredService<IPathFinder>();
             var elasticClient = options.GetRequiredService<IElasticClientSetDataAsync>();
             var historyNodeStateWriter = options.GetRequiredService<IHistoryNodeStateWriter>();
             var descriptionWriteService = options.GetRequiredService<IDescriptionWriteService>();
             var serializerProcessSection = options.GetRequiredService<IXmlSerializationProcessSection>();
             var serializerDiagramSection = options.GetRequiredService<IXmlSerializationBpmnDiagramSection>();
 
+            var processModelBuilder = options.GetRequiredService<IProcessModelBuilder>();
+            var checkBpmnProcessDto = options.GetRequiredService<ICheckBpmnProcessDto>();
+
             return BpmnClientBuilder.Build(
                 pathDiagram,
                 loggerFactory,
-                pathFinder,
                 elasticClient,
                 historyNodeStateWriter,
                 descriptionWriteService,
                 serializerProcessSection,
-                serializerDiagramSection);
+                serializerDiagramSection,
+                processModelBuilder,
+                checkBpmnProcessDto);
         });
 
         return services;
@@ -89,7 +94,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Коллекция сервисов.</param>
     /// <param name="handlerType">Type handler.</param>
     /// <returns>IServiceCollection.</returns>
-    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(this IServiceCollection services, Type handlerType)
+    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(this IServiceCollection services,
+        Type handlerType)
     {
         if (services == null)
         {

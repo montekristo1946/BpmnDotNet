@@ -8,7 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoFixture" Version="$(AutoFixtureVersion)"/>
+        <PackageReference Include="AutoFixture" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.AutoNSubstitute" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.Xunit2" Version="5.0.0-preview0012" />
         <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorVesion)"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)"/>
         <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)"/>
@@ -68,6 +70,15 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="BpmnDiagram\diagram_2.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\diagram_3.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\NotEnd_9.bpmn">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BpmnDiagram\CheckError\NotStart_10.bpmn">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

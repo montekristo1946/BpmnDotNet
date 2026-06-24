@@ -12,8 +12,8 @@ internal class ContextData : IContextBpmnProcess
 
     public ConcurrentDictionary<string, string> ConditionRoute { get; init; } = new();
 
-    public ConcurrentDictionary<string, Type> RegistrationMessagesType { get; init; } = new();
+    public ConcurrentDictionary<Type,string> RegistrationMessagesType { get; init; } = new();
 
-    public ConcurrentDictionary<Type, object> ReceivedMessage { get; init; } = new();
+    public ConcurrentDictionary<string, object> ReceivedMessage { get; init; } = new();
     
 }

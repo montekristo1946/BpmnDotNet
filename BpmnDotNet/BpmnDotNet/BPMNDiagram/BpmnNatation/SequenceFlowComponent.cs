@@ -6,9 +6,9 @@ using BpmnDotNet.Abstractions.Elements;
 /// Node в объектовом виде, SequenceFlow.
 /// </summary>
 /// <param name="id">ID.</param>
-/// <param name="incoming">Входные Flow.</param>
-/// <param name="outgoing">Выходные Flow.</param>
-public class SequenceFlowComponent(string id, string[] incoming, string[] outgoing)
+/// <param name="sourceId">Входные Flow.</param>
+/// <param name="targetId">Выходные Flow.</param>
+public class SequenceFlowComponent(string id, string sourceId, string targetId)
     : IElement, IIncomingPath, IOutgoingPath
 {
     /// <summary>
@@ -17,17 +17,12 @@ public class SequenceFlowComponent(string id, string[] incoming, string[] outgoi
     public string IdElement { get; } = id;
 
     /// <summary>
-    /// Gets elementType.
-    /// </summary>
-    public ElementType ElementType { get; } = ElementType.SequenceFlow;
-
-    /// <summary>
     /// Gets входные Flow.
     /// </summary>
-    public string[] Incoming { get; } = incoming;
+    public string SourceId { get; } = sourceId;
 
     /// <summary>
     /// Gets выходные Flow.
     /// </summary>
-    public string[] Outgoing { get; } = outgoing;
+    public string TargetId { get; } = targetId;
 }
