@@ -110,7 +110,7 @@ public class CheckBpmnProcessDtoTest
         var exception = Assert.Throws<InvalidDataException>(() =>
             _checkBpmnProcessDto.HasOneStartEven(diagram.ElementsFromBody, idProcess));
 
-        Assert.Equal("There should be only one StartEvent on the diagram, find: 2", exception.Message);
+        Assert.Equal("There should be only one StartEvent on the diagram, find: 2: Process_0mjkbbx", exception.Message);
     }
     
     [Fact]
