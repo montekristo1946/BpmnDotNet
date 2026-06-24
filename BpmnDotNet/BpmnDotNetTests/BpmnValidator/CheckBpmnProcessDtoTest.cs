@@ -1,6 +1,10 @@
+using AutoFixture.Xunit2;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BpmnValidator;
+using BpmnDotNet.Dto;
 using BpmnDotNet.Handlers;
+using BpmnDotNetTests.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace BpmnDotNetTests.BpmnValidator;
 
@@ -56,5 +60,70 @@ public class CheckBpmnProcessDtoTest
         Assert.Equal(
             "[CheckBpmnProcessDto:HasOneTarget] Process_0mjkbbx Outgoing elements must have exactly one target element. StartEvent_1",
             exception.Message);
+    }
+
+    [Fact]
+    internal void HasOneSource_CheckServiceTask_Exception()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/SendTask_2.bpmn");
+
+        var idProcess = "Process_0mjkbbx";
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _checkBpmnProcessDto.HasOneTarget(diagram.ElementsFromBody, idProcess));
+
+        Assert.Equal(
+            "[CheckBpmnProcessDto:HasOneTarget] Process_0mjkbbx Outgoing elements must have exactly one target element. ServiceTask_demo",
+            exception.Message);
+    }
+
+    [Fact]
+    internal void Check_CheckManyInputFlowReceiveTask_NotException()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/ReceiveTask_3.bpmn");
+
+        var exception = Record.Exception(() => _checkBpmnProcessDto.Check(diagram));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    internal void Check_CheckManyInputFlowSubProcess_NotException()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/SubProcess_4.bpmn");
+
+        var exception = Record.Exception(() => _checkBpmnProcessDto.Check(diagram));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    internal void HasOneStartEven_CheckManyStart_Exception()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection(
+                "./BpmnDiagram/CheckError/CheckBeginningAndEnd_5.bpmn");
+
+        var idProcess = "Process_0mjkbbx";
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _checkBpmnProcessDto.HasOneStartEven(diagram.ElementsFromBody, idProcess));
+
+        Assert.Equal("There should be only one StartEvent on the diagram, find: 2", exception.Message);
+    }
+    
+    [Fact]
+    internal void Check_CheckManyStart_Exception()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection(
+                "./BpmnDiagram/CheckError/ExclusiveGateway_6.bpmn");
+
+        var idProcess = "Process_0mjkbbx";
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _checkBpmnProcessDto.HasNotOneTargetExclusiveGateway(diagram.ElementsFromBody, idProcess));
+
+        Assert.Equal("ExclusiveGateway cannot have less than two outputs, find: 1:Gateway_0odwt7n: Process_0mjkbbx", exception.Message);
     }
 }

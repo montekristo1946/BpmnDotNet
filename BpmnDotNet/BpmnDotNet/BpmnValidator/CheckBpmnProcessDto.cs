@@ -15,6 +15,9 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         var idBpmn = bpmnProcess.IdBpmnProcess;
         HasStartAndEndEvents(elementsFromBody, idBpmn);
         HasOneTarget(elementsFromBody, idBpmn);
+        HasStartAndEndEvents(elementsFromBody, idBpmn);
+        HasOneStartEven(elementsFromBody, idBpmn);
+        HasNotOneTargetExclusiveGateway(elementsFromBody, idBpmn);
     }
 
 
@@ -81,6 +84,44 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         if (endEvent == null)
         {
             throw new InvalidDataException($"Not EndEvent element found {typeof(EndEventComponent)}: {idBpmn}");
+        }
+    }
+
+    /// <summary>
+    /// На схеме должен быть один startEvent.
+    /// </summary>
+    /// <param name="elements"><see cref="IElement"/>.</param>
+    /// <param name="idBpmn">id bpmn.</param>
+    /// <exception cref="NotImplementedException"><see cref="NotImplementedException"/>.</exception>
+    internal void HasOneStartEven(IElement[] elements, string idBpmn)
+    {
+        const int countValide = 1;
+        var count = elements.OfType<StartEventComponent>().Count();
+        if (count != countValide)
+        {
+            throw new InvalidDataException($"There should be only one StartEvent on the diagram, find: {count}: {idBpmn}");
+        }
+    }
+
+    /// <summary>
+    /// ExclusiveGateway не может быть один выход.
+    /// </summary>
+    /// <param name="elements"><see cref="IElement"/>.</param>
+    /// <param name="idBpmn">id bpmn.</param>
+    /// <exception cref="NotImplementedException"><see cref="NotImplementedException"/>.</exception>
+    internal void HasNotOneTargetExclusiveGateway(IElement[] elements, string idBpmn)
+    {
+        const int countValide = 2;
+        var gateways = elements.OfType<ExclusiveGatewayComponent>().ToArray();
+        var flows = elements.OfType<SequenceFlowComponent>().ToArray();
+        foreach (var getaway in gateways)
+        {
+            var countSource = flows.Count(p => p.SourceId == getaway.IdElement);
+            if (countSource < countValide)
+            {
+                throw new InvalidDataException(
+                    $"ExclusiveGateway cannot have less than two outputs, find: {countSource}:{getaway.IdElement}: {idBpmn}");
+            }
         }
     }
 }
