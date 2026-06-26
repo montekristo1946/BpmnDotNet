@@ -126,4 +126,48 @@ public class CheckBpmnProcessDtoTest
 
         Assert.Equal("ExclusiveGateway cannot have less than two outputs, find: 1:Gateway_0odwt7n: Process_0mjkbbx", exception.Message);
     }
+    
+    [Fact]
+    internal void Check_CheckOneWayParallelGateway_NotException()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/ParallelGateway_7.bpmn");
+
+        var exception = Record.Exception(() => _checkBpmnProcessDto.Check(diagram));
+
+        Assert.Null(exception);
+    }
+    
+    [Fact]
+    internal void Check_CheckFailId_Exception()
+    {
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/FailId_8.bpmn"));
+
+        Assert.Equal("Not Find ID from:bpmn:process", exception.Message);
+    }
+    
+    [Fact]
+    internal void Check_CheckNotEnd_NotException()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/NotEnd_9.bpmn");
+        
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _checkBpmnProcessDto.Check(diagram));
+
+        Assert.Equal("Not EndEvent element found BpmnDotNet.BPMNDiagram.BpmnNatation.EndEventComponent: Process_1frdact", exception.Message);
+    }
+    
+    [Fact]
+    internal void Check_CheckNotStartEven_NotException()
+    {
+        var diagram =
+            _xmlSerializationProcessSection.LoadXmlProcessSection("./BpmnDiagram/CheckError/NotStart_10.bpmn");
+        
+        var exception = Assert.Throws<InvalidDataException>(() =>
+            _checkBpmnProcessDto.Check(diagram));
+
+        Assert.Equal("Not StartEvent element found BpmnDotNet.BPMNDiagram.BpmnNatation.StartEventComponent: Process_0mjkbbx", exception.Message);
+    }
 }
