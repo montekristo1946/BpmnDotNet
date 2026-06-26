@@ -1,11 +1,10 @@
-﻿using BpmnDotNet.HistoryDomain.Dto;
-
-namespace BpmnDotNet.ElasticClientDomain;
+﻿namespace BpmnDotNet.ElasticClientDomain;
 
 using System.Text.Json;
 using BpmnDotNet.BPMNDiagram;
 using BpmnDotNet.Dto;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
+using BpmnDotNet.HistoryDomain.Dto;
 using BpmnDotNet.Utils;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Serialization;

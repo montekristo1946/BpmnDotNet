@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Dto;
 
@@ -11,9 +10,14 @@ using BpmnDotNet.BpmnEngineDomain.Dto;
 internal interface IBpmnNode
 {
     /// <summary>
-    /// Уникальный идентификатор.
+    /// Gets уникальный идентификатор.
     /// </summary>
     public string Id { get; init; }
+
+    /// <summary>
+    /// Gets метод вызова реализации пользователя.
+    /// </summary>
+    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; }
 
     /// <summary>
     /// Метод вызова блока для engine.
@@ -30,9 +34,4 @@ internal interface IBpmnNode
         ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
         ConcurrentDictionary<string, string> errorRegistry,
         CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Gets метод вызова реализации пользователя.
-    /// </summary>
-    public Func<IContextBpmnProcess, CancellationToken, Task> ActivityHandlerAsync { get; init; }
 }

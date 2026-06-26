@@ -20,7 +20,6 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         HasNotOneTargetExclusiveGateway(elementsFromBody, idBpmn);
     }
 
-
     /// <summary>
     /// Элементы с одним выходом.
     /// </summary>
@@ -55,15 +54,6 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
                     $"[CheckBpmnProcessDto:HasOneTarget] {idBpmn} Outgoing elements must have exactly one target element. {element.IdElement}");
             }
         }
-    }
-
-    private bool CheckTargetPathOneWay(string id, SequenceFlowComponent[] flows)
-    {
-        var countSource = flows.Count(p => p.SourceId == id);
-
-        const int countValide = 1;
-
-        return countSource == countValide;
     }
 
     /// <summary>
@@ -123,5 +113,14 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
                     $"ExclusiveGateway cannot have less than two outputs, find: {countSource}:{getaway.IdElement}: {idBpmn}");
             }
         }
+    }
+
+    private bool CheckTargetPathOneWay(string id, SequenceFlowComponent[] flows)
+    {
+        var countSource = flows.Count(p => p.SourceId == id);
+
+        const int countValide = 1;
+
+        return countSource == countValide;
     }
 }

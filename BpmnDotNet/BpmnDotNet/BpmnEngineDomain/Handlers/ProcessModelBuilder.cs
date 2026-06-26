@@ -17,7 +17,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<ProcessModelBuilder> _logger;
 
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessModelBuilder"/> class.
     /// </summary>
@@ -82,33 +81,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
         return processModel;
     }
 
-    // TODO: Протестить что будет если TDestination не будет соответствовать интерфейсу, возможно завернуть в try cath.
-    private void CreateGenericActivity<TSource,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDestination>(
-        TSource source,
-        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        ProcessModel processModel)
-        where TSource : IElement
-        where TDestination : IBpmnNode
-    {
-        var id = source.IdElement;
-
-        var res = handlers.TryGetValue(id, out var handler);
-
-        if (!res || handler is null)
-        {
-            _logger.LogDebug(
-                "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
-            handler = MoqHandler;
-        }
-
-        var logger = _loggerFactory.CreateLogger<TDestination>();
-
-        var bpmnNode = (IBpmnNode)Activator.CreateInstance(typeof(TDestination), logger, handler, id)!;
-
-        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
-    }
-
     /// <summary>
     ///  Группируем все потоки по SourceId и преобразуем в словарь массивов TargetId потоков.
     /// </summary>
@@ -139,6 +111,33 @@ internal class ProcessModelBuilder : IProcessModelBuilder
                 group => group.Select(flow => new DirectionFlow(flow.Id, flow.SourceId)).ToArray());
 
         return sourceIndex;
+    }
+
+    // TODO: Протестить что будет если TDestination не будет соответствовать интерфейсу, возможно завернуть в try cath.
+    private void CreateGenericActivity<TSource,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDestination>(
+        TSource source,
+        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
+        ProcessModel processModel)
+        where TSource : IElement
+        where TDestination : IBpmnNode
+    {
+        var id = source.IdElement;
+
+        var res = handlers.TryGetValue(id, out var handler);
+
+        if (!res || handler is null)
+        {
+            _logger.LogDebug(
+                "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
+            handler = MoqHandler;
+        }
+
+        var logger = _loggerFactory.CreateLogger<TDestination>();
+
+        var bpmnNode = (IBpmnNode)Activator.CreateInstance(typeof(TDestination), logger, handler, id)!;
+
+        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
     }
 
     private void CreateSequenceFlow(

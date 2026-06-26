@@ -1,17 +1,16 @@
-using BpmnDotNet.BpmnEngineDomain.Abstractions;
-using BpmnDotNet.BpmnEngineDomain.Handlers;
-using BpmnDotNet.BpmnValidator;
-using BpmnDotNet.BpmnValidator.Abstractions;
-using BpmnDotNet.ClientDomain.Abstractions;
-using BpmnDotNet.HistoryDomain.Abstractions;
-
 namespace BpmnDotNet.Configuration;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BpmnDotNet.Abstractions.Handlers;
+using BpmnDotNet.BpmnEngineDomain.Abstractions;
+using BpmnDotNet.BpmnEngineDomain.Handlers;
+using BpmnDotNet.BpmnValidator;
+using BpmnDotNet.BpmnValidator.Abstractions;
+using BpmnDotNet.ClientDomain.Abstractions;
 using BpmnDotNet.ElasticClientDomain.Abstractions;
 using BpmnDotNet.Handlers;
+using BpmnDotNet.HistoryDomain.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -94,7 +93,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Коллекция сервисов.</param>
     /// <param name="handlerType">Type handler.</param>
     /// <returns>IServiceCollection.</returns>
-    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(this IServiceCollection services,
+    public static IServiceCollection AutoRegisterBpmnHandlersFromAssemblyNamespaceOf(
+        this IServiceCollection services,
         Type handlerType)
     {
         if (services == null)

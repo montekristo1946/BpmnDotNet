@@ -22,7 +22,6 @@ internal class BpmnEngine : IBpmnEngine
     private int _disposed = 0;
     private int _isProcessCancel = 0;
 
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BpmnEngine"/> class.
     /// </summary>
@@ -41,7 +40,6 @@ internal class BpmnEngine : IBpmnEngine
         get => Interlocked.CompareExchange(ref _isProcessCancel, 0, 0) == 1;
         private set => Interlocked.Exchange(ref _isProcessCancel, value ? 1 : 0);
     }
-
 
     /// <inheritdoc/>
     public async Task<BusinessProcessJobStatus> StartProcessAsync(
@@ -69,7 +67,7 @@ internal class BpmnEngine : IBpmnEngine
         _timeInitInstanse = DateTime.Now.Ticks;
         var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         _threadBackground = Task.Run(
-            () => ThreadBackground(processModel, contextBpmnProcess, startSignal,_ctsBpmnEngine.Token),
+            () => ThreadBackground(processModel, contextBpmnProcess, startSignal, _ctsBpmnEngine.Token),
             _ctsBpmnEngine.Token);
 
         await startSignal.Task;
@@ -311,7 +309,6 @@ internal class BpmnEngine : IBpmnEngine
 
         return false;
     }
-
 
     /// <summary>
     /// Добавит в словарь сообщение.

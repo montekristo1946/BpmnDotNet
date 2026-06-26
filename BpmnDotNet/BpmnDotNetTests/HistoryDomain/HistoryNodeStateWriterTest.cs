@@ -277,7 +277,7 @@ public class HistoryNodeStateWriterTest
                 idBpmnProcess,
                 tokenProcess,
                 nodeStateRegistry,
-                null,
+                null!,
                 dateFromInitInstance));
     }
 
@@ -298,7 +298,7 @@ public class HistoryNodeStateWriterTest
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(
             () => sut.SetStateProcessAsync(
-                null,
+                null!,
                 tokenProcess,
                 nodeStateRegistry,
                 errorRegistry,
@@ -371,7 +371,7 @@ public class HistoryNodeStateWriterTest
         await Assert.ThrowsAsync<ArgumentNullException>(
             () => sut.SetStateProcessAsync(
                 idBpmnProcess,
-                null,
+                null!,
                 nodeStateRegistry,
                 errorRegistry,
                 dateFromInitInstance));

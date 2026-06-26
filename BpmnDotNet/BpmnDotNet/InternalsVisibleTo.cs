@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("BpmnDotNetTests")]
 [assembly: InternalsVisibleTo("BpmnDotNetIntegrationTests")]
 
-
 /// <summary>
 /// InternalsVisibleTo.
 /// </summary>

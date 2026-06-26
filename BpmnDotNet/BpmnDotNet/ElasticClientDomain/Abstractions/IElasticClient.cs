@@ -1,8 +1,7 @@
-using BpmnDotNet.HistoryDomain.Dto;
-
 namespace BpmnDotNet.ElasticClientDomain.Abstractions;
 
 using BpmnDotNet.Dto;
+using BpmnDotNet.HistoryDomain.Dto;
 
 /// <summary>
 ///     Клиент для записи в Elastic.

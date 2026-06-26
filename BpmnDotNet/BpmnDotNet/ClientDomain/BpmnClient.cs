@@ -275,7 +275,6 @@ internal class BpmnClient : IBpmnClient
         }
     }
 
-
     /// <summary>
     /// Запрос BpmnProcessDto с логированием.
     /// </summary>

@@ -1,6 +1,6 @@
-using BpmnDotNet.BpmnEngineDomain.Dto;
-
 namespace BpmnDotNet.HistoryDomain.Dto;
+
+using BpmnDotNet.BpmnEngineDomain.Dto;
 
 /// <summary>
 ///     Состояние узлов на Bpmn схеме.

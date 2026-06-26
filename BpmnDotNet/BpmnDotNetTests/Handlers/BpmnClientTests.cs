@@ -535,7 +535,7 @@ public class BpmnClientTests
             TimeSpan.FromSeconds(1));
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => bpmnClient.RegisterHandlers<IBpmnHandler>(null));
+        Assert.Throws<ArgumentNullException>(() => bpmnClient.RegisterHandlers<IBpmnHandler>(null!));
     }
     
     [Theory]

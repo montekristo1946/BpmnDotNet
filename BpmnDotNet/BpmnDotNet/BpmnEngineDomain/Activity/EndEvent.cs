@@ -1,11 +1,10 @@
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
+using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// EndEvent Activity.

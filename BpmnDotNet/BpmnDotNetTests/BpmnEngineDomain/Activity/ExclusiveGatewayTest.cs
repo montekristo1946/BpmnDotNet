@@ -63,13 +63,13 @@ public class ExclusiveGatewayTest
     [InlineData("gateway_2", null)]
     [InlineData("gateway_3", "   ")]
     public void GetRouteFlow_WhenConditionNameIsNullOrWhitespace_ThrowsInvalidDataException(
-        string idCurrentNode, string conditionName)
+        string idCurrentNode, string? conditionName)
     {
         // Arrange
         var context = Substitute.For<IContextBpmnProcess>();
         
         var conditionRoute = new ConcurrentDictionary<string, string>();
-        conditionRoute.TryAdd(idCurrentNode, conditionName);
+        conditionRoute.TryAdd(idCurrentNode, conditionName!);
         context.ConditionRoute.Returns(conditionRoute);
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         var gateway = new ExclusiveGateway(Substitute.For<ILogger<ExclusiveGateway>>(), handler, _fixture.Create<string>());

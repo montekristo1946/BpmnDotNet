@@ -107,7 +107,7 @@ public class ReceiveTaskTest
         string currentId)
     {
         // Arrange
-        processModel.FlowsByTarget.TryAdd(currentId, null);
+        processModel.FlowsByTarget.TryAdd(currentId, null!);
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
@@ -381,7 +381,7 @@ public class ReceiveTaskTest
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null, nodeStateRegistry,[]));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null!, nodeStateRegistry,[]));
     }
 
     [Theory]
@@ -389,7 +389,6 @@ public class ReceiveTaskTest
     internal async Task ExecuteAsync_WhenActivityHandlerIsNull_ThrowsArgumentNullException(
         [Frozen] ILogger<ReceiveTask> logger,
         [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
-        [Frozen] ConcurrentDictionary<string, object> receivedMessage,
         ProcessModel processModel,
         IContextBpmnProcess context,
         string currentId)

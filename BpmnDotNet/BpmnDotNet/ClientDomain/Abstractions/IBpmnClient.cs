@@ -13,8 +13,8 @@ public interface IBpmnClient : IAsyncDisposable
     ///     Запуск процесса.
     /// </summary>
     /// <param name="context"><see cref="IContextBpmnProcess"/>.</param>
-    /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
-    /// <returns><see cref="BusinessProcessJobStatus"/></returns>
+    /// <param name="cancellationToken"><see cref="CancellationToken"/>.</param>
+    /// <returns><see cref="BusinessProcessJobStatus"/>.</returns>
     public Task<BusinessProcessJobStatus> StartNewProcessAsync(IContextBpmnProcess context, CancellationToken cancellationToken);
 
     /// <summary>

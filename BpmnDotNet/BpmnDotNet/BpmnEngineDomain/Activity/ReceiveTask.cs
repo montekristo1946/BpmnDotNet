@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace BpmnDotNet.BpmnEngineDomain.Activity;
 
+using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Dto;
@@ -118,7 +117,6 @@ internal class ReceiveTask : IBpmnNode
             statusBpmnEngine = StatusNode.FailedCompleted;
             errorRegistry[Id] = e.Message;
         }
-
 
         nodeStateRegistry[Id] = statusBpmnEngine;
         return new BpmnNodeResult()

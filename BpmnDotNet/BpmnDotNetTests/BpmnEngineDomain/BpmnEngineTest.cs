@@ -341,7 +341,7 @@ public class BpmnEngineTest
             Substitute.For<IHistoryNodeStateWriter>());
         var semaphoreField = typeof(BpmnEngine).GetField("_semaphore",
             BindingFlags.NonPublic | BindingFlags.Instance);
-        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut);
+        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut)!;
         Assert.NotNull(semaphore);
 
         var context = Substitute.For<IContextBpmnProcess>();
@@ -374,7 +374,7 @@ public class BpmnEngineTest
             Substitute.For<IHistoryNodeStateWriter>());
         var semaphoreField = typeof(BpmnEngine).GetField("_semaphore",
             BindingFlags.NonPublic | BindingFlags.Instance);
-        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut);
+        var semaphore = (SemaphoreSlim)semaphoreField!.GetValue(sut)!;
         Assert.NotNull(semaphore);
 
         var context = Substitute.For<IContextBpmnProcess>();

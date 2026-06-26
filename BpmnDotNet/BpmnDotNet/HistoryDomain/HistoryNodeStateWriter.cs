@@ -66,7 +66,6 @@ internal class HistoryNodeStateWriter : IHistoryNodeStateWriter
             ArrayMessageErrors = errorRegistry.Values.ToArray(),
         };
 
-
         var resSetData = await _elasticClient.SetDataAsync(historyNodeState);
 
         if (resSetData is false)

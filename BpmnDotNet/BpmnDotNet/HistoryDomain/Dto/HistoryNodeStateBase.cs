@@ -1,6 +1,6 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.HistoryDomain.Dto;
+
+using BpmnDotNet.Dto;
 
 /// <summary>
 ///     Dto -отвечающая за историю отработки блоков.
