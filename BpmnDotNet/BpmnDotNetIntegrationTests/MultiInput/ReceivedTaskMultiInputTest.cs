@@ -119,7 +119,6 @@ public class ReceivedTaskMultiInputTest : IDisposable
 
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
-        await Task.Delay(TimeSpan.FromMilliseconds(500), cts.Token);
         
         bpmnClient.SendMessage(
             contextData.IdBpmnProcess,

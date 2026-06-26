@@ -436,13 +436,14 @@ public class BpmnEngineTest
         var semaphoreField = typeof(BpmnEngine).GetField("_semaphore",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         Assert.NotNull(semaphoreField);
-        var semaphore = (SemaphoreSlim)semaphoreField.GetValue(engine);
+        var semaphore = (SemaphoreSlim)semaphoreField.GetValue(engine)!;
         Assert.NotNull(semaphore);
 
         semaphore.Release();
+        var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         // Act
-        await engine.ThreadBackground(processModel, context, cts.Token);
+        await engine.ThreadBackground(processModel, context, startSignal,cts.Token);
 
         // Assert
         await engine.Received(1).RunEventLoopAsync(
@@ -512,12 +513,13 @@ public class BpmnEngineTest
         var semaphoreField = typeof(BpmnEngine).GetField("_semaphore",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         Assert.NotNull(semaphoreField);
-        var semaphore = (SemaphoreSlim)semaphoreField.GetValue(engine);
+        var semaphore = (SemaphoreSlim)semaphoreField.GetValue(engine)!;
         Assert.NotNull(semaphore);
         semaphore.Release();
+        var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         // Act
-        await engine.ThreadBackground(processModel, context, cts.Token);
+        await engine.ThreadBackground(processModel, context,startSignal, cts.Token);
 
         // Assert
         logger.Received(1).Log(

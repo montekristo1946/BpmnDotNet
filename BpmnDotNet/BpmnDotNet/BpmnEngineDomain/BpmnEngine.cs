@@ -44,7 +44,7 @@ internal class BpmnEngine : IBpmnEngine
 
 
     /// <inheritdoc/>
-    public Task<BusinessProcessJobStatus> StartProcessAsync(
+    public async Task<BusinessProcessJobStatus> StartProcessAsync(
         IContextBpmnProcess contextBpmnProcess,
         ProcessModel processModel,
         CancellationToken externalCt)
@@ -67,10 +67,12 @@ internal class BpmnEngine : IBpmnEngine
         CreateStartToken(processModel);
         _semaphore.Release();
         _timeInitInstanse = DateTime.Now.Ticks;
+        var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         _threadBackground = Task.Run(
-            () => ThreadBackground(processModel, contextBpmnProcess, _ctsBpmnEngine.Token),
+            () => ThreadBackground(processModel, contextBpmnProcess, startSignal,_ctsBpmnEngine.Token),
             _ctsBpmnEngine.Token);
 
+        await startSignal.Task;
         var jobStatus = new BusinessProcessJobStatus
         {
             IdBpmnProcess = contextBpmnProcess.IdBpmnProcess,
@@ -79,7 +81,7 @@ internal class BpmnEngine : IBpmnEngine
             Process = this,
         };
 
-        return Task.FromResult(jobStatus);
+        return jobStatus;
     }
 
     /// <inheritdoc/>
@@ -170,17 +172,22 @@ internal class BpmnEngine : IBpmnEngine
     /// </summary>
     /// <param name="processModel"><see cref="ProcessModel"/>.</param>
     /// <param name="contextBpmnProcess"><see cref="IContextBpmnProcess"/>.</param>
+    /// <param name="startSignal"><see cref="TaskCompletionSource"/>.</param>
     /// <param name="ctsToken"><see cref="CancellationToken"/>.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     internal async Task ThreadBackground(
         ProcessModel processModel,
         IContextBpmnProcess contextBpmnProcess,
+        TaskCompletionSource startSignal,
         CancellationToken ctsToken)
     {
         _logger.LogDebug(
             "[BpmnEngine:ThreadBackground] Starting business process... {IdBpmnProcess} {TokenProcess}",
             contextBpmnProcess.IdBpmnProcess,
             contextBpmnProcess.TokenProcess);
+
+        // сообщаем вызывающему потоку, что мы запустились
+        startSignal.TrySetResult();
 
         ConcurrentDictionary<string, StatusNode> stateRegistry = new();
         ConcurrentDictionary<string, string> errorRegistry = new();
