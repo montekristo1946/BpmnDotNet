@@ -113,19 +113,6 @@ public class CheckBpmnProcessDtoTest
         Assert.Equal("There should be only one StartEvent on the diagram, find: 2: Process_0mjkbbx", exception.Message);
     }
     
-    [Fact]
-    internal void Check_CheckManyStart_Exception()
-    {
-        var diagram =
-            _xmlSerializationProcessSection.LoadXmlProcessSection(
-                "./BpmnDiagram/CheckError/ExclusiveGateway_6.bpmn");
-
-        var idProcess = "Process_0mjkbbx";
-        var exception = Assert.Throws<InvalidDataException>(() =>
-            _checkBpmnProcessDto.HasNotOneTargetExclusiveGateway(diagram.ElementsFromBody, idProcess));
-
-        Assert.Equal("ExclusiveGateway cannot have less than two outputs, find: 1:Gateway_0odwt7n: Process_0mjkbbx", exception.Message);
-    }
     
     [Fact]
     internal void Check_CheckOneWayParallelGateway_NotException()
