@@ -277,7 +277,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.AllBpmnProcessCompleted, result.Status);
+        Assert.Equal(StatusNode.NormalCompleted, result.Status);
         Assert.NotEmpty(result.Tokens);
         await handler.Received(1).Invoke(context, Arg.Any<CancellationToken>());
     }
@@ -647,7 +647,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.True(nodeStateRegistry.ContainsKey(currentId));
-        Assert.Equal(StatusNode.AllBpmnProcessCompleted, nodeStateRegistry[currentId]);
+        Assert.Equal(StatusNode.NormalCompleted, nodeStateRegistry[currentId]);
 
         if (nextNodes.Length > 0)
         {

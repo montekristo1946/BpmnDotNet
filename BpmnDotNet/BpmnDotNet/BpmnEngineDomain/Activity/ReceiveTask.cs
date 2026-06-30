@@ -78,7 +78,7 @@ internal class ReceiveTask : IBpmnNode
             if (!isCheckMessage)
             {
                 _logger.LogDebug(
-                    "[ReceiveTask:ExecuteAsync]Message not found, IdNode:{Id}; {IdBpmnProcess}:{TokenProcess}",
+                    "[ReceiveTask:ExecuteAsync] Message not found, IdNode:{Id}; {IdBpmnProcess}:{TokenProcess}",
                     Id,
                     context.IdBpmnProcess,
                     context.TokenProcess);
@@ -109,7 +109,7 @@ internal class ReceiveTask : IBpmnNode
                 nodeStateRegistry[nexFlow.IdFlow] = StatusNode.NormalCompleted;
             }
 
-            statusBpmnEngine = StatusNode.AllBpmnProcessCompleted;
+            statusBpmnEngine = StatusNode.NormalCompleted;
         }
         catch (Exception e)
         {
