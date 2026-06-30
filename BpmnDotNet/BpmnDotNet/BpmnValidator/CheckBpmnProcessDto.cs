@@ -15,8 +15,9 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         var idBpmn = bpmnProcess.IdBpmnProcess;
         HasStartAndEndEvents(elementsFromBody, idBpmn);
         HasOneTarget(elementsFromBody, idBpmn);
+        HasStartAndEndEvents(elementsFromBody, idBpmn);
+        HasOneStartEven(elementsFromBody, idBpmn);
     }
-
 
     /// <summary>
     /// Элементы с одним выходом.
@@ -54,15 +55,6 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         }
     }
 
-    private bool CheckTargetPathOneWay(string id, SequenceFlowComponent[] flows)
-    {
-        var countSource = flows.Count(p => p.SourceId == id);
-
-        const int countValide = 1;
-
-        return countSource == countValide;
-    }
-
     /// <summary>
     /// Проверить что на схеме есть start even и  endEvent.
     /// </summary>
@@ -82,5 +74,30 @@ internal class CheckBpmnProcessDto : ICheckBpmnProcessDto
         {
             throw new InvalidDataException($"Not EndEvent element found {typeof(EndEventComponent)}: {idBpmn}");
         }
+    }
+
+    /// <summary>
+    /// На схеме должен быть один startEvent.
+    /// </summary>
+    /// <param name="elements"><see cref="IElement"/>.</param>
+    /// <param name="idBpmn">id bpmn.</param>
+    /// <exception cref="NotImplementedException"><see cref="NotImplementedException"/>.</exception>
+    internal void HasOneStartEven(IElement[] elements, string idBpmn)
+    {
+        const int countValide = 1;
+        var count = elements.OfType<StartEventComponent>().Count();
+        if (count != countValide)
+        {
+            throw new InvalidDataException($"There should be only one StartEvent on the diagram, find: {count}: {idBpmn}");
+        }
+    }
+
+    private bool CheckTargetPathOneWay(string id, SequenceFlowComponent[] flows)
+    {
+        var countSource = flows.Count(p => p.SourceId == id);
+
+        const int countValide = 1;
+
+        return countSource == countValide;
     }
 }

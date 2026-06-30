@@ -119,13 +119,13 @@ public class ReceivedTaskMultiInputTest : IDisposable
 
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
-
+        
         bpmnClient.SendMessage(
             contextData.IdBpmnProcess,
             contextData.TokenProcess,
             typeof(MessageExampleFirst),
             new MessageExampleFirst());
-
+      
         await taskNode.ProcessTask;
         
         Assert.True(taskNode.Process.IsProcessCancel);

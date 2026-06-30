@@ -1,8 +1,6 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.Abstractions.Handlers;
 
-using BpmnDotNet.Abstractions.Elements;
+using BpmnDotNet.Dto;
 
 /// <summary>
 ///     Сериализатор в объектный вид процесс выполнения.

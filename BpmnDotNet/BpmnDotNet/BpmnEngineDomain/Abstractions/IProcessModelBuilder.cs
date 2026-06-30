@@ -1,11 +1,10 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.BpmnEngineDomain.Abstractions;
 
 using System.Collections.Concurrent;
 using BpmnDotNet.Abstractions.Context;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.BpmnEngineDomain.Dto;
+using BpmnDotNet.Dto;
 
 /// <summary>
 /// Строитель ProcessModel.

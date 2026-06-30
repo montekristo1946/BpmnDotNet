@@ -3,7 +3,6 @@ namespace BpmnDotNet.BpmnEngineDomain.Handlers;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using BpmnDotNet.Abstractions.Context;
-using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
 using BpmnDotNet.BpmnEngineDomain.Abstractions;
 using BpmnDotNet.BpmnEngineDomain.Activity;
@@ -16,7 +15,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<ProcessModelBuilder> _logger;
-
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProcessModelBuilder"/> class.
@@ -43,28 +41,28 @@ internal class ProcessModelBuilder : IProcessModelBuilder
                     CreateSequenceFlow(flow, handlers, processModel);
                     break;
                 case StartEventComponent component:
-                    CreateGenericActivity<StartEventComponent, StartEvent>(component, handlers, processModel);
+                    CreateGenericActivity<StartEvent>(component.IdElement, handlers, processModel);
                     break;
                 case EndEventComponent component:
-                    CreateGenericActivity<EndEventComponent, EndEvent>(component, handlers, processModel);
+                    CreateGenericActivity<EndEvent>(component.IdElement, handlers, processModel);
                     break;
                 case ExclusiveGatewayComponent component:
-                    CreateGenericActivity<ExclusiveGatewayComponent, ExclusiveGateway>(component, handlers, processModel);
+                    CreateGenericActivity<ExclusiveGateway>(component.IdElement, handlers, processModel);
                     break;
                 case ParallelGatewayComponent component:
-                    CreateGenericActivity<ParallelGatewayComponent, ParallelGateway>(component, handlers, processModel);
+                    CreateGenericActivity<ParallelGateway>(component.IdElement, handlers, processModel);
                     break;
                 case ReceiveTaskComponent component:
-                    CreateGenericActivity<ReceiveTaskComponent, ReceiveTask>(component, handlers, processModel);
+                    CreateGenericActivity<ReceiveTask>(component.IdElement, handlers, processModel);
                     break;
                 case SendTaskComponent component:
-                    CreateGenericActivity<SendTaskComponent, SendTask>(component, handlers, processModel);
+                    CreateGenericActivity<SendTask>(component.IdElement, handlers, processModel);
                     break;
                 case ServiceTaskComponent component:
-                    CreateGenericActivity<ServiceTaskComponent, ServiceTask>(component, handlers, processModel);
+                    CreateGenericActivity<ServiceTask>(component.IdElement, handlers, processModel);
                     break;
                 case SubProcessComponent component:
-                    CreateGenericActivity<SubProcessComponent, SubProcess>(component, handlers, processModel);
+                    CreateGenericActivity<SubProcess>(component.IdElement, handlers, processModel);
                     break;
                 default:
                     throw new ArgumentException($"Unknown element type: {element.GetType()}");
@@ -80,33 +78,6 @@ internal class ProcessModelBuilder : IProcessModelBuilder
             processModel.FlowsByTarget.AddOrUpdate(kvp.Key, _ => kvp.Value, (key, oldMessage) => kvp.Value));
 
         return processModel;
-    }
-
-    // TODO: Протестить что будет если TDestination не будет соответствовать интерфейсу, возможно завернуть в try cath.
-    private void CreateGenericActivity<TSource,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDestination>(
-        TSource source,
-        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
-        ProcessModel processModel)
-        where TSource : IElement
-        where TDestination : IBpmnNode
-    {
-        var id = source.IdElement;
-
-        var res = handlers.TryGetValue(id, out var handler);
-
-        if (!res || handler is null)
-        {
-            _logger.LogDebug(
-                "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
-            handler = MoqHandler;
-        }
-
-        var logger = _loggerFactory.CreateLogger<TDestination>();
-
-        var bpmnNode = (IBpmnNode)Activator.CreateInstance(typeof(TDestination), logger, handler, id)!;
-
-        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
     }
 
     /// <summary>
@@ -139,6 +110,36 @@ internal class ProcessModelBuilder : IProcessModelBuilder
                 group => group.Select(flow => new DirectionFlow(flow.Id, flow.SourceId)).ToArray());
 
         return sourceIndex;
+    }
+
+    /// <summary>
+    ///  Динамически создаст Activity.
+    /// </summary>
+    /// <param name="id">Id элемента.</param>
+    /// <param name="handlers">Func handlers.</param>
+    /// <param name="processModel"><see cref="ProcessModel"/>.</param>
+    /// <typeparam name="TDestination"><see cref="IBpmnNode"/>.</typeparam>
+    internal void CreateGenericActivity<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDestination>(
+        string id,
+        ConcurrentDictionary<string, Func<IContextBpmnProcess, CancellationToken, Task>> handlers,
+        ProcessModel processModel)
+        where TDestination : IBpmnNode
+    {
+        var res = handlers.TryGetValue(id, out var handler);
+
+        if (!res || handler is null)
+        {
+            _logger.LogDebug(
+                "[ProcessModelBuilder:CreateGenericActivity] Unknown get handlers; Id: {IdElement}", id);
+            handler = MoqHandler;
+        }
+
+        var logger = _loggerFactory.CreateLogger<TDestination>();
+
+        var bpmnNode = (IBpmnNode)Activator.CreateInstance(typeof(TDestination), logger, handler, id)!;
+
+        processModel.Nodes.AddOrUpdate(id, _ => bpmnNode, (key, oldMessage) => bpmnNode);
     }
 
     private void CreateSequenceFlow(

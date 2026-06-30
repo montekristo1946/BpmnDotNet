@@ -1,8 +1,6 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.BpmnValidator.Abstractions;
 
-using BpmnDotNet.BpmnEngineDomain.Dto;
+using BpmnDotNet.Dto;
 
 /// <summary>
 /// Проверка Bpmn в объектном виде.

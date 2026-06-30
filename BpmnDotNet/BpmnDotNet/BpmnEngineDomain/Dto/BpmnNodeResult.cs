@@ -14,4 +14,4 @@ internal record BpmnNodeResult()
     /// Gets статус выполнения.
     /// </summary>
     public StatusNode Status { get; init; } = StatusNode.None;
-};
+}

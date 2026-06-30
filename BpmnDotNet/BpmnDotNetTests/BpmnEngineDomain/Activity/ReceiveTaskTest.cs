@@ -107,7 +107,7 @@ public class ReceiveTaskTest
         string currentId)
     {
         // Arrange
-        processModel.FlowsByTarget.TryAdd(currentId, null);
+        processModel.FlowsByTarget.TryAdd(currentId, null!);
 
         var handler = (Func<IContextBpmnProcess, CancellationToken, Task>)((_, _) => Task.CompletedTask);
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
@@ -277,7 +277,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(StatusNode.AllBpmnProcessCompleted, result.Status);
+        Assert.Equal(StatusNode.NormalCompleted, result.Status);
         Assert.NotEmpty(result.Tokens);
         await handler.Received(1).Invoke(context, Arg.Any<CancellationToken>());
     }
@@ -381,7 +381,7 @@ public class ReceiveTaskTest
         var sut = Substitute.ForPartsOf<ReceiveTask>(logger, handler, currentId);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null, nodeStateRegistry,[]));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(processModel, null!, nodeStateRegistry,[]));
     }
 
     [Theory]
@@ -389,7 +389,6 @@ public class ReceiveTaskTest
     internal async Task ExecuteAsync_WhenActivityHandlerIsNull_ThrowsArgumentNullException(
         [Frozen] ILogger<ReceiveTask> logger,
         [Frozen] ConcurrentDictionary<string, StatusNode> nodeStateRegistry,
-        [Frozen] ConcurrentDictionary<string, object> receivedMessage,
         ProcessModel processModel,
         IContextBpmnProcess context,
         string currentId)
@@ -648,7 +647,7 @@ public class ReceiveTaskTest
 
         // Assert
         Assert.True(nodeStateRegistry.ContainsKey(currentId));
-        Assert.Equal(StatusNode.AllBpmnProcessCompleted, nodeStateRegistry[currentId]);
+        Assert.Equal(StatusNode.NormalCompleted, nodeStateRegistry[currentId]);
 
         if (nextNodes.Length > 0)
         {

@@ -1,11 +1,10 @@
-using BpmnDotNet.Dto;
-
 namespace BpmnDotNet.Handlers;
 
 using System.Xml;
 using BpmnDotNet.Abstractions.Elements;
 using BpmnDotNet.Abstractions.Handlers;
 using BpmnDotNet.BPMNDiagram.BpmnNatation;
+using BpmnDotNet.Dto;
 
 /// <inheritdoc />
 internal class XmlSerializationProcessSection : IXmlSerializationProcessSection
