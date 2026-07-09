@@ -52,7 +52,7 @@ internal class SampleService
 
     public void StartNewProcess(DateTime dataTimeProcess)
     {
-        var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var contextData = CreateContextData(1,dataTimeProcess);
         _bpmnClient.StartNewProcessAsync(contextData, cts.Token).Wait(cts.Token);
         
