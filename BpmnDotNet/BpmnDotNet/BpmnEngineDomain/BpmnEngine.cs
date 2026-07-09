@@ -138,11 +138,14 @@ internal class BpmnEngine : IBpmnEngine
                 }
                 catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is OperationCanceledException))
                 {
-                    _logger.LogInformation("[BpmnEngine:DisposeAsync] Background thread successfully cancelled (AggregateException).");
+                    _logger.LogInformation(
+                        "[BpmnEngine:DisposeAsync] Background thread successfully cancelled (AggregateException).");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "[BpmnEngine:DisposeAsync] Background thread terminated with an unhandled exception.");
+                    _logger.LogError(
+                        ex,
+                        "[BpmnEngine:DisposeAsync] Background thread terminated with an unhandled exception.");
                 }
             }
         }
@@ -215,6 +218,11 @@ internal class BpmnEngine : IBpmnEngine
                 {
                     break;
                 }
+            }
+
+            if (_eventQueue.Count > 0)
+            {
+                throw new InvalidOperationException("[BpmnEngine:ThreadBackground] Not all nodes were processed");
             }
         }
         catch (OperationCanceledException)
@@ -320,11 +328,6 @@ internal class BpmnEngine : IBpmnEngine
             }
 
             nodes.Tokens.ToList().ForEach(eventQueue.Enqueue);
-        }
-
-        if (eventQueue.Count > 0)
-        {
-            throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] Not all nodes were processed");
         }
 
         return false;
