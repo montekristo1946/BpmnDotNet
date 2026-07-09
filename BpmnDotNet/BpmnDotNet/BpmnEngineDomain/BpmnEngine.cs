@@ -132,10 +132,17 @@ internal class BpmnEngine : IBpmnEngine
                 {
                     await _threadBackground.WaitAsync(TimeSpan.FromSeconds(5));
                 }
-                catch (AggregateException ex) when (
-                    ex.InnerExceptions.All(e => e is OperationCanceledException))
+                catch (OperationCanceledException)
                 {
-                    _logger.LogWarning("[BpmnEngine:Dispose] OperationCanceledException");
+                    _logger.LogInformation("[BpmnEngine:DisposeAsync] Background thread successfully cancelled.");
+                }
+                catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is OperationCanceledException))
+                {
+                    _logger.LogInformation("[BpmnEngine:DisposeAsync] Background thread successfully cancelled (AggregateException).");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[BpmnEngine:DisposeAsync] Background thread terminated with an unhandled exception.");
                 }
             }
         }
@@ -219,7 +226,7 @@ internal class BpmnEngine : IBpmnEngine
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "[BpmnEngine:ThreadBackground] Exception");
+            _logger.LogError(e, "[BpmnEngine:ThreadBackground] Exception:");
             var idProcess = $"{contextBpmnProcess.IdBpmnProcess}_{contextBpmnProcess.TokenProcess}";
             stateRegistry[idProcess] = StatusNode.FailedCompleted;
             errorRegistry[idProcess] = e.Message;
@@ -236,7 +243,7 @@ internal class BpmnEngine : IBpmnEngine
         }
 
         _logger.LogDebug(
-            "[BpmnEngine:ThreadBackground] End business... {IdBpmnProcess} {TokenProcess}",
+            "[BpmnEngine:ThreadBackground] End business process: {IdBpmnProcess} TokenProcess:{TokenProcess}",
             contextBpmnProcess.IdBpmnProcess,
             contextBpmnProcess.TokenProcess);
     }
@@ -259,17 +266,19 @@ internal class BpmnEngine : IBpmnEngine
         ConcurrentQueue<Token> eventQueue,
         CancellationToken ctsToken)
     {
-        while (eventQueue.Count > 0 && !ctsToken.IsCancellationRequested)
+        while (!ctsToken.IsCancellationRequested && eventQueue.TryDequeue(out var token))
         {
-            var resGetToken = eventQueue.TryDequeue(out var token);
-            if (!resGetToken || token == null)
+            if (token == null)
             {
-                _logger.LogError("[BpmnEngine:RunEventLoopAsync] No events queued");
-                return false;
+                _logger.LogError($"[BpmnEngine:RunEventLoopAsync] EventLoop null.");
+                continue;
             }
 
             var currentId = token.CurrentNodeId;
-            _logger.LogDebug("[BpmnEngine:RunEventLoopAsync] Init Current Id: {CurrentId}", currentId);
+            _logger.LogDebug(
+                "[BpmnEngine:RunEventLoopAsync] Init Current Id: {CurrentId}; Tocken:{TokenProcess}",
+                currentId,
+                contextBpmnProcess.TokenProcess);
 
             var node = processModel.Nodes[currentId];
             nodeStateRegistry[currentId] = StatusNode.Works;
@@ -287,6 +296,12 @@ internal class BpmnEngine : IBpmnEngine
                 nodeStateRegistry,
                 errorRegistry,
                 ctsToken);
+
+            _logger.LogDebug(
+                "[BpmnEngine:RunEventLoopAsync] End Current Id: {CurrentId}; Tocken:{TokenProcess}",
+                currentId,
+                contextBpmnProcess.TokenProcess);
+
             if (nodes is null)
             {
                 throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] ExecuteAsync returned null.");
@@ -305,6 +320,11 @@ internal class BpmnEngine : IBpmnEngine
             }
 
             nodes.Tokens.ToList().ForEach(eventQueue.Enqueue);
+        }
+
+        if (eventQueue.Count > 0)
+        {
+            throw new InvalidOperationException("[BpmnEngine:RunEventLoopAsync] Not all nodes were processed");
         }
 
         return false;

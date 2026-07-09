@@ -98,6 +98,7 @@ public class ServiceTaskMultiInputTest: IDisposable
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var taskNode = await bpmnClient.StartNewProcessAsync(contextData, cts.Token);
         await taskNode.ProcessTask;
+        await taskNode.Process.DisposeAsync();
         
         Assert.True(taskNode.Process.IsProcessCancel);
     }
